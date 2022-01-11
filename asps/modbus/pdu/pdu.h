@@ -9,7 +9,7 @@
 
 #include <cstdint>
 
-#include <asps/modbus/coil.h>
+#include <asps/modbus/semantic/coils.h>
 
 namespace asps {
 namespace modbus {
@@ -41,9 +41,10 @@ protected:
 };
 
 // Modbus Exception PDU
-class excep_pdu
-  : public pdu
+class excep_pdu : public pdu
 {
+  enum { exception_id = 0x80 };
+
 public:
   enum exception_codes {
     illegal_function = 0x01,
@@ -58,14 +59,12 @@ public:
   };
 
   excep_pdu(uint8_t function_code, uint8_t exception_code)
-    : pdu(function_code | exception_id_),
+    : pdu(function_code | exception_id),
       exception_code_(exception_code)
     {}
   ~excep_pdu() {}
 
 private:
-  const static uint8_t exception_id_ = 0x80;
-
   uint8_t exception_code_;
 };
 

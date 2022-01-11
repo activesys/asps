@@ -2,11 +2,8 @@
 # Use of this source code is governed by a MIT license that can be
 # found in the LICENSE file. See the AUTHORS file for names of contributors.
 
-# Build chat
-add_subdirectory(chat)
+##################################
+# Build chat demos executable
+add_executable(chat_client chat_client.cc)
+target_link_libraries(chat_client aschat)
 
-# Build modbus
-add_subdirectory(modbus)
-
-# Build iec60870
-# add_subdirectory(iec60870)

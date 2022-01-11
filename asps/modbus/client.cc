@@ -9,10 +9,6 @@
 namespace asps {
 namespace modbus {
 
-void client::read_coils(const coils& c)
-{
-
-}
 
 } // namespace modbus
 } // namespace asps

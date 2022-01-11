@@ -9,8 +9,10 @@ enable_testing()
 ##################################
 # Set sources for modbus
 set(ASPS_MODBUS_TEST_SOURCES
-    coils_test.cc
-    registers_test.cc
+    config_test.cc
+    semantic/access_model_test.cc
+    semantic/coils_test.cc
+    semantic/registers_test.cc
 )
 
 ##################################

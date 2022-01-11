@@ -22,13 +22,15 @@ configure_file(
 ##################################
 # Set sources for modbus
 set(ASPS_MODBUS_SOURCES
-    coils.cc
-    registers.cc
     client.cc
     server.cc
+    semantic/coils.cc
+    semantic/registers.cc
     session/session.cc
     pdu/pdu.cc
+    pdu/pdu_seq.cc
     adu/tcp_adu.cc
+    adu/tcp_adu_seq.cc
 )
 
 ##################################

@@ -37,10 +37,17 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 ###############################
 # Checking include files
 include(CheckIncludeFile)
-check_include_file("stdint.h" HAVE_STDINT_H)
+check_include_file("netinet/in.h" HAVE_NETINET_IN_H)
 
 ##################################
-# Checking third-party libraries
+# Checking boost libraries
+find_package(Boost REQUIRED COMPONENTS system)
+if (Boost_FOUND)
+  include_directories(${Boost_INCLUDE_DIRS})
+  if (${CMAKE_BUILD_TYPE} MATCHES "Debug")
+    add_definitions(-DBOOST_ASIO_ENABLE_HANDLER_TRACKING)
+  endif()
+endif()
 
 ##################################
 # Build libraries
@@ -53,3 +60,7 @@ pkg_search_module(GTEST gtest_main)
 if (GTEST_FOUND)
   add_subdirectory(test)
 endif (GTEST_FOUND)
+
+##################################
+# Build demos
+add_subdirectory(demos)

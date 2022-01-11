@@ -7,7 +7,7 @@
 #ifndef ASPS_MODBUS_CLIENT_H
 #define ASPS_MODBUS_CLIENT_H
 
-#include <asps/modbus/coils.h>
+#include <asps/modbus/semantic/coils.h>
 
 namespace asps {
 namespace modbus {
@@ -20,7 +20,6 @@ public:
   ~client() {}
 
 public:
-  void read_coils(const coils& cs);
 
 private:
 };

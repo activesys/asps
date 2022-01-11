@@ -1,0 +1,10 @@
+// Copyright (c) 2021 The asps Authors. All rights reserved.
+// Use of this source code is governed by a MIT license that can be
+// found in the LICENSE file. See the AUTHORS file for names of contributors.
+//
+// Version for ASPS Chat
+
+#define ASPS_CHAT_VERSION       @ASPS_CHAT_VERSION@
+#define ASPS_CHAT_VERSION_MAJOR @ASPS_CHAT_VERSION_MAJOR@
+#define ASPS_CHAT_VERSION_MINOR @ASPS_CHAT_VERSION_MINOR@
+#define ASPS_CHAT_VERSION_PATCH @ASPS_CHAT_VERSION_PATCH@
