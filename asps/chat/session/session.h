@@ -10,11 +10,12 @@
 #include <cstdint>
 #include <string>
 #include <memory>
+#include <set>
 #include <unordered_map>
 #include <vector>
 #include <boost/asio.hpp>
 
-#include <asps/chat/notify.h>
+#include <asps/chat/event.h>
 #include <asps/chat/msg/chat_seq.h>
 
 namespace asps {
@@ -33,30 +34,65 @@ private:
 };
 
 // Chat Client Session
+class client_session;
+typedef std::shared_ptr<client_session> client_session_ptr;
+
 class client_session
 {
 public:
-  client_session(tcp::socket& sock, client_notify& notify)
+  client_session(tcp::socket& sock, client_event* event)
     : socket_(sock),
-      notify_(notify)
+      event_(event)
   {}
 
 public:
-  uint16_t send_msg(const std::string& msg);
-  void receive_msg();
+  uint16_t send(const std::string& msg);
+  void start();
 
 private:
   void do_read_header();
   void do_read_body(uint16_t msg_len);
 
 private:
-  std::unordered_map<uint16_t, client_seq_ptr> seqs;
+  std::unordered_map<uint16_t, client_seq_ptr> seqs_;
   tcp::socket& socket_;
   std::vector<uint8_t> buffer_;
-  client_notify& notify_;
+  client_event* event_;
 };
 
-typedef std::shared_ptr<client_session> client_session_ptr;
+// Chat Server Session
+class server_session;
+typedef std::shared_ptr<server_session> server_session_ptr;
+typedef std::set<server_session_ptr> server_session_set_type;
+
+class server_session : public std::enable_shared_from_this<server_session>
+{
+public:
+  server_session(
+    tcp::socket socket,
+    server_session_set_type& session_set,
+    server_event* event)
+    : socket_(std::move(socket)),
+      session_set_(session_set),
+      event_(event),
+      seq_(event)
+  {}
+
+public:
+  void start();
+
+private:
+  void do_read_header();
+  void do_read_body(uint16_t msg_len);
+  void do_send(chat_msg& msg);
+
+private:
+  tcp::socket socket_;
+  server_session_set_type& session_set_;
+  std::vector<uint8_t> buffer_;
+  server_seq seq_;
+  server_event* event_;
+};
 
 } // namespace chat
 } // namespace asps

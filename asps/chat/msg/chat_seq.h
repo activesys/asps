@@ -12,7 +12,7 @@
 #include <memory>
 #include <functional>
 
-#include <asps/chat/notify.h>
+#include <asps/chat/event.h>
 #include <asps/chat/msg/chat_msg.h>
 
 namespace asps {
@@ -22,9 +22,9 @@ namespace chat {
 class client_seq
 {
 public:
-  client_seq(uint16_t chat_id, client_notify& notify)
+  client_seq(uint16_t chat_id, client_event* event)
     : chat_id_(chat_id),
-      notify_(notify)
+      event_(event)
   {}
 
 public:
@@ -34,10 +34,25 @@ public:
 private:
   uint16_t chat_id_;
   chat_msg msg_;
-  client_notify& notify_;
+  client_event* event_;
 };
 
 typedef std::shared_ptr<client_seq> client_seq_ptr;
+
+// Chat Server Sequence
+class server_seq
+{
+public:
+  explicit server_seq(server_event* event)
+    : event_(event)
+  {}
+
+public:
+  chat_msg response(chat_msg& req_msg);
+
+private:
+  server_event* event_;
+};
 
 } // namespace chat
 } // namespace asps

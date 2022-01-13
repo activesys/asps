@@ -11,26 +11,45 @@
 using namespace asps::chat;
 
 // Chat Client
-bool client::connect()
+void client::register_event(client_event* event)
+{
+  event_ = event;
+}
+
+void client::async_connect()
 {
   boost::system::error_code ec;
-  boost::asio::connect(socket_, endpoints_, ec);
-  if (!ec) {
-    session_ = std::make_shared<client_session>(socket_, notify_);
-    session_->receive_msg();
-    t_ = std::thread([this]{context_.run();});
-  }
+  boost::asio::async_connect(
+    socket_,
+    endpoint_,
+    [this](boost::system::error_code ec, tcp::resolver::endpoint_type endpoint)
+    {
+      if (ec) {
+        if (event_) {
+          event_->on_connect(ec.message());
+        }
+      } else {
+        session_ = std::make_shared<client_session>(socket_, event_);
+        session_->start();
 
-  return !ec;
+        if (event_) {
+          event_->on_connect(endpoint.address().to_string(), endpoint.port());
+        }
+      }
+    });
 }
 
 void client::close()
 {
   socket_.close();
-  t_.join();
 }
 
-uint16_t client::send(const std::string& msg)
+uint16_t client::async_send(const std::string& msg)
 {
-  return session_->send_msg(msg);
+  return session_->send(msg);
+}
+
+void client::run()
+{
+  context_.run();
 }

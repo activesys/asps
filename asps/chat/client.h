@@ -7,12 +7,11 @@
 #ifndef ASPS_CHAT_CLIENT_H
 #define ASPS_CHAT_CLIENT_H
 
-#include <functional>
 #include <string>
 #include <thread>
 #include <boost/asio.hpp>
 
-#include <asps/chat/notify.h>
+#include <asps/chat/event.h>
 #include <asps/chat/session/session.h>
 
 namespace asps {
@@ -24,29 +23,33 @@ using boost::asio::ip::tcp;
 class client
 {
 public:
-  client(const std::string& host, uint16_t port, client_notify notify)
+  client(const std::string& host, uint16_t port)
     : context_(),
       socket_(context_),
-      notify_(notify)
+      event_(nullptr)
   {
     tcp::resolver resolver(context_);
-    endpoints_ = resolver.resolve(host, std::to_string(port));
+    endpoint_ = resolver.resolve(host, std::to_string(port));
   }
-  ~client() {}
+  ~client()
+  {
+    delete event_;
+  }
 
 public:
-  bool connect();
+  // Async interface
+  void register_event(client_event* event);
+  void async_connect();
+  uint16_t async_send(const std::string& msg);
+  void run();
   void close();
-
-  uint16_t send(const std::string& msg);
 
 private:
   boost::asio::io_context context_;
   tcp::socket socket_;
-  tcp::resolver::results_type endpoints_;
-  std::thread t_;
+  tcp::resolver::results_type endpoint_;
   client_session_ptr session_;
-  client_notify notify_;
+  client_event* event_;
 };
 
 } // namespace chat
