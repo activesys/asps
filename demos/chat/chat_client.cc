@@ -5,7 +5,7 @@
 // Demo Chat Client.
 
 #include <iostream>
-#include <asps/chat/client.h>
+#include <asps/chat/chat.h>
 
 using namespace asps::chat;
 

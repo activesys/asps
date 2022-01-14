@@ -22,11 +22,11 @@ configure_file(
 ##################################
 # Set sources for CHAT
 set(ASPS_CHAT_SOURCES
-    client.cc
-    server.cc
+    api/client.cc
+    api/server.cc
     session/session.cc
-    msg/chat_seq.cc
-    msg/chat_msg.cc
+    sequence/chat_seq.cc
+    message/chat_msg.cc
 )
 
 ##################################

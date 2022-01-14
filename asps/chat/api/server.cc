@@ -4,7 +4,7 @@
 //
 // Chat Server.
 
-#include <asps/chat/server.h>
+#include <asps/chat/api/server.h>
 
 using namespace asps::chat;
 

@@ -6,7 +6,7 @@
 
 #include <cstring>
 #include <netinet/in.h>
-#include <asps/chat/msg/chat_msg.h>
+#include <asps/chat/message/chat_msg.h>
 
 using namespace asps::chat;
 

@@ -15,8 +15,8 @@
 #include <vector>
 #include <boost/asio.hpp>
 
-#include <asps/chat/event.h>
-#include <asps/chat/msg/chat_seq.h>
+#include <asps/chat/api/event.h>
+#include <asps/chat/sequence/chat_seq.h>
 
 namespace asps {
 namespace chat {

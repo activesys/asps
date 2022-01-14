@@ -4,7 +4,7 @@
 //
 // Chat Sequence.
 
-#include <asps/chat/msg/chat_seq.h>
+#include <asps/chat/sequence/chat_seq.h>
 
 using namespace asps::chat;
 

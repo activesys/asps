@@ -4,8 +4,8 @@
 //
 // Chat Message.
 
-#ifndef ASPS_CHAT_MSG_CHATMSG_H
-#define ASPS_CHAT_MSG_CHATMSG_H
+#ifndef ASPS_CHAT_MESSAGE_CHATMSG_H
+#define ASPS_CHAT_MESSAGE_CHATMSG_H
 
 #include <cstdint>
 #include <string>
@@ -56,4 +56,4 @@ private:
 } // namespace chat
 } // namespace asps
 
-#endif // ASPS_CHAT_MSG_CHATMSG_H
+#endif // ASPS_CHAT_MESSAGE_CHATMSG_H

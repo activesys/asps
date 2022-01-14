@@ -4,14 +4,14 @@
 //
 // Chat Client.
 
-#ifndef ASPS_CHAT_CLIENT_H
-#define ASPS_CHAT_CLIENT_H
+#ifndef ASPS_CHAT_API_CLIENT_H
+#define ASPS_CHAT_API_CLIENT_H
 
 #include <string>
 #include <thread>
 #include <boost/asio.hpp>
 
-#include <asps/chat/event.h>
+#include <asps/chat/api/event.h>
 #include <asps/chat/session/session.h>
 
 namespace asps {
@@ -55,4 +55,4 @@ private:
 } // namespace chat
 } // namespace asps
 
-#endif // ASPS_CHAT_CLIENT_H
+#endif // ASPS_CHAT_API_CLIENT_H

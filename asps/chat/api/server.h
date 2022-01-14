@@ -4,13 +4,13 @@
 //
 // Chat Server.
 
-#ifndef ASPS_CHAT_SERVER_H
-#define ASPS_CHAT_SERVER_H
+#ifndef ASPS_CHAT_API_SERVER_H
+#define ASPS_CHAT_API_SERVER_H
 
 #include <cstdint>
 #include <boost/asio.hpp>
 
-#include <asps/chat/event.h>
+#include <asps/chat/api/event.h>
 #include <asps/chat/session/session.h>
 
 namespace asps {
@@ -43,4 +43,4 @@ private:
 } // namespace chat
 } // namespace asps
 
-#endif // ASPS_CHAT_SERVER_H
+#endif // ASPS_CHAT_API_SERVER_H

@@ -4,8 +4,8 @@
 //
 // Chat Event.
 
-#ifndef ASPS_CHAT_EVENT_H
-#define ASPS_CHAT_EVENT_H
+#ifndef ASPS_CHAT_API_EVENT_H
+#define ASPS_CHAT_API_EVENT_H
 
 #include <cstdint>
 #include <string>
@@ -58,4 +58,4 @@ protected:
 } // namespace chat
 } // namespace asps
 
-#endif // ASPS_CHAT_EVENT_H
+#endif // ASPS_CHAT_API_EVENT_H

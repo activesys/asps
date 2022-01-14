@@ -4,16 +4,16 @@
 //
 // Chat Sequence.
 
-#ifndef ASPS_CHAT_MSG_CHATSEQ_H
-#define ASPS_CHAT_MSG_CHATSEQ_H
+#ifndef ASPS_CHAT_SEQUENCE_CHATSEQ_H
+#define ASPS_CHAT_SEQUENCE_CHATSEQ_H
 
 #include <cstdint>
 #include <string>
 #include <memory>
 #include <functional>
 
-#include <asps/chat/event.h>
-#include <asps/chat/msg/chat_msg.h>
+#include <asps/chat/api/event.h>
+#include <asps/chat/message/chat_msg.h>
 
 namespace asps {
 namespace chat {
@@ -57,4 +57,4 @@ private:
 } // namespace chat
 } // namespace asps
 
-#endif // ASPS_CHAT_MSG_CHATSEQ_H
+#endif // ASPS_CHAT_SEQUENCE_CHATSEQ_H

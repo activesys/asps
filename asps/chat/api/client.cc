@@ -6,7 +6,7 @@
 
 #include <memory>
 #include <boost/bind.hpp>
-#include <asps/chat/client.h>
+#include <asps/chat/api/client.h>
 
 using namespace asps::chat;
 
