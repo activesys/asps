@@ -17,8 +17,8 @@ namespace modbus {
 class coils : public read_write_model<bool>
 {
 public:
-  coils(uint16_t starting_address, uint16_t count, bool* statuses)
-    : read_write_model(starting_address, count, statuses)
+  coils(uint16_t starting_address, uint16_t count, bool* status)
+    : read_write_model(starting_address, count, status)
   {}
 };
 
@@ -27,8 +27,8 @@ class discrete_inputs : public read_only_model<bool>
 {
 public:
   discrete_inputs(
-    uint16_t starting_address, uint16_t count, const bool* statuses)
-    : read_only_model(starting_address, count, statuses)
+    uint16_t starting_address, uint16_t count, const bool* status)
+    : read_only_model(starting_address, count, status)
   {}
 };
 

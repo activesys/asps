@@ -22,15 +22,15 @@ configure_file(
 ##################################
 # Set sources for modbus
 set(ASPS_MODBUS_SOURCES
-    client.cc
-    server.cc
+    api/client.cc
+    api/server.cc
     semantic/coils.cc
     semantic/registers.cc
-    session/session.cc
-    pdu/pdu.cc
-    pdu/pdu_seq.cc
-    adu/tcp_adu.cc
-    adu/tcp_adu_seq.cc
+    session/client_session.cc
+    pdu/message/pdu.cc
+    pdu/sequence/pdu_sequence.cc
+    adu/message/tcp_adu.cc
+    adu/sequence/tcp_adu_sequence.cc
 )
 
 ##################################
@@ -41,4 +41,8 @@ set_target_properties(asmodbus
     VERSION     ${ASPS_MODBUS_VERSION_TEXT}
     SOVERSION   ${ASPS_MODBUS_SOVERSION_TEXT}
 )
-target_link_libraries(asmodbus)
+target_link_libraries(asmodbus Boost::system pthread)
+
+##################################
+# Install library
+#install(asmodbus  LIBRARY DESTINATION lib)

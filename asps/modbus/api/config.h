@@ -4,8 +4,8 @@
 //
 // Modbus Config.
 
-#ifndef ASPS_MODBUS_CONFIG_H
-#define ASPS_MODBUS_CONFIG_H
+#ifndef ASPS_MODBUS_API_CONFIG_H
+#define ASPS_MODBUS_API_CONFIG_H
 
 #include <cstdint>
 #include <algorithm>
@@ -121,10 +121,9 @@ uint16_t config::quantity_of_write_coils_ =
   config::max_quantity_of_write_coils;
 uint16_t config::quantity_of_write_registers_ =
   config::max_quantity_of_write_registers;
-uint16_t config::quantity_of_concurrent_requests_ =
-  config::max_quantity_of_concurrent_requests;
+uint16_t config::quantity_of_concurrent_requests_ = 1;
 
 } // namespace modbus
 } // namespace asps
 
-#endif // ASPS_MODBUS_CONFIG_H
+#endif // ASPS_MODBUS_API_CONFIG_H

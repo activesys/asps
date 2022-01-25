@@ -52,6 +52,10 @@ public:
     return datas_[address - starting_address_];
   }
 
+  uint16_t starting_address() const {return starting_address_;}
+  uint16_t count() const {return count_;}
+
+public:
   static void split(
     const read_only_model& model, uint16_t count, std::deque<ptr_type>& models)
   {
@@ -118,6 +122,10 @@ public:
     return datas_[address - starting_address_];
   }
 
+  uint16_t starting_address() const {return starting_address_;}
+  uint16_t count() const {return count_;}
+
+public:
   static void split(
     const read_write_model& model, uint16_t count, std::deque<ptr_type>& models)
   {

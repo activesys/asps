@@ -2,13 +2,13 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file. See the AUTHORS file for names of contributors.
 //
-// Chat Client.
+// Modbus Client.
 
-#include <asps/chat/api/client.h>
+#include <asps/modbus/api/client.h>
 
-using namespace asps::chat;
+using namespace asps::modbus;
 
-// Chat Client
+// Modbus Client
 void client::register_event(client_event* event)
 {
   event_ = event;
@@ -42,12 +42,12 @@ void client::close()
   socket_.close();
 }
 
-uint16_t client::async_send(const std::string& msg)
-{
-  return session_->send(msg);
-}
-
 void client::run()
 {
   context_.run();
+}
+
+void client::read_coils(uint8_t unit_identifier, const coils& cs)
+{
+  session_->read_coils(unit_identifier, cs);
 }

@@ -5,7 +5,7 @@
 // Unit test for Modbus config.
 
 #include <gtest/gtest.h>
-#include <asps/modbus/config.h>
+#include <asps/modbus/api/config.h>
 
 namespace asps_test {
 namespace modbus_test {
@@ -90,8 +90,7 @@ TEST(config_test, quantity_of_write_registers)
 TEST(config_test, quantity_of_concurrent_requests)
 {
   EXPECT_EQ(
-    config::quantity_of_concurrent_requests(),
-    config::max_quantity_of_concurrent_requests);
+    config::quantity_of_concurrent_requests(), 1);
   config::quantity_of_concurrent_requests(0x0d);
   EXPECT_EQ(config::quantity_of_concurrent_requests(), 0x0d);
   config::quantity_of_concurrent_requests(

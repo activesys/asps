@@ -2,27 +2,29 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file. See the AUTHORS file for names of contributors.
 //
-// Chat Client.
+// Modbus Client.
 
-#ifndef ASPS_CHAT_API_CLIENT_H
-#define ASPS_CHAT_API_CLIENT_H
+#ifndef ASPS_MODBUS_API_CLIENT_H
+#define ASPS_MODBUS_API_CLIENT_H
 
+#include <cstdint>
 #include <string>
 #include <boost/asio.hpp>
 
-#include <asps/chat/api/event.h>
-#include <asps/chat/session/session.h>
+#include <asps/modbus/api/event.h>
+#include <asps/modbus/session/client_session.h>
+#include <asps/modbus/semantic/coils.h>
 
 namespace asps {
-namespace chat {
+namespace modbus {
 
 using boost::asio::ip::tcp;
 
-// Chat client
+// Modbus Client
 class client
 {
 public:
-  client(const std::string& host, uint16_t port)
+  client(const std::string& host, uint16_t port = 502)
     : context_(),
       socket_(context_),
       event_(nullptr)
@@ -36,19 +38,20 @@ public:
   // Async interface
   void register_event(client_event* event);
   void async_connect();
-  uint16_t async_send(const std::string& msg);
   void run();
   void close();
+
+  void read_coils(uint8_t unit_identifier, const coils& cs);
 
 private:
   boost::asio::io_context context_;
   tcp::socket socket_;
   tcp::resolver::results_type endpoint_;
-  client_session_ptr session_;
   client_event* event_;
+  client_session_ptr session_;
 };
 
-} // namespace chat
+} // namespace modbus
 } // namespace asps
 
-#endif // ASPS_CHAT_API_CLIENT_H
+#endif // ASPS_MODBUS_API_CLIENT_H
