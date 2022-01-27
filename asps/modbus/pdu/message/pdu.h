@@ -39,7 +39,7 @@ public:
     write_single_register = 0x06,
     write_multiple_coils = 0x0f,
     write_multiple_registers = 0x10,
-    invalid_pdu = 0x7f
+    invalid_pdu = 0x64  // user defined function code
   };
 
 public:
@@ -47,6 +47,9 @@ public:
     : function_code_(function_code)
   {}
   virtual ~pdu() {}
+
+public:
+  uint8_t function_code() {return function_code_;}
 
 public:
   virtual uint8_t* serialize() = 0;
@@ -106,6 +109,9 @@ public:
 public:
   uint8_t* serialize() override;
   std::size_t serialized_size() override;
+
+  uint16_t starting_address() {return starting_address_;}
+  uint16_t quantity_of_coils() {return quantity_of_coils_;}
 
 public:
   static pdu_ptr unserialize(const uint8_t* buffer);

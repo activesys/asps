@@ -12,7 +12,7 @@
 #include <boost/asio.hpp>
 
 #include <asps/modbus/api/event.h>
-#include <asps/modbus/session/client_session.h>
+#include <asps/modbus/session/session.h>
 #include <asps/modbus/semantic/coils.h>
 
 namespace asps {

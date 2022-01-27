@@ -43,6 +43,22 @@ private:
 
 typedef std::shared_ptr<tcp_adu_client_sequence> tcp_adu_client_sequence_ptr;
 
+// Modbus TCP ADU Server sequence
+class tcp_adu_server_sequence
+{
+public:
+  tcp_adu_server_sequence(server_event* event)
+    : event_(event)
+  {}
+
+public:
+  tcp_adu set_request(tcp_adu& adu);
+
+private:
+  server_event* event_;
+  pdu_server_sequence_ptr pdu_sequence_;
+};
+
 } // namespace modbus
 } // namespace asps
 

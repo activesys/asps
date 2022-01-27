@@ -28,7 +28,7 @@ pdu_ptr pdu::unserialize(const uint8_t* buffer, bool is_request)
 
     default:
       // We make an invalid pdu exception pdu
-      return std::make_shared<excep_pdu>(invalid_pdu, success);
+      return std::make_shared<excep_pdu>(invalid_pdu, server_device_failure);
       break;
     }
   }

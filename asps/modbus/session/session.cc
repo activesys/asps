@@ -7,7 +7,7 @@
 #include <deque>
 #include <sstream>
 #include <asps/modbus/api/config.h>
-#include <asps/modbus/session/client_session.h>
+#include <asps/modbus/session/session.h>
 #include <asps/modbus/adu/message/tcp_adu.h>
 
 using namespace asps::modbus;
@@ -109,4 +109,64 @@ void client_session::send_read_coils_request()
       }
     }
   }
+}
+
+// Chat Server Session
+void server_session::start()
+{
+  session_set_.insert(shared_from_this());
+  read_mbap_header();
+}
+
+void server_session::read_mbap_header()
+{
+  buffer_.resize(tcp_adu::mbap_header_size());
+  boost::asio::async_read(
+    socket_,
+    boost::asio::buffer(buffer_.data(), buffer_.size()),
+    [this](boost::system::error_code ec, std::size_t /* length */)
+    {
+      if (!ec) {
+        read_pdu(tcp_adu::pdu_size(buffer_));
+      } else if (ec == boost::asio::error::eof) {
+        session_set_.erase(shared_from_this());
+      } else if (event_) {
+        event_->on_error(ec.message());
+      }
+    });
+}
+
+void server_session::read_pdu(uint16_t length)
+{
+  buffer_.resize(tcp_adu::mbap_header_size() + length);
+  boost::asio::async_read(
+    socket_,
+    boost::asio::buffer(buffer_.data() + tcp_adu::mbap_header_size(), length),
+    [this](boost::system::error_code ec, std::size_t /* length */)
+    {
+      if (!ec) {
+        tcp_adu request = tcp_adu::unserialize(buffer_, false);
+        tcp_adu_server_sequence sequence(event_);
+        tcp_adu response = sequence.set_request(request);
+        boost::asio::async_write(
+          socket_,
+          boost::asio::buffer(response.serialize(), response.serialized_size()),
+          [this](boost::system::error_code ec, std::size_t /* length */)
+          {
+            if (ec == boost::asio::error::eof) {
+              session_set_.erase(shared_from_this());
+            } else if (ec && event_) {
+              event_->on_error(ec.message());
+            }
+          });
+
+        if (socket_.is_open()) {
+          read_mbap_header();
+        }
+      } else if (ec == boost::asio::error::eof) {
+        session_set_.erase(shared_from_this());
+      } else if (event_) {
+        event_->on_error(ec.message());
+      }
+    });
 }

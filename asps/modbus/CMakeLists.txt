@@ -26,7 +26,7 @@ set(ASPS_MODBUS_SOURCES
     api/server.cc
     semantic/coils.cc
     semantic/registers.cc
-    session/client_session.cc
+    session/session.cc
     pdu/message/pdu.cc
     pdu/sequence/pdu_sequence.cc
     adu/message/tcp_adu.cc

@@ -11,6 +11,7 @@
 #include <memory>
 #include <vector>
 #include <unordered_map>
+#include <unordered_set>
 
 #include <boost/asio.hpp>
 
@@ -55,6 +56,37 @@ private:
 };
 
 typedef std::shared_ptr<client_session> client_session_ptr;
+
+// Modbus Server Session
+class server_session;
+typedef std::shared_ptr<server_session> server_session_ptr;
+typedef std::unordered_set<server_session_ptr> server_session_set_type;
+
+class server_session : public std::enable_shared_from_this<server_session>
+{
+public:
+  server_session(
+    tcp::socket socket,
+    server_session_set_type& session_set,
+    server_event* event)
+    : socket_(std::move(socket)),
+      session_set_(session_set),
+      event_(event)
+  {}
+
+public:
+  void start();
+
+private:
+  void read_mbap_header();
+  void read_pdu(uint16_t length);
+
+private:
+  tcp::socket socket_;
+  server_session_set_type& session_set_;
+  std::vector<uint8_t> buffer_;
+  server_event* event_;
+};
 
 } // namespace modbus
 } // namespace asps

@@ -5,6 +5,7 @@
 // Modbus Server.
 
 #include <asps/modbus/api/server.h>
+#include <asps/modbus/session/session.h>
 
 using namespace asps::modbus;
 
@@ -23,10 +24,8 @@ void server::async_listen()
         if (event_) {
           event_->on_accept(endpoint.address().to_string(), endpoint.port());
         }
-        /*
         std::make_shared<server_session>(
           std::move(socket), sessions_, event_)->start();
-          */
       }
 
       async_listen();

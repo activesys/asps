@@ -55,6 +55,10 @@ public:
 
   virtual void on_error(const std::string& error_message) = 0;
 
+public:
+  virtual coils::ptr_type on_read_coils(
+    uint16_t starting_address, uint16_t quantity_of_coils);
+
 protected:
   server& modbus_server;
 };

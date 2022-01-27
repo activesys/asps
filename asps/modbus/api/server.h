@@ -11,6 +11,7 @@
 #include <boost/asio.hpp>
 
 #include <asps/modbus/api/event.h>
+#include <asps/modbus/session/session.h>
 
 namespace asps {
 namespace modbus {
@@ -37,6 +38,7 @@ private:
   boost::asio::io_context context_;
   tcp::acceptor acceptor_;
   server_event* event_;
+  server_session_set_type sessions_;
 };
 
 } // namespace modbus

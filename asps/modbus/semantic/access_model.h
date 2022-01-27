@@ -12,7 +12,8 @@
 #include <deque>
 #include <memory>
 #include <stdexcept>
-#include <boost/core/noncopyable.hpp>
+
+#include <asps/modbus/semantic/exception.h>
 
 namespace asps {
 namespace modbus {
@@ -31,7 +32,8 @@ public:
   read_only_model(uint16_t starting_address, uint16_t count, const T* datas)
     : starting_address_(starting_address),
       count_(count),
-      datas_(datas)
+      datas_(datas),
+      code_(success)
   {}
   virtual ~read_only_model() {}
 
@@ -54,6 +56,8 @@ public:
 
   uint16_t starting_address() const {return starting_address_;}
   uint16_t count() const {return count_;}
+  exception_code code() const {return code_;}
+  void code(exception_code code) {code_ = code;}
 
 public:
   static void split(
@@ -67,7 +71,8 @@ public:
     }
   }
 
-private:
+protected:
+  exception_code code_;
   uint16_t starting_address_;
   uint16_t count_;
   const T* datas_;
@@ -86,7 +91,8 @@ public:
   read_write_model(uint16_t starting_address, uint16_t count, T* datas)
     : starting_address_(starting_address),
       count_(count),
-      datas_(datas)
+      datas_(datas),
+      code_(success)
   {}
   virtual ~read_write_model() {};
 
@@ -124,6 +130,8 @@ public:
 
   uint16_t starting_address() const {return starting_address_;}
   uint16_t count() const {return count_;}
+  exception_code code() const {return code_;}
+  void code(exception_code code) {code_ = code;}
 
 public:
   static void split(
@@ -137,7 +145,8 @@ public:
     }
   }
 
-private:
+protected:
+  exception_code code_;
   uint16_t starting_address_;
   uint16_t count_;
   T* datas_;

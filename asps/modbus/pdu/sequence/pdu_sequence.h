@@ -34,12 +34,11 @@ protected:
 
 typedef std::shared_ptr<pdu_client_sequence> pdu_client_sequence_ptr;
 
-// Modbus read coils request pdu client sequence
-class read_coils_request_pdu_client_sequence
-  : public pdu_client_sequence
+// Modbus read coils pdu client sequence
+class read_coils_pdu_client_sequence : public pdu_client_sequence
 {
 public:
-  read_coils_request_pdu_client_sequence(
+  read_coils_pdu_client_sequence(
     const coils::ptr_type cs,
     client_event* event)
     : pdu_client_sequence(event),
@@ -54,7 +53,47 @@ public:
   coils::ptr_type coils_;
 };
 
-// Modbus 
+// Modbus PDU Server Sequence
+class pdu_server_sequence
+{
+public:
+  pdu_server_sequence(server_event* event)
+    : event_(event)
+  {}
+  virtual ~pdu_server_sequence() {}
+
+public:
+  virtual pdu_ptr set_request(pdu_ptr pdu) = 0;
+
+protected:
+  server_event* event_;
+};
+
+typedef std::shared_ptr<pdu_server_sequence> pdu_server_sequence_ptr;
+
+// Modbus read coils pdu server sequence
+class read_coils_pdu_server_sequence : public pdu_server_sequence
+{
+public:
+  read_coils_pdu_server_sequence(server_event* event)
+    : pdu_server_sequence(event)
+  {}
+
+public:
+  pdu_ptr set_request(pdu_ptr pdu) override;
+};
+
+// Modbus invalid pdu server sequence
+class invalid_pdu_server_sequence : public pdu_server_sequence
+{
+public:
+  invalid_pdu_server_sequence(server_event* event)
+    : pdu_server_sequence(event)
+  {}
+
+public:
+  pdu_ptr set_request(pdu_ptr pdu) override;
+};
 
 } // namespace modbus
 } // namespace asps
