@@ -145,7 +145,7 @@ void server_session::read_pdu(uint16_t length)
     [this](boost::system::error_code ec, std::size_t /* length */)
     {
       if (!ec) {
-        tcp_adu request = tcp_adu::unserialize(buffer_, false);
+        tcp_adu request = tcp_adu::unserialize(buffer_, true);
         tcp_adu_server_sequence sequence(event_);
         tcp_adu response = sequence.set_request(request);
         boost::asio::async_write(

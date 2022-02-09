@@ -133,7 +133,7 @@ uint8_t* read_coils_response::serialize()
   // ecnode coils status
   for (uint8_t i = 0; i < coils_status_.size(); ++i) {
     uint8_t value = coils_status_.at(i);
-    pos[i/8] = value << i % 8;
+    pos[i/8] |= value << i % 8;
   }
   pos += byte_count_;
 
@@ -239,7 +239,7 @@ uint8_t* write_multiple_coils_request::serialize()
   // encode output values
   for (uint8_t i = 0; i < quantity_of_outputs_; ++i) {
     uint8_t value = outputs_value_[i];
-    pos[i/8] = value << i % 8;
+    pos[i/8] != value << i % 8;
   }
   pos += byte_count_;
 
