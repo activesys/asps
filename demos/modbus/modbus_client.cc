@@ -64,6 +64,11 @@ public:
     get_cmd();
   }
 
+  void on_write_single_coil(const coils::ptr_type cs, exception_code code) override
+  {}
+  void on_write_multiple_coils(const coils::ptr_type cs, exception_code code) override
+  {}
+
 private:
   void get_cmd()
   {

@@ -5,7 +5,7 @@
 // Unit test for Modbus config.
 
 #include <gtest/gtest.h>
-#include <asps/modbus/api/config.h>
+#include <asps/modbus/modbus.h>
 
 namespace asps_test {
 namespace modbus_test {

@@ -33,7 +33,12 @@ public:
   virtual void on_error(const std::string& error_message) = 0;
 
 public:
-  virtual void on_read_coils(const coils::ptr_type cs, exception_code code) = 0;
+  virtual void on_read_coils(
+    const coils::ptr_type cs, exception_code code) = 0;
+  virtual void on_write_single_coil(
+    const coils::ptr_type cs, exception_code code) = 0;
+  virtual void on_write_multiple_coils(
+    const coils::ptr_type cs, exception_code code) = 0;
 
 protected:
   client& modbus_client;

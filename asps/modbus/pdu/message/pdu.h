@@ -175,12 +175,18 @@ public:
   std::size_t serialized_size() override;
 
 public:
+  uint16_t output_address() {return output_address_;}
+  bool output_value() {return output_value_;}
+
+public:
   static pdu_ptr unserialize(const uint8_t* buffer);
 
 private:
   uint16_t output_address_;
   bool output_value_;
 };
+
+typedef write_single_coil_request write_single_coil_response;
 
 // Modbus Write Multiple Coils
 class write_multiple_coils_request : public pdu
@@ -209,6 +215,11 @@ public:
   std::size_t serialized_size() override;
 
 public:
+  uint16_t starting_address() {return starting_address_;}
+  uint16_t quantity_of_outputs() {return quantity_of_outputs_;}
+  const coils_type& outputs_value() {return outputs_value_;}
+
+public:
   static pdu_ptr unserialize(const uint8_t* buffer);
 
 private:
@@ -216,6 +227,38 @@ private:
   uint16_t quantity_of_outputs_;
   coils_type outputs_value_;
   uint8_t byte_count_;
+};
+
+class write_multiple_coils_response : public pdu
+{
+  enum {
+    starting_address_field_length = 2,
+    quantity_of_outputs_field_length = 2
+  };
+
+public:
+  write_multiple_coils_response(
+    uint16_t starting_address, uint16_t quantity_of_outputs)
+    : pdu(write_multiple_coils),
+      starting_address_(starting_address),
+      quantity_of_outputs_(quantity_of_outputs)
+  {}
+  ~write_multiple_coils_response() {}
+
+public:
+  uint8_t* serialize() override;
+  std::size_t serialized_size() override;
+
+public:
+  uint16_t starting_address() {return starting_address_;}
+  uint16_t quantity_of_outputs() {return quantity_of_outputs_;}
+
+public:
+  static pdu_ptr unserialize(const uint8_t* buffer);
+
+private:
+  uint16_t starting_address_;
+  uint16_t quantity_of_outputs_;
 };
 
 } // namespace modbus

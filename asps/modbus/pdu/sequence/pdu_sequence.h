@@ -25,7 +25,7 @@ public:
   virtual ~pdu_client_sequence() {}
 
 public:
-  virtual pdu_ptr get_request(bool is_read) = 0;
+  virtual pdu_ptr get_request() = 0;
   virtual void set_response(pdu_ptr pdu) = 0;
 
 protected:
@@ -46,10 +46,48 @@ public:
   {}
 
 public:
-  pdu_ptr get_request(bool is_read) override;
+  pdu_ptr get_request() override;
   void set_response(pdu_ptr pdu) override;
 
+private:
+  coils::ptr_type coils_;
+};
+
+// Modbus write single coil pdu client sequence
+class write_single_coil_pdu_client_sequence : public pdu_client_sequence
+{
 public:
+  write_single_coil_pdu_client_sequence(
+    const coils::ptr_type cs,
+    client_event* event)
+    : pdu_client_sequence(event),
+      coils_(cs)
+  {}
+
+public:
+  pdu_ptr get_request() override;
+  void set_response(pdu_ptr pdu) override;
+
+private:
+  coils::ptr_type coils_;
+};
+
+// Modbus write multiple coils pdu client sequence
+class write_multiple_coils_pdu_client_sequence : public pdu_client_sequence
+{
+public:
+  write_multiple_coils_pdu_client_sequence(
+    const coils::ptr_type cs,
+    client_event* event)
+    : pdu_client_sequence(event),
+      coils_(cs)
+  {}
+
+public:
+  pdu_ptr get_request() override;
+  void set_response(pdu_ptr pdu) override;
+
+private:
   coils::ptr_type coils_;
 };
 

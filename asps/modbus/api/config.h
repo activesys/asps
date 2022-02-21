@@ -108,21 +108,6 @@ private:
   static uint16_t quantity_of_concurrent_requests_;
 };
 
-// Initialize config
-uint16_t config::quantity_of_coils_ =
-  config::max_quantity_of_coils;
-uint16_t config::quantity_of_discrete_inputs_ =
-  config::max_quantity_of_discrete_inputs;
-uint16_t config::quantity_of_holding_registers_ =
-  config::max_quantity_of_holding_registers;
-uint16_t config::qunatity_of_input_registers_ =
-  config::max_quantity_of_input_registers;
-uint16_t config::quantity_of_write_coils_ =
-  config::max_quantity_of_write_coils;
-uint16_t config::quantity_of_write_registers_ =
-  config::max_quantity_of_write_registers;
-uint16_t config::quantity_of_concurrent_requests_ = 1;
-
 } // namespace modbus
 } // namespace asps
 

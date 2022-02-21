@@ -9,17 +9,19 @@ enable_testing()
 ##################################
 # Set sources for modbus
 set(ASPS_MODBUS_TEST_SOURCES
-    config_test.cc
+    api/config_test.cc
     semantic/access_model_test.cc
     semantic/coils_test.cc
     semantic/registers_test.cc
+    pdu/message/pdu_test.cc
+    pdu/message/pdu_sequence_test.cc
 )
 
 ##################################
 # Build test executable
 add_executable(asmodbus_test ${ASPS_MODBUS_TEST_SOURCES})
-target_link_libraries(asmodbus_test ${GTEST_LDFLAGS})
-target_compile_options(asmodbus_test PUBLIC ${GTEST_CFLAGS})
+target_link_libraries(asmodbus_test ${GTEST_LDFLAGS} ${GMOCK_LDFLAGS} asmodbus)
+target_compile_options(asmodbus_test PUBLIC ${GTEST_CFLAGS} ${GMOCK_CFLAGS})
 
 ##################################
 # Discover test case

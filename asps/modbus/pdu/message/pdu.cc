@@ -19,12 +19,18 @@ pdu_ptr pdu::unserialize(const uint8_t* buffer, bool is_request)
   } else {
     switch (function_code) {
     case read_coils:
-      if (is_request) {
-        return read_coils_request::unserialize(buffer);
-      } else {
-        return read_coils_response::unserialize(buffer);
-      }
+      return is_request ? read_coils_request::unserialize(buffer) :
+                          read_coils_response::unserialize(buffer);
       break;
+
+    case write_single_coil:
+      return is_request ? write_single_coil_request::unserialize(buffer) :
+                          write_single_coil_response::unserialize(buffer);
+      break;
+
+    case write_multiple_coils:
+      return is_request ? write_multiple_coils_request::unserialize(buffer) :
+                          write_multiple_coils_response::unserialize(buffer);
 
     default:
       // We make an invalid pdu exception pdu
@@ -239,7 +245,7 @@ uint8_t* write_multiple_coils_request::serialize()
   // encode output values
   for (uint8_t i = 0; i < quantity_of_outputs_; ++i) {
     uint8_t value = outputs_value_[i];
-    pos[i/8] != value << i % 8;
+    pos[i/8] |= value << i % 8;
   }
   pos += byte_count_;
 
@@ -274,4 +280,47 @@ pdu_ptr write_multiple_coils_request::unserialize(const uint8_t* buffer)
 
   return std::make_shared<write_multiple_coils_request>(
            starting_address, quantity_of_outputs, outputs_value);
+}
+
+std::size_t write_multiple_coils_response::serialized_size()
+{
+  return function_code_field_length +
+         starting_address_field_length +
+         quantity_of_outputs_field_length;
+}
+
+uint8_t* write_multiple_coils_response::serialize()
+{
+  buffer_.resize(serialized_size());
+  uint8_t* pos = buffer_.data();
+  // encode function code
+  *pos = function_code_;
+  pos += function_code_field_length;
+  // encode starting address
+  *reinterpret_cast<uint16_t*>(pos) = htons(starting_address_);
+  pos += starting_address_field_length;
+  // encode quantity of outputs
+  *reinterpret_cast<uint16_t*>(pos) = htons(quantity_of_outputs_);
+  pos += quantity_of_outputs_field_length;
+
+  return buffer_.data();
+}
+
+pdu_ptr write_multiple_coils_response::unserialize(const uint8_t* buffer)
+{
+  const uint8_t* pos = buffer;
+  // decode function code
+  uint8_t function_code = *pos;
+  pos += function_code_field_length;
+  // decode starting address
+  uint16_t starting_address =
+    ntohs(*reinterpret_cast<uint16_t*>(const_cast<uint8_t*>(pos)));
+  pos += starting_address_field_length;
+  // decode quantity of outputs
+  uint16_t quantity_of_outputs =
+    ntohs(*reinterpret_cast<uint16_t*>(const_cast<uint8_t*>(pos)));
+  pos += quantity_of_outputs_field_length;
+
+  return std::make_shared<write_multiple_coils_response>(
+           starting_address, quantity_of_outputs);
 }

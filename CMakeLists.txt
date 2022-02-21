@@ -57,9 +57,10 @@ add_subdirectory(asps)
 # Build testing
 find_package(PkgConfig)
 pkg_search_module(GTEST gtest_main)
-if (GTEST_FOUND)
+pkg_search_module(GMOCK gmock_main)
+if (GTEST_FOUND AND GMOCK_FOUND)
   add_subdirectory(test)
-endif (GTEST_FOUND)
+endif (GTEST_FOUND AND GMOCK_FOUND)
 
 ##################################
 # Build demos

@@ -13,7 +13,7 @@ tcp_adu tcp_adu_client_sequence::get_request(const coils::ptr_type cs)
 {
   pdu_sequence_ =
     std::make_shared<read_coils_pdu_client_sequence>(cs, event_);
-  pdu_ptr pdu = pdu_sequence_->get_request(true);
+  pdu_ptr pdu = pdu_sequence_->get_request();
 
   return tcp_adu(transaction_identifier_, unit_identifier_, pdu);
 }
