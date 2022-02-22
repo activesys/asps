@@ -25,8 +25,8 @@ public:
   virtual ~pdu_client_sequence() {}
 
 public:
-  virtual pdu_ptr get_request() = 0;
-  virtual void set_response(pdu_ptr pdu) = 0;
+  virtual mb_pdu::pointer_type get_request() = 0;
+  virtual void set_response(mb_pdu::pointer_type pdu) = 0;
 
 protected:
   client_event* event_;
@@ -46,8 +46,8 @@ public:
   {}
 
 public:
-  pdu_ptr get_request() override;
-  void set_response(pdu_ptr pdu) override;
+  mb_pdu::pointer_type get_request() override;
+  void set_response(mb_pdu::pointer_type pdu) override;
 
 private:
   coils::ptr_type coils_;
@@ -65,8 +65,8 @@ public:
   {}
 
 public:
-  pdu_ptr get_request() override;
-  void set_response(pdu_ptr pdu) override;
+  mb_pdu::pointer_type get_request() override;
+  void set_response(mb_pdu::pointer_type pdu) override;
 
 private:
   coils::ptr_type coils_;
@@ -84,16 +84,32 @@ public:
   {}
 
 public:
-  pdu_ptr get_request() override;
-  void set_response(pdu_ptr pdu) override;
+  mb_pdu::pointer_type get_request() override;
+  void set_response(mb_pdu::pointer_type pdu) override;
 
 private:
   coils::ptr_type coils_;
 };
 
+// Modbus invalid pdu client sequence
+class invalid_pdu_client_sequence : public pdu_client_sequence
+{
+public:
+  invalid_pdu_client_sequence(client_event* event)
+    : pdu_client_sequence(event)
+  {}
+
+public:
+  mb_pdu::pointer_type get_request() override;
+  void set_response(mb_pdu::pointer_type pdu) override;
+};
+
 // Modbus PDU Server Sequence
 class pdu_server_sequence
 {
+public:
+  typedef std::shared_ptr<pdu_server_sequence> pointer_type;
+
 public:
   pdu_server_sequence(server_event* event)
     : event_(event)
@@ -101,13 +117,11 @@ public:
   virtual ~pdu_server_sequence() {}
 
 public:
-  virtual pdu_ptr set_request(pdu_ptr pdu) = 0;
+  virtual mb_pdu::pointer_type set_request(mb_pdu::pointer_type pdu) = 0;
 
 protected:
   server_event* event_;
 };
-
-typedef std::shared_ptr<pdu_server_sequence> pdu_server_sequence_ptr;
 
 // Modbus read coils pdu server sequence
 class read_coils_pdu_server_sequence : public pdu_server_sequence
@@ -118,7 +132,31 @@ public:
   {}
 
 public:
-  pdu_ptr set_request(pdu_ptr pdu) override;
+  mb_pdu::pointer_type set_request(mb_pdu::pointer_type pdu) override;
+};
+
+// Modbus write single coil pdu server sequence
+class write_single_coil_pdu_server_sequence : public pdu_server_sequence
+{
+public:
+  write_single_coil_pdu_server_sequence(server_event* event)
+    : pdu_server_sequence(event)
+  {}
+
+public:
+  mb_pdu::pointer_type set_request(mb_pdu::pointer_type pdu) override;
+};
+
+// Modbus write multiple coils pdu server sequence
+class write_multiple_coils_pdu_server_sequence : public pdu_server_sequence
+{
+public:
+  write_multiple_coils_pdu_server_sequence(server_event* event)
+    : pdu_server_sequence(event)
+  {}
+
+public:
+  mb_pdu::pointer_type set_request(mb_pdu::pointer_type pdu) override;
 };
 
 // Modbus invalid pdu server sequence
@@ -130,7 +168,7 @@ public:
   {}
 
 public:
-  pdu_ptr set_request(pdu_ptr pdu) override;
+  mb_pdu::pointer_type set_request(mb_pdu::pointer_type pdu) override;
 };
 
 } // namespace modbus

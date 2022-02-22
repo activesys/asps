@@ -10,7 +10,7 @@
 #include <cstdint>
 #include <string>
 
-#include <asps/modbus/semantic/exception.h>
+#include <asps/modbus/semantic/constant.h>
 #include <asps/modbus/semantic/coils.h>
 
 namespace asps {
@@ -61,8 +61,9 @@ public:
   virtual void on_error(const std::string& error_message) = 0;
 
 public:
-  virtual coils::ptr_type on_read_coils(
-    uint16_t starting_address, uint16_t quantity_of_coils) = 0;
+  virtual coils::ptr_type on_read_coils(const coils::ptr_type cs) = 0;
+  virtual coils::ptr_type on_write_single_coil(const coils::ptr_type cs) = 0;
+  virtual coils::ptr_type on_write_multiple_coils(const coils::ptr_type cs) = 0;
 
 protected:
   server& modbus_server;

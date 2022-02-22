@@ -13,7 +13,7 @@
 #include <memory>
 #include <stdexcept>
 
-#include <asps/modbus/semantic/exception.h>
+#include <asps/modbus/semantic/constant.h>
 
 namespace asps {
 namespace modbus {

@@ -14,7 +14,9 @@ set(ASPS_MODBUS_TEST_SOURCES
     semantic/coils_test.cc
     semantic/registers_test.cc
     pdu/message/pdu_test.cc
-    pdu/message/pdu_sequence_test.cc
+    pdu/sequence/pdu_sequence_test.cc
+    adu/message/tcp_adu_test.cc
+    adu/sequence/tcp_adu_sequence_test.cc
 )
 
 ##################################

@@ -2,10 +2,10 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file. See the AUTHORS file for names of contributors.
 //
-// Modbus Exception Codes.
+// Modbus Constants.
 
-#ifndef ASPS_MODBUS_SEMANTIC_EXCEPTION_H
-#define ASPS_MODBUS_SEMANTIC_EXCEPTION_H
+#ifndef ASPS_MODBUS_SEMANTIC_CONSTANT_H
+#define ASPS_MODBUS_SEMANTIC_CONSTANT_H
 
 namespace asps {
 namespace modbus {
@@ -23,7 +23,19 @@ enum exception_code {
   gateway_target_device_failed_to_response = 0x0b
 };
 
+enum function_codes {
+  read_coils = 0x01,
+  read_discrete_inputs = 0x02,
+  read_holding_registers = 0x03,
+  read_input_registers = 0x04,
+  write_single_coil = 0x05,
+  write_single_register = 0x06,
+  write_multiple_coils = 0x0f,
+  write_multiple_registers = 0x10,
+  invalid_pdu = 0x64  // user defined function code
+};
+
 } // modbus
 } // asps
 
-#endif // ASPS_MODBUS_SEMANTIC_EXCEPTION_H
+#endif // ASPS_MODBUS_SEMANTIC_CONSTANT_H

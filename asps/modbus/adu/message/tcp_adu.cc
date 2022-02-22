@@ -20,36 +20,6 @@ std::size_t tcp_adu::mbap_header_size()
          unit_identifier_field_length;
 }
 
-uint16_t tcp_adu::pdu_size(std::vector<uint8_t>& buffer)
-{
-  uint8_t* pos = buffer.data();
-  pos += transaction_identifier_field_length + protocol_identifier_field_length;
-
-  return ntohs(*reinterpret_cast<uint16_t*>(pos)) - unit_identifier_field_length;
-}
-
-tcp_adu tcp_adu::unserialize(std::vector<uint8_t>& buffer, bool is_request)
-{
-  uint8_t* pos = buffer.data();
-  // decode transaction identifier
-  uint16_t transaction_identifier = ntohs(*reinterpret_cast<uint16_t*>(pos));
-  pos += transaction_identifier_field_length;
-  // decode protocol identifier
-  uint16_t protocol_identifier = ntohs(*reinterpret_cast<uint16_t*>(pos));
-  pos += protocol_identifier_field_length;
-  // decode length
-  uint16_t length = ntohs(*reinterpret_cast<uint16_t*>(pos));
-  pos += length_field_length;
-  // decode unit identifier
-  uint8_t unit_identifier = *pos;
-  pos += unit_identifier_field_length;
-  // decode pdu
-  pdu_ptr pdu = pdu::unserialize(pos, is_request);
-  pos += length - 1;
-
-  return tcp_adu(transaction_identifier, unit_identifier, pdu);
-}
-
 std::size_t tcp_adu::serialized_size()
 {
   return transaction_identifier_field_length +
@@ -57,6 +27,15 @@ std::size_t tcp_adu::serialized_size()
          length_field_length +
          unit_identifier_field_length +
          pdu_->serialized_size();
+}
+
+uint16_t tcp_adu::pdu_size(const uint8_t* buffer)
+{
+  const uint8_t* pos = buffer;
+  pos += transaction_identifier_field_length + protocol_identifier_field_length;
+
+  return ntohs(*reinterpret_cast<uint16_t*>(const_cast<uint8_t*>(pos))) -
+         unit_identifier_field_length;
 }
 
 uint8_t* tcp_adu::serialize()
@@ -81,4 +60,29 @@ uint8_t* tcp_adu::serialize()
   pos += pdu_->serialized_size();
 
   return buffer_.data();
+}
+
+tcp_adu::pointer_type tcp_adu::unserialize(const uint8_t* buffer, bool is_request)
+{
+  const uint8_t* pos = buffer;
+  // decode transaction identifier
+  uint16_t transaction_identifier =
+    ntohs(*reinterpret_cast<uint16_t*>(const_cast<uint8_t*>(pos)));
+  pos += transaction_identifier_field_length;
+  // decode protocol identifier
+  uint16_t protocol_identifier =
+    ntohs(*reinterpret_cast<uint16_t*>(const_cast<uint8_t*>(pos)));
+  pos += protocol_identifier_field_length;
+  // decode length
+  uint16_t length =
+    ntohs(*reinterpret_cast<uint16_t*>(const_cast<uint8_t*>(pos)));
+  pos += length_field_length;
+  // decode unit identifier
+  uint8_t unit_identifier = *pos;
+  pos += unit_identifier_field_length;
+  // decode pdu
+  mb_pdu::pointer_type pdu = mb_pdu::unserialize(pos, is_request);
+  pos += length - 1;
+
+  return std::make_shared<tcp_adu>(transaction_identifier, unit_identifier, pdu);
 }

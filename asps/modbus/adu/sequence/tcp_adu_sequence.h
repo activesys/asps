@@ -4,14 +4,15 @@
 //
 // Modbus TCP ADU sequence.
 
-#ifndef BOOST_MODBUS_ADU_SEQUENCE_TCPADUSEQUENCE_H
-#define BOOST_MODBUS_ADU_SEQUENCE_TCPADUSEQUENCE_H
+#ifndef ASPS_MODBUS_ADU_SEQUENCE_TCPADUSEQUENCE_H
+#define ASPS_MODBUS_ADU_SEQUENCE_TCPADUSEQUENCE_H
 
 #include <cstdint>
 #include <memory>
 #include <asps/modbus/api/event.h>
 #include <asps/modbus/adu/message/tcp_adu.h>
 #include <asps/modbus/semantic/coils.h>
+#include <asps/modbus/semantic/constant.h>
 #include <asps/modbus/pdu/sequence/pdu_sequence.h>
 
 namespace asps {
@@ -20,6 +21,9 @@ namespace modbus {
 // Modbus TCP ADU Client Sequence
 class tcp_adu_client_sequence
 {
+public:
+  typedef std::shared_ptr<tcp_adu_client_sequence> pointer_type;
+
 public:
   tcp_adu_client_sequence(
     uint16_t transaction_identifier,
@@ -31,8 +35,9 @@ public:
   {}
 
 public:
-  tcp_adu get_request(const coils::ptr_type cs);
-  void set_response(tcp_adu& adu);
+  tcp_adu::pointer_type get_request(
+    const coils::ptr_type cs, function_codes code);
+  void set_response(tcp_adu::pointer_type adu);
 
 private:
   uint16_t transaction_identifier_;
@@ -41,25 +46,28 @@ private:
   pdu_client_sequence_ptr pdu_sequence_;
 };
 
-typedef std::shared_ptr<tcp_adu_client_sequence> tcp_adu_client_sequence_ptr;
+
 
 // Modbus TCP ADU Server sequence
 class tcp_adu_server_sequence
 {
+public:
+  typedef std::shared_ptr<tcp_adu_server_sequence> pointer_type;
+
 public:
   tcp_adu_server_sequence(server_event* event)
     : event_(event)
   {}
 
 public:
-  tcp_adu set_request(tcp_adu& adu);
+  tcp_adu::pointer_type set_request(tcp_adu::pointer_type adu);
 
 private:
   server_event* event_;
-  pdu_server_sequence_ptr pdu_sequence_;
+  pdu_server_sequence::pointer_type pdu_sequence_;
 };
 
 } // namespace modbus
 } // namespace asps
 
-#endif // BOOST_MODBUS_ADU_SEQUENCE_TCPADUSEQUENCE_H
+#endif // ASPS_MODBUS_ADU_SEQUENCE_TCPADUSEQUENCE_H

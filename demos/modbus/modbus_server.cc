@@ -34,15 +34,24 @@ public:
   {
     std::cout << "modbus_server> error: " << error_message << std::endl;
   }
-  coils::ptr_type on_read_coils(
-    uint16_t starting_address, uint16_t quantity_of_coils) override
+  coils::ptr_type on_read_coils(const coils::ptr_type cs) override
   {
     std::cout << "modbus_server> read_coils: starting_address " 
-              << starting_address << ", "
-              << "quantity_of_coils " << quantity_of_coils << std::endl;
+              << cs->starting_address() << ", "
+              << "quantity_of_coils " << cs->count() << std::endl;
 
     return std::make_shared<coils>(
-      starting_address, quantity_of_coils, my_memory_+starting_address);
+      cs->starting_address(), cs->count(), my_memory_+cs->starting_address());
+  }
+  coils::ptr_type on_write_single_coil(const coils::ptr_type cs) override
+  {
+    return std::make_shared<coils>(
+      cs->starting_address(), cs->count(), my_memory_+cs->starting_address());
+  }
+  coils::ptr_type on_write_multiple_coils(const coils::ptr_type cs) override
+  {
+    return std::make_shared<coils>(
+      cs->starting_address(), cs->count(), my_memory_+cs->starting_address());
   }
 
 private:

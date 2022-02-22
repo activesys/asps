@@ -10,7 +10,7 @@
 using namespace asps::modbus;
 
 // Modbus PDU
-pdu_ptr pdu::unserialize(const uint8_t* buffer, bool is_request)
+mb_pdu::pointer_type mb_pdu::unserialize(const uint8_t* buffer, bool is_request)
 {
   // decode function code
   uint8_t function_code = *buffer;
@@ -61,7 +61,7 @@ uint8_t* excep_pdu::serialize()
   return buffer_.data();
 }
 
-pdu_ptr excep_pdu::unserialize(const uint8_t* buffer)
+mb_pdu::pointer_type excep_pdu::unserialize(const uint8_t* buffer)
 {
   const uint8_t* pos = buffer;
   // decode function code
@@ -99,7 +99,7 @@ uint8_t* read_coils_request::serialize()
   return buffer_.data();
 }
 
-pdu_ptr read_coils_request::unserialize(const uint8_t* buffer)
+mb_pdu::pointer_type read_coils_request::unserialize(const uint8_t* buffer)
 {
   const uint8_t* pos = buffer;
   // decode function code
@@ -146,7 +146,7 @@ uint8_t* read_coils_response::serialize()
   return buffer_.data();
 }
 
-pdu_ptr read_coils_response::unserialize(const uint8_t* buffer)
+mb_pdu::pointer_type read_coils_response::unserialize(const uint8_t* buffer)
 {
   const uint8_t* pos = buffer;
   // decode function code
@@ -196,7 +196,7 @@ uint8_t* write_single_coil_request::serialize()
   return buffer_.data();
 }
 
-pdu_ptr write_single_coil_request::unserialize(const uint8_t* buffer)
+mb_pdu::pointer_type write_single_coil_request::unserialize(const uint8_t* buffer)
 {
   const uint8_t* pos = buffer;
   // decode function code
@@ -252,7 +252,7 @@ uint8_t* write_multiple_coils_request::serialize()
   return buffer_.data();
 }
 
-pdu_ptr write_multiple_coils_request::unserialize(const uint8_t* buffer)
+mb_pdu::pointer_type write_multiple_coils_request::unserialize(const uint8_t* buffer)
 {
   const uint8_t* pos = buffer;
   // decode function code
@@ -306,7 +306,7 @@ uint8_t* write_multiple_coils_response::serialize()
   return buffer_.data();
 }
 
-pdu_ptr write_multiple_coils_response::unserialize(const uint8_t* buffer)
+mb_pdu::pointer_type write_multiple_coils_response::unserialize(const uint8_t* buffer)
 {
   const uint8_t* pos = buffer;
   // decode function code

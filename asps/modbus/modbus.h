@@ -7,7 +7,7 @@
 #ifndef ASPS_MODBUS_MODBUS_H
 #define ASPS_MODBUS_MODBUS_H
 
-#include <asps/modbus/semantic/exception.h>
+#include <asps/modbus/semantic/constant.h>
 #include <asps/modbus/semantic/coils.h>
 #include <asps/modbus/semantic/registers.h>
 #include <asps/modbus/api/config.h>

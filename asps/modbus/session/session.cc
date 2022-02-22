@@ -31,7 +31,7 @@ void client_session::read_mbap_header()
           event_->on_error(ec.message());
         }
       } else {
-        read_pdu(tcp_adu::pdu_size(buffer_));
+        read_pdu(tcp_adu::pdu_size(buffer_.data()));
       }
     });
 }
@@ -49,8 +49,8 @@ void client_session::read_pdu(uint16_t length)
           event_->on_error(ec.message());
         }
       } else {
-        tcp_adu adu = tcp_adu::unserialize(buffer_, false);
-        uint16_t tid = adu.transaction_identifier();
+        tcp_adu::pointer_type adu = tcp_adu::unserialize(buffer_.data(), false);
+        uint16_t tid = adu->transaction_identifier();
 
         if (sequences_.count(tid)) {
           sequences_[tid]->set_response(adu);
@@ -96,10 +96,10 @@ void client_session::send_read_coils_request()
           std::make_shared<tcp_adu_client_sequence>(
             tid, it->first, event_));
 
-        tcp_adu adu = sequences_[tid]->get_request(cs);
+        tcp_adu::pointer_type adu = sequences_[tid]->get_request(cs, function_codes::read_coils);
         boost::asio::async_write(
           socket_,
-          boost::asio::buffer(adu.serialize(), adu.serialized_size()),
+          boost::asio::buffer(adu->serialize(), adu->serialized_size()),
           [this](boost::system::error_code ec, std::size_t /* length */)
           {
             if (ec && event_) {
@@ -127,7 +127,7 @@ void server_session::read_mbap_header()
     [this](boost::system::error_code ec, std::size_t /* length */)
     {
       if (!ec) {
-        read_pdu(tcp_adu::pdu_size(buffer_));
+        read_pdu(tcp_adu::pdu_size(buffer_.data()));
       } else if (ec == boost::asio::error::eof) {
         session_set_.erase(shared_from_this());
       } else if (event_) {
@@ -145,12 +145,12 @@ void server_session::read_pdu(uint16_t length)
     [this](boost::system::error_code ec, std::size_t /* length */)
     {
       if (!ec) {
-        tcp_adu request = tcp_adu::unserialize(buffer_, true);
+        tcp_adu::pointer_type request = tcp_adu::unserialize(buffer_.data(), true);
         tcp_adu_server_sequence sequence(event_);
-        tcp_adu response = sequence.set_request(request);
+        tcp_adu::pointer_type response = sequence.set_request(request);
         boost::asio::async_write(
           socket_,
-          boost::asio::buffer(response.serialize(), response.serialized_size()),
+          boost::asio::buffer(response->serialize(), response->serialized_size()),
           [this](boost::system::error_code ec, std::size_t /* length */)
           {
             if (ec == boost::asio::error::eof) {

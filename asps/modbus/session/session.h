@@ -27,7 +27,7 @@ using boost::asio::ip::tcp;
 // Modbus client session
 class client_session
 {
-  typedef std::unordered_map<uint16_t, tcp_adu_client_sequence_ptr> sequence_type;
+  typedef std::unordered_map<uint16_t, tcp_adu_client_sequence::pointer_type> sequence_type;
   typedef std::unordered_map<uint16_t, std::deque<coils::ptr_type>> coils_queue_type;
 
 public:
