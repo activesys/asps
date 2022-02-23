@@ -27,7 +27,7 @@ protected:
 
   client c_;
   client_event_mock ce_;
-  coils::ptr_type cs_;
+  coils::pointer_type cs_;
   bool status_[10];
 };
 
@@ -43,7 +43,8 @@ TEST_F(pdu_sequence_test, read_coils_pdu_client_sequence_get_request)
 TEST_F(pdu_sequence_test, read_coils_pdu_client_sequence_set_response_response)
 {
   read_coils_pdu_client_sequence seq(cs_, &ce_);
-  mb_pdu::coils_type ct(10);
+  bits_type ct(10);
+  mb_pdu::pointer_type req = seq.get_request();
   mb_pdu::pointer_type p = std::make_shared<read_coils_response>(ct);
   EXPECT_CALL(ce_, on_read_coils(_, success))
     .Times(1);
@@ -53,6 +54,7 @@ TEST_F(pdu_sequence_test, read_coils_pdu_client_sequence_set_response_response)
 TEST_F(pdu_sequence_test, read_coils_pdu_client_sequence_set_response_exception)
 {
   read_coils_pdu_client_sequence seq(cs_, &ce_);
+  mb_pdu::pointer_type req = seq.get_request();
   mb_pdu::pointer_type p = std::make_shared<excep_pdu>(read_coils, illegal_function);
   EXPECT_CALL(ce_, on_read_coils(_, illegal_function))
     .Times(1);
@@ -62,6 +64,7 @@ TEST_F(pdu_sequence_test, read_coils_pdu_client_sequence_set_response_exception)
 TEST_F(pdu_sequence_test, read_coils_pdu_client_sequence_set_response_error)
 {
   read_coils_pdu_client_sequence seq(cs_, &ce_);
+  mb_pdu::pointer_type req = seq.get_request();
   mb_pdu::pointer_type p = std::make_shared<write_single_coil_request>(100, false);
   EXPECT_CALL(ce_, on_error("Invalid Read Coils Response PDU"))
     .Times(1);
@@ -80,6 +83,7 @@ TEST_F(pdu_sequence_test, write_single_coil_pdu_client_sequence_get_request)
 TEST_F(pdu_sequence_test, write_single_coil_pdu_client_sequence_set_response)
 {
   write_single_coil_pdu_client_sequence seq(cs_, &ce_);
+  mb_pdu::pointer_type req = seq.get_request();
   mb_pdu::pointer_type p = std::make_shared<write_single_coil_response>(100, false);
   EXPECT_CALL(ce_, on_write_single_coil(_, success))
     .Times(1);
@@ -89,6 +93,7 @@ TEST_F(pdu_sequence_test, write_single_coil_pdu_client_sequence_set_response)
 TEST_F(pdu_sequence_test, write_single_coil_pdu_client_sequence_set_response_exception)
 {
   write_single_coil_pdu_client_sequence seq(cs_, &ce_);
+  mb_pdu::pointer_type req = seq.get_request();
   mb_pdu::pointer_type p = std::make_shared<excep_pdu>(write_single_coil, illegal_function);
   EXPECT_CALL(ce_, on_write_single_coil(_, illegal_function))
     .Times(1);
@@ -98,7 +103,8 @@ TEST_F(pdu_sequence_test, write_single_coil_pdu_client_sequence_set_response_exc
 TEST_F(pdu_sequence_test, write_single_coil_pdu_client_sequence_set_response_error)
 {
   write_single_coil_pdu_client_sequence seq(cs_, &ce_);
-  mb_pdu::coils_type ct(10);
+  bits_type ct(10);
+  mb_pdu::pointer_type req = seq.get_request();
   mb_pdu::pointer_type p = std::make_shared<read_coils_response>(ct);
   EXPECT_CALL(ce_, on_error("Invalid Write Single Coil Response PDU"))
     .Times(1);
@@ -118,6 +124,7 @@ TEST_F(pdu_sequence_test, write_multiple_coils_pdu_client_sequence_get_request)
 TEST_F(pdu_sequence_test, write_multiple_coils_pdu_client_sequence_set_response)
 {
   write_multiple_coils_pdu_client_sequence seq(cs_, &ce_);
+  mb_pdu::pointer_type req = seq.get_request();
   mb_pdu::pointer_type p = std::make_shared<write_multiple_coils_response>(100, 10);
   EXPECT_CALL(ce_, on_write_multiple_coils(_, success))
     .Times(1);
@@ -127,6 +134,7 @@ TEST_F(pdu_sequence_test, write_multiple_coils_pdu_client_sequence_set_response)
 TEST_F(pdu_sequence_test, write_multiple_coils_pdu_client_sequence_set_response_exception)
 {
   write_multiple_coils_pdu_client_sequence seq(cs_, &ce_);
+  mb_pdu::pointer_type req = seq.get_request();
   mb_pdu::pointer_type p = std::make_shared<excep_pdu>(write_multiple_coils, illegal_function);
   EXPECT_CALL(ce_, on_write_multiple_coils(_, illegal_function))
     .Times(1);
@@ -136,7 +144,8 @@ TEST_F(pdu_sequence_test, write_multiple_coils_pdu_client_sequence_set_response_
 TEST_F(pdu_sequence_test, write_multiple_coils_pdu_client_sequence_set_response_exception_error)
 {
   write_multiple_coils_pdu_client_sequence seq(cs_, &ce_);
-  mb_pdu::coils_type ct(10);
+  bits_type ct(10);
+  mb_pdu::pointer_type req = seq.get_request();
   mb_pdu::pointer_type p = std::make_shared<read_coils_response>(ct);
   EXPECT_CALL(ce_, on_error("Invalid Write Multiple Coils Response PDU"))
     .Times(1);
@@ -160,7 +169,7 @@ TEST_F(pdu_server_sequence_test, read_coils_pdu_server_sequence_set_request_succ
 {
   read_coils_pdu_server_sequence seq(&se_);
   bool status[10];
-  coils::ptr_type cs = std::make_shared<coils>(100, 10, status);
+  coils::pointer_type cs = std::make_shared<coils>(100, 10, status);
   EXPECT_CALL(se_, on_read_coils(_))
     .WillOnce(Return(cs));
 
@@ -174,7 +183,7 @@ TEST_F(pdu_server_sequence_test, read_coils_pdu_server_sequence_set_request_fail
 {
   read_coils_pdu_server_sequence seq(&se_);
   bool status[10];
-  coils::ptr_type cs = std::make_shared<coils>(100, 10, status);
+  coils::pointer_type cs = std::make_shared<coils>(100, 10, status);
   cs->code(illegal_data_address);
   EXPECT_CALL(se_, on_read_coils(_))
     .WillOnce(Return(cs));
@@ -216,7 +225,7 @@ TEST_F(pdu_server_sequence_test, write_single_coil_pdu_server_sequence_set_reque
 {
   write_single_coil_pdu_server_sequence seq(&se_);
   bool status[10];
-  coils::ptr_type cs = std::make_shared<coils>(100, 10, status);
+  coils::pointer_type cs = std::make_shared<coils>(100, 10, status);
   EXPECT_CALL(se_, on_write_single_coil(_))
     .WillOnce(Return(cs));
 
@@ -230,7 +239,7 @@ TEST_F(pdu_server_sequence_test, write_single_coil_pdu_server_sequence_set_reque
 {
   write_single_coil_pdu_server_sequence seq(&se_);
   bool status[10];
-  coils::ptr_type cs = std::make_shared<coils>(100, 10, status);
+  coils::pointer_type cs = std::make_shared<coils>(100, 10, status);
   cs->code(illegal_data_address);
   EXPECT_CALL(se_, on_write_single_coil(_))
     .WillOnce(Return(cs));
@@ -272,11 +281,11 @@ TEST_F(pdu_server_sequence_test, write_multiple_coils_pdu_server_sequence_set_re
 {
   write_multiple_coils_pdu_server_sequence seq(&se_);
   bool status[10];
-  coils::ptr_type cs = std::make_shared<coils>(100, 10, status);
+  coils::pointer_type cs = std::make_shared<coils>(100, 10, status);
   EXPECT_CALL(se_, on_write_multiple_coils(_))
     .WillOnce(Return(cs));
 
-  mb_pdu::coils_type output_values(10);
+  bits_type output_values(10);
   mb_pdu::pointer_type req = std::make_shared<write_multiple_coils_request>(100, 10, output_values);
   mb_pdu::pointer_type p = seq.set_request(req);
   write_multiple_coils_response* rsp = dynamic_cast<write_multiple_coils_response*>(p.get());
@@ -287,12 +296,12 @@ TEST_F(pdu_server_sequence_test, write_multiple_coils_pdu_server_sequence_set_re
 {
   write_multiple_coils_pdu_server_sequence seq(&se_);
   bool status[10];
-  coils::ptr_type cs = std::make_shared<coils>(100, 10, status);
+  coils::pointer_type cs = std::make_shared<coils>(100, 10, status);
   cs->code(illegal_data_address);
   EXPECT_CALL(se_, on_write_multiple_coils(_))
     .WillOnce(Return(cs));
 
-  mb_pdu::coils_type output_values(10);
+  bits_type output_values(10);
   mb_pdu::pointer_type req = std::make_shared<write_multiple_coils_request>(100, 10, output_values);
   mb_pdu::pointer_type p = seq.set_request(req);
   excep_pdu* e = dynamic_cast<excep_pdu*>(p.get());
@@ -318,7 +327,7 @@ TEST_F(pdu_server_sequence_test, write_multiple_coils_pdu_server_sequence_set_re
 TEST_F(pdu_server_sequence_test, write_multiple_coils_pdu_server_sequence_set_request_null_event)
 {
   write_multiple_coils_pdu_server_sequence seq(NULL);
-  mb_pdu::coils_type output_values(10);
+  bits_type output_values(10);
   mb_pdu::pointer_type req = std::make_shared<write_multiple_coils_request>(100, 10, output_values);
   mb_pdu::pointer_type p = seq.set_request(req);
   excep_pdu* e = dynamic_cast<excep_pdu*>(p.get());

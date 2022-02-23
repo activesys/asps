@@ -9,6 +9,7 @@
 
 #include <cstdint>
 #include <memory>
+#include <deque>
 #include <vector>
 #include <unordered_map>
 #include <unordered_set>
@@ -28,7 +29,7 @@ using boost::asio::ip::tcp;
 class client_session
 {
   typedef std::unordered_map<uint16_t, tcp_adu_client_sequence::pointer_type> sequence_type;
-  typedef std::unordered_map<uint16_t, std::deque<coils::ptr_type>> coils_queue_type;
+  typedef std::unordered_map<uint16_t, std::deque<coils::pointer_type>> coils_queue_type;
 
 public:
   client_session(tcp::socket& socket, client_event* event)

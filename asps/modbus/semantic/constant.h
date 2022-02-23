@@ -7,6 +7,9 @@
 #ifndef ASPS_MODBUS_SEMANTIC_CONSTANT_H
 #define ASPS_MODBUS_SEMANTIC_CONSTANT_H
 
+#include <cstdint>
+#include <vector>
+
 namespace asps {
 namespace modbus {
 
@@ -34,6 +37,12 @@ enum function_codes {
   write_multiple_registers = 0x10,
   invalid_pdu = 0x64  // user defined function code
 };
+
+typedef bool bit_type;
+typedef std::vector<bit_type> bits_type;
+typedef uint16_t word_type;
+typedef std::vector<word_type> words_type;
+
 
 } // modbus
 } // asps

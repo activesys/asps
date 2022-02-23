@@ -36,7 +36,7 @@ public:
 
 public:
   tcp_adu::pointer_type get_request(
-    const coils::ptr_type cs, function_codes code);
+    const coils::pointer_type cs, function_codes code);
   void set_response(tcp_adu::pointer_type adu);
 
 private:
@@ -45,8 +45,6 @@ private:
   client_event* event_;
   pdu_client_sequence_ptr pdu_sequence_;
 };
-
-
 
 // Modbus TCP ADU Server sequence
 class tcp_adu_server_sequence

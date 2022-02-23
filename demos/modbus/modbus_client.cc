@@ -37,7 +37,7 @@ public:
               << error_message << std::endl;
   }
 
-  void on_read_coils(const coils::ptr_type cs, exception_code code) override
+  void on_read_coils(const coils::pointer_type cs, exception_code code) override
   {
     if (code) {
       std::cout << "modbus_client> read coils response, starting address: "
@@ -56,7 +56,7 @@ public:
       for (uint16_t i = 0; i < cs->count(); ++i) {
         std::cout << "[" << std::setfill('0') << std::setw(5) << std::right
                   << cs->starting_address() + i << "] "
-                  << (cs->at(cs->starting_address()+i) ? "on" : "off")
+                  << (cs->bit(cs->starting_address()+i) ? "on" : "off")
                   << std::endl;
       }
     }
@@ -64,9 +64,9 @@ public:
     get_cmd();
   }
 
-  void on_write_single_coil(const coils::ptr_type cs, exception_code code) override
+  void on_write_single_coil(const coils::pointer_type cs, exception_code code) override
   {}
-  void on_write_multiple_coils(const coils::ptr_type cs, exception_code code) override
+  void on_write_multiple_coils(const coils::pointer_type cs, exception_code code) override
   {}
 
 private:

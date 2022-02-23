@@ -27,9 +27,9 @@ public:
   MOCK_METHOD(void, on_connect, (const std::string& address, uint16_t port), (override));
   MOCK_METHOD(void, on_connect, (const std::string& error_message), (override));
   MOCK_METHOD(void, on_error, (const std::string& error_message), (override));
-  MOCK_METHOD(void, on_read_coils, (const coils::ptr_type cs, exception_code code), (override));
-  MOCK_METHOD(void, on_write_single_coil, (const coils::ptr_type cs, exception_code code), (override));
-  MOCK_METHOD(void, on_write_multiple_coils, (const coils::ptr_type cs, exception_code code), (override));
+  MOCK_METHOD(void, on_read_coils, (const coils::pointer_type cs, exception_code code), (override));
+  MOCK_METHOD(void, on_write_single_coil, (const coils::pointer_type cs, exception_code code), (override));
+  MOCK_METHOD(void, on_write_multiple_coils, (const coils::pointer_type cs, exception_code code), (override));
 };
 
 class server_event_mock : public server_event
@@ -43,9 +43,9 @@ public:
   MOCK_METHOD(void, on_accept, (const std::string& address, uint16_t port), (override));
   MOCK_METHOD(void, on_accept, (const std::string& error_message), (override));
   MOCK_METHOD(void, on_error, (const std::string& error_message), (override));
-  MOCK_METHOD(coils::ptr_type, on_read_coils, (const coils::ptr_type cs), (override));
-  MOCK_METHOD(coils::ptr_type, on_write_single_coil, (const coils::ptr_type cs), (override));
-  MOCK_METHOD(coils::ptr_type, on_write_multiple_coils, (const coils::ptr_type cs), (override));
+  MOCK_METHOD(coils::pointer_type, on_read_coils, (const coils::pointer_type cs), (override));
+  MOCK_METHOD(coils::pointer_type, on_write_single_coil, (const coils::pointer_type cs), (override));
+  MOCK_METHOD(coils::pointer_type, on_write_multiple_coils, (const coils::pointer_type cs), (override));
 };
 
 } // modbus_test

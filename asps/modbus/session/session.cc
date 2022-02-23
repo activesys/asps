@@ -73,7 +73,7 @@ void client_session::read_pdu(uint16_t length)
 
 void client_session::read_coils(uint8_t unit_identifier, const coils& cs)
 {
-  coils::split(cs, config::quantity_of_coils(), coils_queue_[unit_identifier]);
+  //coils::split(cs, config::quantity_of_coils(), coils_queue_[unit_identifier]);
   send_read_coils_request();
 }
 
@@ -89,14 +89,15 @@ void client_session::send_read_coils_request()
       uint16_t tid = transaction_identifier_++;
       if (!sequences_.count(tid)) {
 
-        coils::ptr_type cs = it->second.front();
+        coils::pointer_type cs = it->second.front();
         it->second.pop_front();
         sequences_.emplace(
           tid,
           std::make_shared<tcp_adu_client_sequence>(
             tid, it->first, event_));
 
-        tcp_adu::pointer_type adu = sequences_[tid]->get_request(cs, function_codes::read_coils);
+        tcp_adu::pointer_type adu =
+          sequences_[tid]->get_request(cs, function_codes::read_coils);
         boost::asio::async_write(
           socket_,
           boost::asio::buffer(adu->serialize(), adu->serialized_size()),

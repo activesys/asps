@@ -48,7 +48,7 @@ TEST(pdu_test, unserialize_read_coils_response)
   mb_pdu::pointer_type p = mb_pdu::unserialize(msg, false);
   read_coils_response* rsp = dynamic_cast<read_coils_response*>(p.get());
   EXPECT_NE(rsp, nullptr);
-  mb_pdu::coils_type cs = rsp->status();
+  bits_type cs = rsp->status();
   EXPECT_EQ(cs.size(), 24); 
 }
 
@@ -136,14 +136,14 @@ TEST(read_coils_request, unserialize)
 // Test read_coils_response
 TEST(read_coils_response, serialized_size)
 {
-  mb_pdu::coils_type cs(100, true);
+  bits_type cs(100, true);
   read_coils_response rsp(cs);
   EXPECT_EQ(rsp.serialized_size(), 15);
 }
 
 TEST(read_coils_response, serialize)
 {
-  mb_pdu::coils_type cs(100, true);
+  bits_type cs(100, true);
   cs[32] = false;
   cs[45] = false;
   cs[47] = false;
@@ -176,7 +176,7 @@ TEST(read_coils_response, unserialize)
   mb_pdu::pointer_type p = read_coils_response::unserialize(msg);
   read_coils_response* rsp = dynamic_cast<read_coils_response*>(p.get());
   EXPECT_NE(rsp, nullptr);
-  mb_pdu::coils_type cs = rsp->status();
+  bits_type cs = rsp->status();
   EXPECT_EQ(cs.size(), 24); 
   // 7~0 1100 1101
   // 15~8 0110 1011
@@ -240,14 +240,14 @@ TEST(write_single_coil_request, unserialize)
 // TEST write_multiple_coils_request
 TEST(write_multiple_coils_request, serialized_size)
 {
-  mb_pdu::coils_type cs(100);
+  bits_type cs(100);
   write_multiple_coils_request req(100, 100, cs);
   EXPECT_EQ(req.serialized_size(), 19);
 }
 
 TEST(write_multiple_coils_request, serialize)
 {
-  mb_pdu::coils_type cs(10);
+  bits_type cs(10);
   // 7~0 1100 1101
   // 9~8 0000 0001
   cs[0] = true;
@@ -277,7 +277,7 @@ TEST(write_multiple_coils_request, unserialize)
   EXPECT_NE(req, nullptr);
   EXPECT_EQ(req->starting_address(), 19);
   EXPECT_EQ(req->quantity_of_outputs(), 10);
-  mb_pdu::coils_type cs = req->outputs_value();
+  bits_type cs = req->outputs_value();
   // 7~0 1100 1101
   // 15~8 0000 0001
   EXPECT_TRUE(cs[0]);

@@ -7,6 +7,7 @@
 #ifndef ASPS_MODBUS_SEMANTIC_REGISTERS_H
 #define ASPS_MODBUS_SEMANTIC_REGISTERS_H
 
+#if 0
 #include <asps/modbus/semantic/access_model.h>
 
 namespace asps {
@@ -34,5 +35,7 @@ public:
 
 } // namespace modbus
 } // namespace asps
+
+#endif
 
 #endif // ASPS_MODBUS_SEMANTIC_REGISTERS_H

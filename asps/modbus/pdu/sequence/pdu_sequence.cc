@@ -12,18 +12,22 @@ using namespace asps::modbus;
 // Modbus read coils pdu client sequence
 mb_pdu::pointer_type read_coils_pdu_client_sequence::get_request()
 {
-  return std::make_shared<read_coils_request>(
-            coils_->starting_address(), coils_->count());
+  req_ = std::make_shared<read_coils_request>(
+          coils_->starting_address(), coils_->count());
+  return req_;
 }
 
 void read_coils_pdu_client_sequence::set_response(mb_pdu::pointer_type pdu)
 {
   if (event_) {
-    if (read_coils_response* p = dynamic_cast<read_coils_response*>(pdu.get())) {
-      for (uint16_t i = 0; i < coils_->count(); ++i) {
-        coils_->at(coils_->starting_address() + i) = p->status().at(i);
-      }
-      event_->on_read_coils(coils_, success);
+    read_coils_response* rsp = dynamic_cast<read_coils_response*>(pdu.get());
+    read_coils_request* req = dynamic_cast<read_coils_request*>(req_.get());
+
+    if (req && rsp) {
+      coils::pointer_type cs = std::make_shared<coils>(
+        req->starting_address(), req->quantity_of_coils(), rsp->status());
+
+      event_->on_read_coils(cs, success);
     } else if (excep_pdu* e = dynamic_cast<excep_pdu*>(pdu.get())) {
       event_->on_read_coils(coils_, e->code());
     } else {
@@ -35,18 +39,26 @@ void read_coils_pdu_client_sequence::set_response(mb_pdu::pointer_type pdu)
 // Modbus write single coil pdu client sequence
 mb_pdu::pointer_type write_single_coil_pdu_client_sequence::get_request()
 {
-  return std::make_shared<write_single_coil_request>(
+  req_ = std::make_shared<write_single_coil_request>(
              coils_->starting_address(),
-             coils_->at(coils_->starting_address()));
+             coils_->bit(coils_->starting_address()));
+  return req_;
 }
 
 void write_single_coil_pdu_client_sequence::set_response(mb_pdu::pointer_type pdu)
 {
   if (event_) {
-    if (write_single_coil_response* p =
-          dynamic_cast<write_single_coil_response*>(pdu.get())) {
-      coils_->at(coils_->starting_address()) = p->output_value();
-      event_->on_write_single_coil(coils_, success);
+    write_single_coil_request* req =
+      dynamic_cast<write_single_coil_request*>(req_.get());
+    write_single_coil_response* rsp =
+      dynamic_cast<write_single_coil_response*>(pdu.get());
+
+    if (req && rsp) {
+      coils::pointer_type cs = std::make_shared<coils>(
+        req->output_address(), 1, coils_->status());
+
+      cs->bit(req->output_address(), req->output_value());
+      event_->on_write_single_coil(cs, success);
     } else if (excep_pdu* e = dynamic_cast<excep_pdu*>(pdu.get())) {
       event_->on_write_single_coil(coils_, e->code());
     } else {
@@ -58,21 +70,25 @@ void write_single_coil_pdu_client_sequence::set_response(mb_pdu::pointer_type pd
 // Modbus write multiple coils pdu client sequence
 mb_pdu::pointer_type write_multiple_coils_pdu_client_sequence::get_request()
 {
-  mb_pdu::coils_type ct(coils_->count());
-  for (std::size_t i = 0; i < coils_->count(); ++i) {
-    ct[i] = coils_->at(coils_->starting_address() + i);
-  }
-  return std::make_shared<write_multiple_coils_request>(
-          coils_->starting_address(), coils_->count(), ct);
+  req_ = std::make_shared<write_multiple_coils_request>(
+          coils_->starting_address(), coils_->count(), coils_->status());
+  return req_;
 }
 
 void
 write_multiple_coils_pdu_client_sequence::set_response(mb_pdu::pointer_type pdu)
 {
   if (event_) {
-    if (write_multiple_coils_response* p =
-          dynamic_cast<write_multiple_coils_response*>(pdu.get())) {
-      event_->on_write_multiple_coils(coils_, success);
+    write_multiple_coils_request* req =
+      dynamic_cast<write_multiple_coils_request*>(req_.get());
+    write_multiple_coils_response* rsp =
+      dynamic_cast<write_multiple_coils_response*>(pdu.get());
+
+    if (req && rsp) {
+      coils::pointer_type cs = std::make_shared<coils>(
+        req->starting_address(), req->quantity_of_outputs(), req->outputs_value());
+
+      event_->on_write_multiple_coils(cs, success);
     } else if (excep_pdu* e = dynamic_cast<excep_pdu*>(pdu.get())) {
       event_->on_write_multiple_coils(coils_, e->code());
     } else {
@@ -99,17 +115,14 @@ mb_pdu::pointer_type
 read_coils_pdu_server_sequence::set_request(mb_pdu::pointer_type pdu)
 {
   if (event_) {
-    if (read_coils_request* p = dynamic_cast<read_coils_request*>(pdu.get())) {
-      bool status[65535];
-      const coils::ptr_type req_cs = std::make_shared<coils>(
-        p->starting_address(), p->quantity_of_coils(), status);
-      const coils::ptr_type rsp_cs = event_->on_read_coils(req_cs);
+    read_coils_request* req = dynamic_cast<read_coils_request*>(pdu.get());
+    if (req) {
+      const coils::pointer_type req_cs = std::make_shared<coils>(
+        req->starting_address(), req->quantity_of_coils());
+      const coils::pointer_type rsp_cs = event_->on_read_coils(req_cs);
+
       if (rsp_cs->code() == success) {
-        mb_pdu::coils_type status(rsp_cs->count());
-        for (uint16_t i = 0; i < rsp_cs->count(); ++i) {
-          status[i] = rsp_cs->at(rsp_cs->starting_address() + i);
-        }
-        return std::make_shared<read_coils_response>(status);
+        return std::make_shared<read_coils_response>(rsp_cs->status());
       } else {
         return std::make_shared<excep_pdu>(read_coils, rsp_cs->code());
       }
@@ -127,15 +140,19 @@ mb_pdu::pointer_type
 write_single_coil_pdu_server_sequence::set_request(mb_pdu::pointer_type pdu)
 {
   if (event_) {
-    if (write_single_coil_request* p =
-          dynamic_cast<write_single_coil_request*>(pdu.get())) {
-      bool status[65535]{p->output_value()};
-      const coils::ptr_type req_cs = std::make_shared<coils>(
-        p->output_address(), 1, status);
-      const coils::ptr_type rsp_cs = event_->on_write_single_coil(req_cs);
+    write_single_coil_request* req =
+      dynamic_cast<write_single_coil_request*>(pdu.get());
+
+    if (req) {
+      const coils::pointer_type req_cs =
+        std::make_shared<coils>(req->output_address(), 1);
+      req_cs->bit(req_cs->starting_address(), req->output_value());
+      const coils::pointer_type rsp_cs = event_->on_write_single_coil(req_cs);
+
       if (rsp_cs->code() == success) {
         return std::make_shared<write_single_coil_response>(
-                p->output_address(), p->output_value());
+                rsp_cs->starting_address(),
+                rsp_cs->bit(rsp_cs->starting_address()));
       } else {
         return std::make_shared<excep_pdu>(write_single_coil, rsp_cs->code());
       }
@@ -154,18 +171,20 @@ mb_pdu::pointer_type
 write_multiple_coils_pdu_server_sequence::set_request(mb_pdu::pointer_type pdu)
 {
   if (event_) {
-    if (write_multiple_coils_request* p =
-        dynamic_cast<write_multiple_coils_request*>(pdu.get())) {
-      bool status[65535];
-      for (std::size_t i = 0; i < p->quantity_of_outputs(); ++i) {
-        status[i] = p->outputs_value()[i];
-      }
-      const coils::ptr_type req_cs = std::make_shared<coils>(
-        p->starting_address(), p->quantity_of_outputs(), status);
-      const coils::ptr_type rsp_cs = event_->on_write_multiple_coils(req_cs);
+    write_multiple_coils_request* req =
+      dynamic_cast<write_multiple_coils_request*>(pdu.get());
+
+    if (req) {
+      const coils::pointer_type req_cs =
+        std::make_shared<coils>(
+          req->starting_address(),
+          req->quantity_of_outputs(),
+          req->outputs_value());
+      const coils::pointer_type rsp_cs = event_->on_write_multiple_coils(req_cs);
+
       if (rsp_cs->code() == success) {
         return std::make_shared<write_multiple_coils_response>(
-                p->starting_address(), p->quantity_of_outputs());
+                rsp_cs->starting_address(), rsp_cs->count());
       } else {
         return std::make_shared<excep_pdu>(write_multiple_coils, rsp_cs->code());
       }

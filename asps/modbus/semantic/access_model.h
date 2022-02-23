@@ -12,6 +12,7 @@
 #include <deque>
 #include <memory>
 #include <stdexcept>
+#include <vector>
 
 #include <asps/modbus/semantic/constant.h>
 
@@ -27,8 +28,15 @@ class read_only_model
 {
 public:
   typedef std::shared_ptr<read_only_model<T>> ptr_type;
+  typedef std::vector<T> data_type;
 
 public:
+  read_only_model(uint16_t starting_address, uint16_t count, data_type& datas)
+    : starting_address_(starting_address),
+      count_(count),
+      datas_(datas),
+      code_(success)
+  {}
   read_only_model(uint16_t starting_address, uint16_t count, const T* datas)
     : starting_address_(starting_address),
       count_(count),
@@ -75,7 +83,7 @@ protected:
   exception_code code_;
   uint16_t starting_address_;
   uint16_t count_;
-  const T* datas_;
+  data_type datas_;
 };
 
 /**

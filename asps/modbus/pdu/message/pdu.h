@@ -25,9 +25,6 @@ protected:
   enum {function_code_field_length = 1};
 
 public:
-  typedef std::vector<bool> coils_type;
-
-public:
   typedef std::shared_ptr<mb_pdu> pointer_type;
 
 public:
@@ -117,7 +114,7 @@ class read_coils_response : public mb_pdu
   };
 
 public:
-  read_coils_response(const coils_type& status)
+  read_coils_response(const bits_type& status)
     : mb_pdu(read_coils),
       coils_status_(status),
       byte_count_((status.size() + 7) / 8)
@@ -128,13 +125,13 @@ public:
   uint8_t* serialize() override;
   std::size_t serialized_size() override;
 
-  const coils_type& status() {return coils_status_;}
+  const bits_type& status() {return coils_status_;}
 
 public:
   static mb_pdu::pointer_type unserialize(const uint8_t* buffer);
 
 private:
-  coils_type coils_status_;
+  bits_type coils_status_;
   uint8_t byte_count_;
 };
 
@@ -189,7 +186,7 @@ public:
   write_multiple_coils_request(
     uint16_t starting_address,
     uint16_t quantity_of_outputs,
-    const coils_type& outputs_value)
+    const bits_type& outputs_value)
     : mb_pdu(write_multiple_coils),
       starting_address_(starting_address),
       quantity_of_outputs_(quantity_of_outputs),
@@ -205,7 +202,7 @@ public:
 public:
   uint16_t starting_address() {return starting_address_;}
   uint16_t quantity_of_outputs() {return quantity_of_outputs_;}
-  const coils_type& outputs_value() {return outputs_value_;}
+  const bits_type& outputs_value() {return outputs_value_;}
 
 public:
   static mb_pdu::pointer_type unserialize(const uint8_t* buffer);
@@ -213,7 +210,7 @@ public:
 private:
   uint16_t starting_address_;
   uint16_t quantity_of_outputs_;
-  coils_type outputs_value_;
+  bits_type outputs_value_;
   uint8_t byte_count_;
 };
 

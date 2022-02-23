@@ -29,6 +29,7 @@ public:
   virtual void set_response(mb_pdu::pointer_type pdu) = 0;
 
 protected:
+  mb_pdu::pointer_type req_;
   client_event* event_;
 };
 
@@ -39,7 +40,7 @@ class read_coils_pdu_client_sequence : public pdu_client_sequence
 {
 public:
   read_coils_pdu_client_sequence(
-    const coils::ptr_type cs,
+    const coils::pointer_type cs,
     client_event* event)
     : pdu_client_sequence(event),
       coils_(cs)
@@ -50,7 +51,7 @@ public:
   void set_response(mb_pdu::pointer_type pdu) override;
 
 private:
-  coils::ptr_type coils_;
+  coils::pointer_type coils_;
 };
 
 // Modbus write single coil pdu client sequence
@@ -58,7 +59,7 @@ class write_single_coil_pdu_client_sequence : public pdu_client_sequence
 {
 public:
   write_single_coil_pdu_client_sequence(
-    const coils::ptr_type cs,
+    const coils::pointer_type cs,
     client_event* event)
     : pdu_client_sequence(event),
       coils_(cs)
@@ -69,7 +70,7 @@ public:
   void set_response(mb_pdu::pointer_type pdu) override;
 
 private:
-  coils::ptr_type coils_;
+  coils::pointer_type coils_;
 };
 
 // Modbus write multiple coils pdu client sequence
@@ -77,7 +78,7 @@ class write_multiple_coils_pdu_client_sequence : public pdu_client_sequence
 {
 public:
   write_multiple_coils_pdu_client_sequence(
-    const coils::ptr_type cs,
+    const coils::pointer_type cs,
     client_event* event)
     : pdu_client_sequence(event),
       coils_(cs)
@@ -88,7 +89,7 @@ public:
   void set_response(mb_pdu::pointer_type pdu) override;
 
 private:
-  coils::ptr_type coils_;
+  coils::pointer_type coils_;
 };
 
 // Modbus invalid pdu client sequence

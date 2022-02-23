@@ -12,7 +12,7 @@ using namespace asps::modbus;
 // Modbus TCP ADU Client Sequence
 tcp_adu::pointer_type
 tcp_adu_client_sequence::get_request(
-  const coils::ptr_type cs, function_codes code)
+  const coils::pointer_type cs, function_codes code)
 {
   switch (code) {
   case read_coils:

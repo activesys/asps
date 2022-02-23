@@ -27,7 +27,7 @@ protected:
 
   client c_;
   client_event_mock ce_;
-  coils::ptr_type cs_;
+  coils::pointer_type cs_;
   bool status_[10];
 };
 
@@ -98,7 +98,7 @@ protected:
 TEST_F(tcp_adu_server_sequence_test, set_request_read_coils)
 {
   bool status[10];
-  coils::ptr_type cs = std::make_shared<coils>(100, 10, status);
+  coils::pointer_type cs = std::make_shared<coils>(100, 10, status);
   EXPECT_CALL(se_, on_read_coils(_))
     .WillOnce(Return(cs));
 
@@ -116,7 +116,7 @@ TEST_F(tcp_adu_server_sequence_test, set_request_read_coils)
 TEST_F(tcp_adu_server_sequence_test, set_request_write_single_coil)
 {
   bool status[10];
-  coils::ptr_type cs = std::make_shared<coils>(100, 10, status);
+  coils::pointer_type cs = std::make_shared<coils>(100, 10, status);
   EXPECT_CALL(se_, on_write_single_coil(_))
     .WillOnce(Return(cs));
 
@@ -134,12 +134,12 @@ TEST_F(tcp_adu_server_sequence_test, set_request_write_single_coil)
 TEST_F(tcp_adu_server_sequence_test, set_request_write_multiple_coils)
 {
   bool status[10];
-  coils::ptr_type cs = std::make_shared<coils>(100, 10, status);
+  coils::pointer_type cs = std::make_shared<coils>(100, 10, status);
   EXPECT_CALL(se_, on_write_multiple_coils(_))
     .WillOnce(Return(cs));
 
   tcp_adu_server_sequence seq(&se_);
-  mb_pdu::coils_type output_values(10);
+  bits_type output_values(10);
   mb_pdu::pointer_type pdu_req = std::make_shared<write_multiple_coils_request>(100, 10, output_values);
   tcp_adu::pointer_type req = std::make_shared<tcp_adu>(100, 1, pdu_req);
   tcp_adu::pointer_type rsp = seq.set_request(req);

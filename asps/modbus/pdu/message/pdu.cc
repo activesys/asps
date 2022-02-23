@@ -158,7 +158,7 @@ mb_pdu::pointer_type read_coils_response::unserialize(const uint8_t* buffer)
   // decode coils status
   // We assume that all the bits in coils status byte are valid,
   // so we may have more data than we actually have.
-  coils_type coils_status(byte_count * 8);
+  bits_type coils_status(byte_count * 8);
   for (uint8_t i = 0; i < byte_count * 8; ++i) {
     coils_status[i] = (pos[i/8] >> i%8) & 0x01;
   }
@@ -272,7 +272,7 @@ mb_pdu::pointer_type write_multiple_coils_request::unserialize(const uint8_t* bu
   // decode outputs value
   // We assume that all the bits in coils status byte are valid,
   // so we may have more data than we actually have.
-  coils_type outputs_value(byte_count * 8);
+  bits_type outputs_value(byte_count * 8);
   for (uint8_t i = 0; i < byte_count * 8; ++i) {
     outputs_value[i] = (pos[i/8] >> i%8) & 0x01;
   }

@@ -13,84 +13,52 @@ namespace modbus_test {
 using namespace asps::modbus;
 
 // Test Coils
-TEST(coils_test, operator_const_normal)
+TEST(coils_test, bit_const_normal)
 {
   bool status[10] = {false, true, true, false};
   coils cs(200, 10, status);
 
-  EXPECT_FALSE(cs[200]);
-  EXPECT_TRUE(cs[201]);
-  EXPECT_TRUE(cs[202]);
-  EXPECT_FALSE(cs[203]);
-  EXPECT_FALSE(cs[204]);
+  EXPECT_FALSE(cs.bit(200));
+  EXPECT_TRUE(cs.bit(201));
+  EXPECT_TRUE(cs.bit(202));
+  EXPECT_FALSE(cs.bit(203));
+  EXPECT_FALSE(cs.bit(204));
 }
 
-TEST(coils_test, operator_assign_status)
+TEST(coils_test, bit_assign_status)
 {
   bool status[10] = {false, true, true, false};
   coils cs(200, 10, status);
 
-  EXPECT_FALSE(cs[200]);
-  EXPECT_TRUE(cs[201]);
-  cs[200] = true;
-  cs[201] = false;
-  EXPECT_TRUE(cs[200]);
-  EXPECT_FALSE(cs[201]);
+  EXPECT_FALSE(cs.bit(200));
+  EXPECT_TRUE(cs.bit(201));
+  cs.bit(200, true);
+  cs.bit(201, false);
+  EXPECT_TRUE(cs.bit(200));
+  EXPECT_FALSE(cs.bit(201));
 }
 
-TEST(coils_test, at_const_normal)
+TEST(coils_test, bit_const_exception)
 {
   bool status[10] = {false, true, true, false};
   coils cs(200, 10, status);
 
-  EXPECT_FALSE(cs[200]);
-  EXPECT_TRUE(cs[201]);
-  EXPECT_TRUE(cs[202]);
-  EXPECT_FALSE(cs[203]);
-  EXPECT_FALSE(cs[204]);
+  EXPECT_THROW(cs.bit(199), std::out_of_range);
+  EXPECT_THROW(cs.bit(210), std::out_of_range);
+  EXPECT_NO_THROW(cs.bit(201));
 }
 
-TEST(coils_test, at_assign_status)
+TEST(coils_test, bit_assign_status_exception)
 {
   bool status[10] = {false, true, true, false};
   coils cs(200, 10, status);
 
-  EXPECT_FALSE(cs.at(200));
-  EXPECT_TRUE(cs.at(201));
-  cs.at(200) = true;
-  cs.at(201) = false;
-  EXPECT_TRUE(cs.at(200));
-  EXPECT_FALSE(cs.at(201));
+  EXPECT_THROW({cs.bit(199, true);}, std::out_of_range);
+  EXPECT_THROW({cs.bit(210, true);}, std::out_of_range);
+  EXPECT_NO_THROW({cs.bit(208, false);});
 }
 
-TEST(coils_test, at_const_exception)
-{
-  bool status[10] = {false, true, true, false};
-  coils cs(200, 10, status);
-
-  EXPECT_THROW(cs.at(199), std::out_of_range);
-  EXPECT_THROW(cs.at(210), std::out_of_range);
-  EXPECT_NO_THROW(cs.at(201));
-}
-
-TEST(coils_test, at_assign_status_exception)
-{
-  bool status[10] = {false, true, true, false};
-  coils cs(200, 10, status);
-
-  EXPECT_THROW({cs.at(199) = true;}, std::out_of_range);
-  EXPECT_THROW({cs.at(210) = true;}, std::out_of_range);
-  EXPECT_NO_THROW({cs.at(208) = false;});
-}
-
-TEST(coils_test, at_nullptr_exception)
-{
-  coils cs(200, 10, nullptr);
-
-  EXPECT_THROW(cs.at(208), std::out_of_range);
-  EXPECT_THROW({cs.at(208) = true;}, std::out_of_range);
-}
-
+#if 0
 // Test Discrete Inputs
 TEST(discrete_inputs_test, operator_const_normal)
 {
@@ -132,6 +100,7 @@ TEST(discrete_inputs_test, at_nullptr_exception)
 
   EXPECT_THROW(dis.at(204), std::out_of_range);
 }
+#endif
 
 } // namespace modbus_test
 } // namespace asps_test
