@@ -12,6 +12,45 @@
 
 using namespace asps::modbus;
 
+void client_session::read_coils(const coils& cs)
+{
+  coils::split(cs, config::quantity_of_coils(), coils_queue_.end());
+  send_request();
+}
+
+void client_session::send_request()
+{
+  while (sequences_.size() < config::quantity_of_concurrent_requests() &&
+         coils_queue_.size() > 0) {
+
+    uint16_t tid = transaction_identifier_++;
+    if (!sequences_.count(tid)) {
+
+      coils::pointer_type cs = coils_queue_.front();
+      coils_queue_.pop_front();
+      sequences_.emplace(
+        tid,
+        std::make_shared<tcp_adu_client_sequence>(
+          tid, unit_identifier_, event_));
+
+      tcp_adu::pointer_type adu =
+        sequences_[tid]->get_request(cs, function_codes::read_coils);
+        /*
+      boost::asio::async_write(
+        socket_,
+        boost::asio::buffer(adu->serialize(), adu->serialized_size()),
+        [this](boost::system::error_code ec, std::size_t length)
+        {
+          if (ec && event_) {
+            event_->on_error(ec.message());
+          }
+        });
+        */
+    }
+  }
+}
+
+#if 0
 // Modbus client session
 void client_session::start()
 {
@@ -111,6 +150,7 @@ void client_session::send_read_coils_request()
     }
   }
 }
+#endif
 
 // Chat Server Session
 void server_session::start()

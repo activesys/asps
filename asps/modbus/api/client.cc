@@ -27,8 +27,8 @@ void client::async_connect()
           event_->on_connect(ec.message());
         }
       } else {
-        session_ = std::make_shared<client_session>(socket_, event_);
-        session_->start();
+        session_ = std::make_shared<client_session>(1);
+        //session_->start();
 
         if (event_) {
           event_->on_connect(endpoint.address().to_string(), endpoint.port());
@@ -49,5 +49,5 @@ void client::run()
 
 void client::read_coils(uint8_t unit_identifier, const coils& cs)
 {
-  session_->read_coils(unit_identifier, cs);
+  session_->read_coils(cs);
 }

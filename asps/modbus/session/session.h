@@ -29,31 +29,46 @@ using boost::asio::ip::tcp;
 class client_session
 {
   typedef std::unordered_map<uint16_t, tcp_adu_client_sequence::pointer_type> sequence_type;
-  typedef std::unordered_map<uint16_t, std::deque<coils::pointer_type>> coils_queue_type;
+  typedef std::deque<coils::pointer_type> coils_queue_type;
 
 public:
+  client_session(uint8_t unit_identifier)
+    : transaction_identifier_(0),
+      unit_identifier_(unit_identifier)
+  {}
+  /*
   client_session(tcp::socket& socket, client_event* event)
     : transaction_identifier_(0),
       socket_(socket),
       event_(event)
   {}
+  */
 
 public:
-  void start();
-  void read_coils(uint8_t unit_identifier, const coils& cs);
+  //void start();
+  void read_coils(const coils& cs);
 
+private:
+  void send_request();
+
+/*
 private:
   void read_mbap_header();
   void read_pdu(uint16_t length);
   void send_read_coils_request();
+  */
 
 private:
   uint16_t transaction_identifier_;
-  tcp::socket& socket_;
-  client_event* event_;
-  std::vector<uint8_t> buffer_;
-  sequence_type sequences_;
+  uint8_t unit_identifier_;
   coils_queue_type coils_queue_;
+  sequence_type sequences_;
+  client_event* event_;
+  /*
+  tcp::socket& socket_;
+  std::vector<uint8_t> buffer_;
+
+  */
 };
 
 typedef std::shared_ptr<client_session> client_session_ptr;

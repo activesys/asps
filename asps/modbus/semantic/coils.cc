@@ -4,6 +4,7 @@
 //
 // Modbus Coils and Discrete Inputs.
 
+#include <algorithm>
 #include <asps/modbus/semantic/coils.h>
 
 namespace asps {

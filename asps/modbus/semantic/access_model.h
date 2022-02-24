@@ -9,7 +9,6 @@
 
 #include <cstdint>
 #include <algorithm>
-#include <deque>
 #include <memory>
 #include <stdexcept>
 #include <vector>
@@ -19,145 +18,148 @@
 namespace asps {
 namespace modbus {
 
-// Modbus Access Model
-/**
- * Read Only Access Model
- */
+// Modbus Memory Accessing Model
 template <typename T>
-class read_only_model
+class accessing_model
 {
 public:
-  typedef std::shared_ptr<read_only_model<T>> ptr_type;
-  typedef std::vector<T> data_type;
+  typedef T value_type;
+  typedef std::vector<value_type> memory_type;
+  typedef std::shared_ptr<accessing_model<T>> pointer_type;
 
 public:
-  read_only_model(uint16_t starting_address, uint16_t count, data_type& datas)
+  accessing_model(
+    uint16_t starting_address,
+    uint16_t count,
+    const memory_type& memory)
     : starting_address_(starting_address),
       count_(count),
-      datas_(datas),
+      memory_(memory),
       code_(success)
   {}
-  read_only_model(uint16_t starting_address, uint16_t count, const T* datas)
+  accessing_model(
+    uint16_t starting_address,
+    uint16_t count,
+    const value_type* values = nullptr)
     : starting_address_(starting_address),
       count_(count),
-      datas_(datas),
       code_(success)
-  {}
-  virtual ~read_only_model() {}
-
-public:
-  const T& operator[](uint16_t address) const noexcept
   {
-    return datas_[address - starting_address_];
-  }
-
-  const T& at(uint16_t address) const
-  {
-    if (datas_ == nullptr ||
-        address < starting_address_ ||
-        address >= starting_address_ + count_) {
-      throw std::out_of_range("Invalid address");
+    if (values) {
+      memory_.assign(values, values + count);
+    } else {
+      memory_.resize(count);
     }
-
-    return datas_[address - starting_address_];
   }
+  virtual ~accessing_model() {}
 
+public:
+  virtual T value(uint16_t address) const = 0;
+  virtual void value(uint16_t address, T v) = 0;
+
+public:
   uint16_t starting_address() const {return starting_address_;}
   uint16_t count() const {return count_;}
   exception_code code() const {return code_;}
   void code(exception_code code) {code_ = code;}
 
 public:
-  static void split(
-    const read_only_model& model, uint16_t count, std::deque<ptr_type>& models)
+  template <typename OutputIterator>
+  static void split(const accessing_model& model,
+                    uint16_t count, OutputIterator pos)
   {
+    std::vector<pointer_type> models;
+
     for (uint16_t i = 0; i < model.count_; i += count) {
-      models.push_back(std::make_shared<read_only_model<T>>(
-        model.starting_address_ + i,
-        std::min<uint16_t>(count, model.count_ - i),
-        model.datas_ + i));
+      uint16_t starting_address = model.starting_address_ + i;
+      uint16_t min_count = std::min<uint16_t>(count, model.count_ - i);
+      memory_type memory(model.memory_.begin() + i,
+                         model.memory_.begin() + i + min_count);
+      models.push_back(std::make_shared<accessing_model<value_type>>(
+        starting_address, min_count, memory));
     }
+
+    std::move(models.begin(), models.end(), pos);
   }
 
 protected:
   exception_code code_;
   uint16_t starting_address_;
   uint16_t count_;
-  data_type datas_;
+  memory_type memory_;
+};
+
+/**
+ * Read Only Access Model
+ */
+template <typename T>
+class read_only_model : public accessing_model<T>
+{
+public:
+  read_only_model(
+    uint16_t starting_address,
+    uint16_t count,
+    const typename accessing_model<T>::memory_type& memory)
+    : accessing_model<T>(starting_address, count, memory)
+  {}
+  read_only_model(
+    uint16_t starting_address,
+    uint16_t count,
+    const typename accessing_model<T>::value_type* values = nullptr)
+    : accessing_model<T>(starting_address, count, values)
+  {}
+  virtual ~read_only_model() {}
+
+public:
+  virtual T value(uint16_t address) const override
+  {
+    if (accessing_model<T>::memory_.size() < accessing_model<T>::count_ ||
+        address < accessing_model<T>::starting_address_ ||
+        address >= accessing_model<T>::starting_address_ + accessing_model<T>::count_) {
+      throw std::out_of_range("Invalid address");
+    }
+
+    return accessing_model<T>::memory_[address - accessing_model<T>::starting_address_];
+  }
+
+  virtual void value(uint16_t address, T v) override
+  {
+    throw std::logic_error("Modify data in read-only model");
+  }
 };
 
 /**
  * Read Write Access Model
  */
 template <typename T>
-class read_write_model
+class read_write_model : public read_only_model<T>
 {
 public:
-  typedef std::shared_ptr<read_write_model<T>> ptr_type;
-
-public:
-  read_write_model(uint16_t starting_address, uint16_t count, T* datas)
-    : starting_address_(starting_address),
-      count_(count),
-      datas_(datas),
-      code_(success)
+  read_write_model(
+    uint16_t starting_address,
+    uint16_t count,
+    const typename accessing_model<T>::memory_type& memory)
+    : read_only_model<T>(starting_address, count, memory)
   {}
-  virtual ~read_write_model() {};
+  read_write_model(
+    uint16_t starting_address,
+    uint16_t count,
+    const typename accessing_model<T>::value_type* values = nullptr)
+    : read_only_model<T>(starting_address, count, values)
+  {}
+  virtual ~read_write_model() {}
 
 public:
-  T& operator[](uint16_t address) noexcept
+  void value(uint16_t address, T v) override
   {
-    return datas_[address - starting_address_];
-  }
-  const T& operator[](uint16_t address) const noexcept
-  {
-    return datas_[address - starting_address_];
-  }
-
-  T& at(uint16_t address)
-  {
-    if (datas_ == nullptr ||
-        address < starting_address_ ||
-        address >= starting_address_ + count_) {
+    if (accessing_model<T>::memory_.size() < accessing_model<T>::count_ ||
+        address < accessing_model<T>::starting_address_ ||
+        address >= accessing_model<T>::starting_address_ + accessing_model<T>::count_) {
       throw std::out_of_range("Invalid address");
     }
 
-    return datas_[address - starting_address_];
+    accessing_model<T>::memory_[address - accessing_model<T>::starting_address_] = v;
   }
-
-  const T& at(uint16_t address) const
-  {
-    if (datas_ == nullptr ||
-        address < starting_address_ ||
-        address >= starting_address_ + count_) {
-      throw std::out_of_range("Invalid address");
-    }
-
-    return datas_[address - starting_address_];
-  }
-
-  uint16_t starting_address() const {return starting_address_;}
-  uint16_t count() const {return count_;}
-  exception_code code() const {return code_;}
-  void code(exception_code code) {code_ = code;}
-
-public:
-  static void split(
-    const read_write_model& model, uint16_t count, std::deque<ptr_type>& models)
-  {
-    for (uint16_t i = 0; i < model.count_; i += count) {
-      models.push_back(std::make_shared<read_write_model<T>>(
-        model.starting_address_ + i,
-        std::min<uint16_t>(count, model.count_ - i),
-        model.datas_ + i));
-    }
-  }
-
-protected:
-  exception_code code_;
-  uint16_t starting_address_;
-  uint16_t count_;
-  T* datas_;
 };
 
 } // namespace modbus
