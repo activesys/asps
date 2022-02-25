@@ -5,10 +5,29 @@
 // Modbus Client.
 
 #include <asps/modbus/api/client.h>
+#include <asps/modbus/common/global_event.h>
 
 using namespace asps::modbus;
 
 // Modbus Client
+void client::read_coils(const coils& cs)
+{
+  session_.read_coils(cs);
+}
+
+void client::receive_response()
+{
+  transport_layer_.read(
+    session_.adu_size(
+      transport_layer_.glance(
+        session_.mbap_header_size())));
+}
+
+void client::event(client_event* e)
+{
+  global_client_event::instance()->event(e);
+}
+/*
 void client::register_event(client_event* event)
 {
   event_ = event;
@@ -27,7 +46,7 @@ void client::async_connect()
           event_->on_connect(ec.message());
         }
       } else {
-        session_ = std::make_shared<client_session>(1);
+        session_ = std::make_shared<client_session>(1, transport_layer_, event_);
         //session_->start();
 
         if (event_) {
@@ -51,3 +70,4 @@ void client::read_coils(uint8_t unit_identifier, const coils& cs)
 {
   session_->read_coils(cs);
 }
+*/

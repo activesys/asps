@@ -98,6 +98,12 @@ private:
   static bool my_memory_[0xffff];
 };
 
+class my_transport_layer : public transport_layer
+{
+public:
+  virtual void send(const uint8_t* msg, std::size_t length) override {}
+};
+
 bool my_event::my_memory_[0xffff];
 
 int main(int argc, char* argv[])
@@ -107,7 +113,8 @@ int main(int argc, char* argv[])
     return 1;
   }
 
-  client c(argv[1], std::atoi(argv[2]));
+  my_transport_layer layer;
+  client c(layer, argv[1], std::atoi(argv[2]));
   c.register_event(new my_event(c));
   c.async_connect();
   c.run();

@@ -4,8 +4,8 @@
 //
 // Modbus TCP ADU.
 
-#ifndef ASPS_MODBUS_ADU_MESSAGE_TCPADU_H
-#define ASPS_MODBUS_ADU_MESSAGE_TCPADU_H
+#ifndef ASPS_MODBUS_ADU_MESSAGE_TCP_ADU_H
+#define ASPS_MODBUS_ADU_MESSAGE_TCP_ADU_H
 
 #include <cstdint>
 #include <vector>
@@ -63,4 +63,4 @@ private:
 } // namespace modbus
 } // namespace asps
 
-#endif // ASPS_MODBUS_ADU_MESSAGE_TCPADU_H
+#endif // ASPS_MODBUS_ADU_MESSAGE_TCP_ADU_H

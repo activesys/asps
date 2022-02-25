@@ -4,8 +4,8 @@
 //
 // Modbus access model.
 
-#ifndef ASPS_MODBUS_SEMANTIC_ACCESSMODEL_H
-#define ASPS_MODBUS_SEMANTIC_ACCESSMODEL_H
+#ifndef ASPS_MODBUS_SEMANTIC_ACCESS_MODEL_H
+#define ASPS_MODBUS_SEMANTIC_ACCESS_MODEL_H
 
 #include <cstdint>
 #include <algorithm>
@@ -165,4 +165,4 @@ public:
 } // namespace modbus
 } // namespace asps
 
-#endif // ASPS_MODBUS_SEMANTIC_ACCESSMODEL_H
+#endif // ASPS_MODBUS_SEMANTIC_ACCESS_MODEL_H

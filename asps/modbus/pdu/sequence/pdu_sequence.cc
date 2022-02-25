@@ -5,6 +5,7 @@
 // All Modbus PDU Sequence.
 
 #include <memory>
+#include <asps/modbus/common/global_event.h>
 #include <asps/modbus/pdu/sequence/pdu_sequence.h>
 
 using namespace asps::modbus;
@@ -19,7 +20,8 @@ mb_pdu::pointer_type read_coils_pdu_client_sequence::get_request()
 
 void read_coils_pdu_client_sequence::set_response(mb_pdu::pointer_type pdu)
 {
-  if (event_) {
+  client_event* event = global_client_event::instance()->event();
+  if (event) {
     read_coils_response* rsp = dynamic_cast<read_coils_response*>(pdu.get());
     read_coils_request* req = dynamic_cast<read_coils_request*>(req_.get());
 
@@ -27,11 +29,11 @@ void read_coils_pdu_client_sequence::set_response(mb_pdu::pointer_type pdu)
       coils::pointer_type cs = std::make_shared<coils>(
         req->starting_address(), req->quantity_of_coils(), rsp->status());
 
-      event_->on_read_coils(cs, success);
+      event->on_read_coils(cs, success);
     } else if (excep_pdu* e = dynamic_cast<excep_pdu*>(pdu.get())) {
-      event_->on_read_coils(coils_, e->code());
+      event->on_read_coils(coils_, e->code());
     } else {
-      event_->on_error("Invalid Read Coils Response PDU");
+      event->on_error("Invalid Read Coils Response PDU");
     }
   }
 }
@@ -47,7 +49,8 @@ mb_pdu::pointer_type write_single_coil_pdu_client_sequence::get_request()
 
 void write_single_coil_pdu_client_sequence::set_response(mb_pdu::pointer_type pdu)
 {
-  if (event_) {
+  client_event* event = global_client_event::instance()->event();
+  if (event) {
     write_single_coil_request* req =
       dynamic_cast<write_single_coil_request*>(req_.get());
     write_single_coil_response* rsp =
@@ -58,11 +61,11 @@ void write_single_coil_pdu_client_sequence::set_response(mb_pdu::pointer_type pd
         req->output_address(), 1, coils_->status());
 
       cs->bit(req->output_address(), req->output_value());
-      event_->on_write_single_coil(cs, success);
+      event->on_write_single_coil(cs, success);
     } else if (excep_pdu* e = dynamic_cast<excep_pdu*>(pdu.get())) {
-      event_->on_write_single_coil(coils_, e->code());
+      event->on_write_single_coil(coils_, e->code());
     } else {
-      event_->on_error("Invalid Write Single Coil Response PDU");
+      event->on_error("Invalid Write Single Coil Response PDU");
     }
   }
 }
@@ -78,7 +81,8 @@ mb_pdu::pointer_type write_multiple_coils_pdu_client_sequence::get_request()
 void
 write_multiple_coils_pdu_client_sequence::set_response(mb_pdu::pointer_type pdu)
 {
-  if (event_) {
+  client_event* event = global_client_event::instance()->event();
+  if (event) {
     write_multiple_coils_request* req =
       dynamic_cast<write_multiple_coils_request*>(req_.get());
     write_multiple_coils_response* rsp =
@@ -88,11 +92,11 @@ write_multiple_coils_pdu_client_sequence::set_response(mb_pdu::pointer_type pdu)
       coils::pointer_type cs = std::make_shared<coils>(
         req->starting_address(), req->quantity_of_outputs(), req->outputs_value());
 
-      event_->on_write_multiple_coils(cs, success);
+      event->on_write_multiple_coils(cs, success);
     } else if (excep_pdu* e = dynamic_cast<excep_pdu*>(pdu.get())) {
-      event_->on_write_multiple_coils(coils_, e->code());
+      event->on_write_multiple_coils(coils_, e->code());
     } else {
-      event_->on_error("Invalid Write Multiple Coils Response PDU");
+      event->on_error("Invalid Write Multiple Coils Response PDU");
     }
   }
 }
@@ -105,8 +109,9 @@ mb_pdu::pointer_type invalid_pdu_client_sequence::get_request()
 
 void invalid_pdu_client_sequence::set_response(mb_pdu::pointer_type pdu)
 {
-  if (event_) {
-    event_->on_error("Invalid Excep PDU");
+  client_event* event = global_client_event::instance()->event();
+  if (event) {
+    event->on_error("Invalid Excep PDU");
   }
 }
 

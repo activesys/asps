@@ -16,6 +16,7 @@
 
 #include <boost/asio.hpp>
 
+#include <asps/modbus/api/transport_layer.h>
 #include <asps/modbus/api/event.h>
 #include <asps/modbus/adu/sequence/tcp_adu_sequence.h>
 #include <asps/modbus/semantic/coils.h>
@@ -32,43 +33,27 @@ class client_session
   typedef std::deque<coils::pointer_type> coils_queue_type;
 
 public:
-  client_session(uint8_t unit_identifier)
+  client_session(uint8_t unit_identifier, transport_layer& layer)
     : transaction_identifier_(0),
-      unit_identifier_(unit_identifier)
+      unit_identifier_(unit_identifier),
+      transport_layer_(layer)
   {}
-  /*
-  client_session(tcp::socket& socket, client_event* event)
-    : transaction_identifier_(0),
-      socket_(socket),
-      event_(event)
-  {}
-  */
 
 public:
-  //void start();
+  uint16_t mbap_header_size();
+  uint16_t adu_size(const uint8_t* buffer);
   void read_coils(const coils& cs);
+  void receive_response(const uint8_t* buffer);
 
 private:
   void send_request();
-
-/*
-private:
-  void read_mbap_header();
-  void read_pdu(uint16_t length);
-  void send_read_coils_request();
-  */
 
 private:
   uint16_t transaction_identifier_;
   uint8_t unit_identifier_;
   coils_queue_type coils_queue_;
   sequence_type sequences_;
-  client_event* event_;
-  /*
-  tcp::socket& socket_;
-  std::vector<uint8_t> buffer_;
-
-  */
+  transport_layer& transport_layer_;
 };
 
 typedef std::shared_ptr<client_session> client_session_ptr;

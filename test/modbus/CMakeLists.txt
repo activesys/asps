@@ -17,6 +17,7 @@ set(ASPS_MODBUS_TEST_SOURCES
     pdu/sequence/pdu_sequence_test.cc
     adu/message/tcp_adu_test.cc
     adu/sequence/tcp_adu_sequence_test.cc
+    session/session_test.cc
 )
 
 ##################################

@@ -5,6 +5,7 @@
 // Modbus TCP ADU sequence.
 
 #include <asps/modbus/semantic/constant.h>
+#include <asps/modbus/common/global_event.h>
 #include <asps/modbus/adu/sequence/tcp_adu_sequence.h>
 
 using namespace asps::modbus;
@@ -17,22 +18,22 @@ tcp_adu_client_sequence::get_request(
   switch (code) {
   case read_coils:
     pdu_sequence_ =
-      std::make_shared<read_coils_pdu_client_sequence>(cs, event_);
+      std::make_shared<read_coils_pdu_client_sequence>(cs);
     break;
 
   case write_single_coil:
     pdu_sequence_ =
-      std::make_shared<write_single_coil_pdu_client_sequence>(cs, event_);
+      std::make_shared<write_single_coil_pdu_client_sequence>(cs);
     break;
 
   case write_multiple_coils:
     pdu_sequence_ =
-      std::make_shared<write_multiple_coils_pdu_client_sequence>(cs, event_);
+      std::make_shared<write_multiple_coils_pdu_client_sequence>(cs);
     break;
 
   default:
     pdu_sequence_ =
-      std::make_shared<invalid_pdu_client_sequence>(event_);
+      std::make_shared<invalid_pdu_client_sequence>();
     break;
   }
 
@@ -44,12 +45,13 @@ tcp_adu_client_sequence::get_request(
 
 void tcp_adu_client_sequence::set_response(tcp_adu::pointer_type adu)
 {
-  if (event_) {
+  client_event* event = global_client_event::instance()->event();
+  if (event) {
     if (adu->transaction_identifier() == transaction_identifier_ &&
         adu->unit_identifier() == unit_identifier_) {
       pdu_sequence_->set_response(adu->pdu());
     } else {
-      event_->on_error("Invalid ADU");
+      event->on_error("Invalid ADU");
     }
   }
 }

@@ -15,16 +15,26 @@ using namespace asps::modbus;
 using ::testing::_;
 using ::testing::Return;
 
+class transport_layer_test : public transport_layer
+{
+public:
+  void write(const uint8_t* msg, std::size_t length) override {}
+  uint8_t* read(std::size_t length) override {return nullptr;}
+  uint8_t* glance(std::size_t length) override {return nullptr;}
+};
+
 class tcp_adu_client_sequence_test : public ::testing::Test
 {
 protected:
   tcp_adu_client_sequence_test()
-    : c_("127.0.0.1"),
+    : c_(1, layer_),
       ce_(c_)
   {
     cs_ = std::make_shared<coils>(100, 10, status_);
+    global_client_event::instance()->event(&ce_);
   }
 
+  transport_layer_test layer_;
   client c_;
   client_event_mock ce_;
   coils::pointer_type cs_;
@@ -34,7 +44,7 @@ protected:
 // TEST tcp_adu_client_sequence
 TEST_F(tcp_adu_client_sequence_test, get_request_read_coils)
 {
-  tcp_adu_client_sequence seq(100, 10, &ce_);
+  tcp_adu_client_sequence seq(100, 10);
   tcp_adu::pointer_type a = seq.get_request(cs_, read_coils);
   EXPECT_NE(a, nullptr);
   EXPECT_EQ(a->transaction_identifier(), 100);
@@ -47,7 +57,7 @@ TEST_F(tcp_adu_client_sequence_test, get_request_read_coils)
 
 TEST_F(tcp_adu_client_sequence_test, get_request_write_single_coil)
 {
-  tcp_adu_client_sequence seq(100, 10, &ce_);
+  tcp_adu_client_sequence seq(100, 10);
   tcp_adu::pointer_type a = seq.get_request(cs_, write_single_coil);
   EXPECT_NE(a, nullptr);
   EXPECT_EQ(a->transaction_identifier(), 100);
@@ -60,7 +70,7 @@ TEST_F(tcp_adu_client_sequence_test, get_request_write_single_coil)
 
 TEST_F(tcp_adu_client_sequence_test, get_request_write_multiple_coils)
 {
-  tcp_adu_client_sequence seq(100, 10, &ce_);
+  tcp_adu_client_sequence seq(100, 10);
   tcp_adu::pointer_type a = seq.get_request(cs_, write_multiple_coils);
   EXPECT_NE(a, nullptr);
   EXPECT_EQ(a->transaction_identifier(), 100);
@@ -73,7 +83,7 @@ TEST_F(tcp_adu_client_sequence_test, get_request_write_multiple_coils)
 
 TEST_F(tcp_adu_client_sequence_test, get_request_invalid_excep)
 {
-  tcp_adu_client_sequence seq(100, 10, &ce_);
+  tcp_adu_client_sequence seq(100, 10);
   tcp_adu::pointer_type a = seq.get_request(cs_, read_discrete_inputs);
   EXPECT_NE(a, nullptr);
   EXPECT_EQ(a->transaction_identifier(), 100);

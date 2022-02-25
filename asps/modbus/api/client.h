@@ -11,6 +11,7 @@
 #include <string>
 #include <boost/asio.hpp>
 
+#include <asps/modbus/api/transport_layer.h>
 #include <asps/modbus/api/event.h>
 #include <asps/modbus/session/session.h>
 #include <asps/modbus/semantic/coils.h>
@@ -24,10 +25,29 @@ using boost::asio::ip::tcp;
 class client
 {
 public:
-  client(const std::string& host, uint16_t port = 502)
+  client(uint8_t unit_identifier, transport_layer& layer)
+    : transport_layer_(layer),
+      session_(unit_identifier, layer)
+  {}
+
+public:
+  void event(client_event* e);
+  void read_coils(const coils& cs);
+  void receive_response();
+
+private:
+  transport_layer& transport_layer_;
+  client_session session_;
+};
+/*
+class client
+{
+public:
+  client(transport_layer& layer, const std::string& host, uint16_t port = 502)
     : context_(),
       socket_(context_),
-      event_(nullptr)
+      event_(nullptr),
+      transport_layer_(layer)
   {
     tcp::resolver resolver(context_);
     endpoint_ = resolver.resolve(host, std::to_string(port));
@@ -49,7 +69,9 @@ private:
   tcp::resolver::results_type endpoint_;
   client_event* event_;
   client_session_ptr session_;
+  transport_layer& transport_layer_;
 };
+*/
 
 } // namespace modbus
 } // namespace asps

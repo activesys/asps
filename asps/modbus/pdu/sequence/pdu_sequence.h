@@ -4,8 +4,8 @@
 //
 // All Modbus PDU Sequence.
 
-#ifndef ASPS_MODBUS_PDU_PDUSEQUENCE_H
-#define ASPS_MODBUS_PDU_PDUSEQUENCE_H
+#ifndef ASPS_MODBUS_PDU_SEQUENCE_PDU_SEQUENCE_H
+#define ASPS_MODBUS_PDU_SEQUENCE_PDU_SEQUENCE_H
 
 #include <memory>
 #include <asps/modbus/pdu/message/pdu.h>
@@ -19,9 +19,7 @@ namespace modbus {
 class pdu_client_sequence
 {
 public:
-  pdu_client_sequence(client_event* event)
-    : event_(event)
-  {}
+  pdu_client_sequence() {}
   virtual ~pdu_client_sequence() {}
 
 public:
@@ -30,7 +28,6 @@ public:
 
 protected:
   mb_pdu::pointer_type req_;
-  client_event* event_;
 };
 
 typedef std::shared_ptr<pdu_client_sequence> pdu_client_sequence_ptr;
@@ -39,11 +36,8 @@ typedef std::shared_ptr<pdu_client_sequence> pdu_client_sequence_ptr;
 class read_coils_pdu_client_sequence : public pdu_client_sequence
 {
 public:
-  read_coils_pdu_client_sequence(
-    const coils::pointer_type cs,
-    client_event* event)
-    : pdu_client_sequence(event),
-      coils_(cs)
+  read_coils_pdu_client_sequence(const coils::pointer_type cs)
+    : coils_(cs)
   {}
 
 public:
@@ -58,11 +52,8 @@ private:
 class write_single_coil_pdu_client_sequence : public pdu_client_sequence
 {
 public:
-  write_single_coil_pdu_client_sequence(
-    const coils::pointer_type cs,
-    client_event* event)
-    : pdu_client_sequence(event),
-      coils_(cs)
+  write_single_coil_pdu_client_sequence(const coils::pointer_type cs)
+    : coils_(cs)
   {}
 
 public:
@@ -77,11 +68,8 @@ private:
 class write_multiple_coils_pdu_client_sequence : public pdu_client_sequence
 {
 public:
-  write_multiple_coils_pdu_client_sequence(
-    const coils::pointer_type cs,
-    client_event* event)
-    : pdu_client_sequence(event),
-      coils_(cs)
+  write_multiple_coils_pdu_client_sequence(const coils::pointer_type cs)
+    : coils_(cs)
   {}
 
 public:
@@ -96,9 +84,7 @@ private:
 class invalid_pdu_client_sequence : public pdu_client_sequence
 {
 public:
-  invalid_pdu_client_sequence(client_event* event)
-    : pdu_client_sequence(event)
-  {}
+  invalid_pdu_client_sequence() {}
 
 public:
   mb_pdu::pointer_type get_request() override;
@@ -175,4 +161,4 @@ public:
 } // namespace modbus
 } // namespace asps
 
-#endif // ASPS_MODBUS_PDU_PDUSEQUENCE_H
+#endif // ASPS_MODBUS_PDU_SEQUENCE_PDU_SEQUENCE_H

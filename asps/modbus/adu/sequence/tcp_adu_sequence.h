@@ -4,8 +4,8 @@
 //
 // Modbus TCP ADU sequence.
 
-#ifndef ASPS_MODBUS_ADU_SEQUENCE_TCPADUSEQUENCE_H
-#define ASPS_MODBUS_ADU_SEQUENCE_TCPADUSEQUENCE_H
+#ifndef ASPS_MODBUS_ADU_SEQUENCE_TCP_ADU_SEQUENCE_H
+#define ASPS_MODBUS_ADU_SEQUENCE_TCP_ADU_SEQUENCE_H
 
 #include <cstdint>
 #include <memory>
@@ -27,11 +27,9 @@ public:
 public:
   tcp_adu_client_sequence(
     uint16_t transaction_identifier,
-    uint8_t unit_identifier,
-    client_event* event)
+    uint8_t unit_identifier)
     : transaction_identifier_(transaction_identifier),
-      unit_identifier_(unit_identifier),
-      event_(event)
+      unit_identifier_(unit_identifier)
   {}
 
 public:
@@ -42,7 +40,6 @@ public:
 private:
   uint16_t transaction_identifier_;
   uint8_t unit_identifier_;
-  client_event* event_;
   pdu_client_sequence_ptr pdu_sequence_;
 };
 
@@ -68,4 +65,4 @@ private:
 } // namespace modbus
 } // namespace asps
 
-#endif // ASPS_MODBUS_ADU_SEQUENCE_TCPADUSEQUENCE_H
+#endif // ASPS_MODBUS_ADU_SEQUENCE_TCP_ADU_SEQUENCE_H

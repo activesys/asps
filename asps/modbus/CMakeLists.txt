@@ -22,6 +22,7 @@ configure_file(
 ##################################
 # Set sources for modbus
 set(ASPS_MODBUS_SOURCES
+    common/global_event.cc
     api/config.cc
     api/client.cc
     api/server.cc
