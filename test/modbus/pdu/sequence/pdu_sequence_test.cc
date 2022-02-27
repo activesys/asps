@@ -169,7 +169,9 @@ protected:
   pdu_server_sequence_test()
     : s_(9502),
       se_(s_)
-  {}
+  {
+    global_server_event::instance()->event(&se_);
+  }
 
   server s_;
   server_event_mock se_;
@@ -177,7 +179,7 @@ protected:
 
 TEST_F(pdu_server_sequence_test, read_coils_pdu_server_sequence_set_request_success)
 {
-  read_coils_pdu_server_sequence seq(&se_);
+  read_coils_pdu_server_sequence seq;
   bool status[10];
   coils::pointer_type cs = std::make_shared<coils>(100, 10, status);
   EXPECT_CALL(se_, on_read_coils(_))
@@ -191,7 +193,7 @@ TEST_F(pdu_server_sequence_test, read_coils_pdu_server_sequence_set_request_succ
 
 TEST_F(pdu_server_sequence_test, read_coils_pdu_server_sequence_set_request_failed)
 {
-  read_coils_pdu_server_sequence seq(&se_);
+  read_coils_pdu_server_sequence seq;
   bool status[10];
   coils::pointer_type cs = std::make_shared<coils>(100, 10, status);
   cs->code(illegal_data_address);
@@ -208,7 +210,7 @@ TEST_F(pdu_server_sequence_test, read_coils_pdu_server_sequence_set_request_fail
 
 TEST_F(pdu_server_sequence_test, read_coils_pdu_server_sequence_set_request_invalid_request)
 {
-  read_coils_pdu_server_sequence seq(&se_);
+  read_coils_pdu_server_sequence seq;
   EXPECT_CALL(se_, on_error("Invalid Read Coils Request PDU"))
     .Times(1);
 
@@ -222,7 +224,8 @@ TEST_F(pdu_server_sequence_test, read_coils_pdu_server_sequence_set_request_inva
 
 TEST_F(pdu_server_sequence_test, read_coils_pdu_server_sequence_set_request_null_event)
 {
-  read_coils_pdu_server_sequence seq(NULL);
+  global_server_event::instance()->event(nullptr);
+  read_coils_pdu_server_sequence seq;
   mb_pdu::pointer_type req = std::make_shared<read_coils_request>(100, false);
   mb_pdu::pointer_type q = seq.set_request(req);
   excep_pdu* e = dynamic_cast<excep_pdu*>(q.get());
@@ -233,7 +236,8 @@ TEST_F(pdu_server_sequence_test, read_coils_pdu_server_sequence_set_request_null
 
 TEST_F(pdu_server_sequence_test, write_single_coil_pdu_server_sequence_set_request_success)
 {
-  write_single_coil_pdu_server_sequence seq(&se_);
+  global_server_event::instance()->event(&se_);
+  write_single_coil_pdu_server_sequence seq;
   bool status[10];
   coils::pointer_type cs = std::make_shared<coils>(100, 10, status);
   EXPECT_CALL(se_, on_write_single_coil(_))
@@ -247,7 +251,7 @@ TEST_F(pdu_server_sequence_test, write_single_coil_pdu_server_sequence_set_reque
 
 TEST_F(pdu_server_sequence_test, write_single_coil_pdu_server_sequence_set_request_failed)
 {
-  write_single_coil_pdu_server_sequence seq(&se_);
+  write_single_coil_pdu_server_sequence seq;
   bool status[10];
   coils::pointer_type cs = std::make_shared<coils>(100, 10, status);
   cs->code(illegal_data_address);
@@ -264,7 +268,7 @@ TEST_F(pdu_server_sequence_test, write_single_coil_pdu_server_sequence_set_reque
 
 TEST_F(pdu_server_sequence_test, write_single_coil_pdu_server_sequence_set_request_invalid_request)
 {
-  write_single_coil_pdu_server_sequence seq(&se_);
+  write_single_coil_pdu_server_sequence seq;
   EXPECT_CALL(se_, on_error("Invalid Write Single Coil Request PDU"))
     .Times(1);
 
@@ -278,7 +282,8 @@ TEST_F(pdu_server_sequence_test, write_single_coil_pdu_server_sequence_set_reque
 
 TEST_F(pdu_server_sequence_test, write_single_coil_pdu_server_sequence_set_request_null_event)
 {
-  write_single_coil_pdu_server_sequence seq(NULL);
+  global_server_event::instance()->event(nullptr);
+  write_single_coil_pdu_server_sequence seq;
   mb_pdu::pointer_type req = std::make_shared<write_single_coil_request>(100, true);
   mb_pdu::pointer_type p = seq.set_request(req);
   excep_pdu* e = dynamic_cast<excep_pdu*>(p.get());
@@ -289,7 +294,8 @@ TEST_F(pdu_server_sequence_test, write_single_coil_pdu_server_sequence_set_reque
 
 TEST_F(pdu_server_sequence_test, write_multiple_coils_pdu_server_sequence_set_request_success)
 {
-  write_multiple_coils_pdu_server_sequence seq(&se_);
+  global_server_event::instance()->event(&se_);
+  write_multiple_coils_pdu_server_sequence seq;
   bool status[10];
   coils::pointer_type cs = std::make_shared<coils>(100, 10, status);
   EXPECT_CALL(se_, on_write_multiple_coils(_))
@@ -304,7 +310,7 @@ TEST_F(pdu_server_sequence_test, write_multiple_coils_pdu_server_sequence_set_re
 
 TEST_F(pdu_server_sequence_test, write_multiple_coils_pdu_server_sequence_set_request_failed)
 {
-  write_multiple_coils_pdu_server_sequence seq(&se_);
+  write_multiple_coils_pdu_server_sequence seq;
   bool status[10];
   coils::pointer_type cs = std::make_shared<coils>(100, 10, status);
   cs->code(illegal_data_address);
@@ -322,7 +328,7 @@ TEST_F(pdu_server_sequence_test, write_multiple_coils_pdu_server_sequence_set_re
 
 TEST_F(pdu_server_sequence_test, write_multiple_coils_pdu_server_sequence_set_request_invalid_request)
 {
-  write_multiple_coils_pdu_server_sequence seq(&se_);
+  write_multiple_coils_pdu_server_sequence seq;
   EXPECT_CALL(se_, on_error("Invalid Write Multiple Coils Request PDU"))
     .Times(1);
 
@@ -336,7 +342,8 @@ TEST_F(pdu_server_sequence_test, write_multiple_coils_pdu_server_sequence_set_re
 
 TEST_F(pdu_server_sequence_test, write_multiple_coils_pdu_server_sequence_set_request_null_event)
 {
-  write_multiple_coils_pdu_server_sequence seq(NULL);
+  global_server_event::instance()->event(nullptr);
+  write_multiple_coils_pdu_server_sequence seq;
   bits_type output_values(10);
   mb_pdu::pointer_type req = std::make_shared<write_multiple_coils_request>(100, 10, output_values);
   mb_pdu::pointer_type p = seq.set_request(req);

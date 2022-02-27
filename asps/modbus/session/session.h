@@ -68,11 +68,9 @@ class server_session : public std::enable_shared_from_this<server_session>
 public:
   server_session(
     tcp::socket socket,
-    server_session_set_type& session_set,
-    server_event* event)
+    server_session_set_type& session_set)
     : socket_(std::move(socket)),
-      session_set_(session_set),
-      event_(event)
+      session_set_(session_set)
   {}
 
 public:
@@ -86,7 +84,6 @@ private:
   tcp::socket socket_;
   server_session_set_type& session_set_;
   std::vector<uint8_t> buffer_;
-  server_event* event_;
 };
 
 } // namespace modbus

@@ -4,8 +4,8 @@
 
 ##################################
 # Build modbus demos executable
-#add_executable(modbus_client modbus_client.cc)
-#target_link_libraries(modbus_client asmodbus)
+add_executable(modbus_client modbus_client.cc)
+target_link_libraries(modbus_client asmodbus Boost::system pthread)
 
 #add_executable(modbus_server modbus_server.cc)
 #target_link_libraries(modbus_server asmodbus)

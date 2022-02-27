@@ -31,6 +31,7 @@ public:
   {}
 
 public:
+  void connect();
   void event(client_event* e);
   void read_coils(const coils& cs);
   void receive_response();

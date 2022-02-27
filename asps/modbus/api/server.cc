@@ -25,7 +25,7 @@ void server::async_listen()
           event_->on_accept(endpoint.address().to_string(), endpoint.port());
         }
         std::make_shared<server_session>(
-          std::move(socket), sessions_, event_)->start();
+          std::move(socket), sessions_)->start();
       }
 
       async_listen();

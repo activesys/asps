@@ -37,6 +37,31 @@ private:
   client_event* event_;
 };
 
+class global_server_event
+{
+private:
+  global_server_event()
+    : event_(nullptr)
+  {}
+
+public:
+  void event(server_event* e) {event_ = e;}
+  server_event* event() {return event_;}
+
+public:
+  static global_server_event* instance()
+  {
+    if (!instance_) {
+      instance_ = new global_server_event;
+    }
+    return instance_;
+  }
+
+private:
+  static global_server_event* instance_;
+  server_event* event_;
+};
+
 } // modbus
 } // asps
 

@@ -50,15 +50,9 @@ public:
   typedef std::shared_ptr<tcp_adu_server_sequence> pointer_type;
 
 public:
-  tcp_adu_server_sequence(server_event* event)
-    : event_(event)
-  {}
-
-public:
   tcp_adu::pointer_type set_request(tcp_adu::pointer_type adu);
 
 private:
-  server_event* event_;
   pdu_server_sequence::pointer_type pdu_sequence_;
 };
 

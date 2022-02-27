@@ -86,12 +86,13 @@ void server_session::read_mbap_header()
     boost::asio::buffer(buffer_.data(), buffer_.size()),
     [this](boost::system::error_code ec, std::size_t /* length */)
     {
+      server_event* event = global_server_event::instance()->event();
       if (!ec) {
         read_pdu(tcp_adu::pdu_size(buffer_.data()));
       } else if (ec == boost::asio::error::eof) {
         session_set_.erase(shared_from_this());
-      } else if (event_) {
-        event_->on_error(ec.message());
+      } else if (event) {
+        event->on_error(ec.message());
       }
     });
 }
@@ -104,19 +105,20 @@ void server_session::read_pdu(uint16_t length)
     boost::asio::buffer(buffer_.data() + tcp_adu::mbap_header_size(), length),
     [this](boost::system::error_code ec, std::size_t /* length */)
     {
+      server_event* event = global_server_event::instance()->event();
       if (!ec) {
         tcp_adu::pointer_type request = tcp_adu::unserialize(buffer_.data(), true);
-        tcp_adu_server_sequence sequence(event_);
+        tcp_adu_server_sequence sequence;
         tcp_adu::pointer_type response = sequence.set_request(request);
         boost::asio::async_write(
           socket_,
           boost::asio::buffer(response->serialize(), response->serialized_size()),
-          [this](boost::system::error_code ec, std::size_t /* length */)
+          [this, event](boost::system::error_code ec, std::size_t /* length */)
           {
             if (ec == boost::asio::error::eof) {
               session_set_.erase(shared_from_this());
-            } else if (ec && event_) {
-              event_->on_error(ec.message());
+            } else if (ec && event) {
+              event->on_error(ec.message());
             }
           });
 
@@ -125,8 +127,8 @@ void server_session::read_pdu(uint16_t length)
         }
       } else if (ec == boost::asio::error::eof) {
         session_set_.erase(shared_from_this());
-      } else if (event_) {
-        event_->on_error(ec.message());
+      } else if (event) {
+        event->on_error(ec.message());
       }
     });
 }

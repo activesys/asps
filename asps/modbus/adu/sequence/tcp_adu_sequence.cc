@@ -64,22 +64,22 @@ tcp_adu_server_sequence::set_request(tcp_adu::pointer_type adu)
   switch (function_code) {
   case read_coils:
     pdu_sequence_ =
-      std::make_shared<read_coils_pdu_server_sequence>(event_);
+      std::make_shared<read_coils_pdu_server_sequence>();
     break;
 
   case write_single_coil:
     pdu_sequence_ =
-      std::make_shared<write_single_coil_pdu_server_sequence>(event_);
+      std::make_shared<write_single_coil_pdu_server_sequence>();
     break;
 
   case write_multiple_coils:
     pdu_sequence_ =
-      std::make_shared<write_multiple_coils_pdu_server_sequence>(event_);
+      std::make_shared<write_multiple_coils_pdu_server_sequence>();
     break;
 
   default:
     pdu_sequence_ =
-      std::make_shared<invalid_pdu_server_sequence>(event_);
+      std::make_shared<invalid_pdu_server_sequence>();
     break;
   }
 

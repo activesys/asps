@@ -119,12 +119,13 @@ void invalid_pdu_client_sequence::set_response(mb_pdu::pointer_type pdu)
 mb_pdu::pointer_type
 read_coils_pdu_server_sequence::set_request(mb_pdu::pointer_type pdu)
 {
-  if (event_) {
+  server_event* event = global_server_event::instance()->event();
+  if (event) {
     read_coils_request* req = dynamic_cast<read_coils_request*>(pdu.get());
     if (req) {
       const coils::pointer_type req_cs = std::make_shared<coils>(
         req->starting_address(), req->quantity_of_coils());
-      const coils::pointer_type rsp_cs = event_->on_read_coils(req_cs);
+      const coils::pointer_type rsp_cs = event->on_read_coils(req_cs);
 
       if (rsp_cs->code() == success) {
         return std::make_shared<read_coils_response>(rsp_cs->status());
@@ -132,7 +133,7 @@ read_coils_pdu_server_sequence::set_request(mb_pdu::pointer_type pdu)
         return std::make_shared<excep_pdu>(read_coils, rsp_cs->code());
       }
     } else {
-      event_->on_error("Invalid Read Coils Request PDU");
+      event->on_error("Invalid Read Coils Request PDU");
       return std::make_shared<excep_pdu>(read_coils, server_device_failure);
     }
   }
@@ -144,7 +145,8 @@ read_coils_pdu_server_sequence::set_request(mb_pdu::pointer_type pdu)
 mb_pdu::pointer_type
 write_single_coil_pdu_server_sequence::set_request(mb_pdu::pointer_type pdu)
 {
-  if (event_) {
+  server_event* event = global_server_event::instance()->event();
+  if (event) {
     write_single_coil_request* req =
       dynamic_cast<write_single_coil_request*>(pdu.get());
 
@@ -152,7 +154,7 @@ write_single_coil_pdu_server_sequence::set_request(mb_pdu::pointer_type pdu)
       const coils::pointer_type req_cs =
         std::make_shared<coils>(req->output_address(), 1);
       req_cs->bit(req_cs->starting_address(), req->output_value());
-      const coils::pointer_type rsp_cs = event_->on_write_single_coil(req_cs);
+      const coils::pointer_type rsp_cs = event->on_write_single_coil(req_cs);
 
       if (rsp_cs->code() == success) {
         return std::make_shared<write_single_coil_response>(
@@ -162,7 +164,7 @@ write_single_coil_pdu_server_sequence::set_request(mb_pdu::pointer_type pdu)
         return std::make_shared<excep_pdu>(write_single_coil, rsp_cs->code());
       }
     } else {
-      event_->on_error("Invalid Write Single Coil Request PDU");
+      event->on_error("Invalid Write Single Coil Request PDU");
       return std::make_shared<excep_pdu>(
               write_single_coil, server_device_failure);
     }
@@ -175,7 +177,8 @@ write_single_coil_pdu_server_sequence::set_request(mb_pdu::pointer_type pdu)
 mb_pdu::pointer_type
 write_multiple_coils_pdu_server_sequence::set_request(mb_pdu::pointer_type pdu)
 {
-  if (event_) {
+  server_event* event = global_server_event::instance()->event();
+  if (event) {
     write_multiple_coils_request* req =
       dynamic_cast<write_multiple_coils_request*>(pdu.get());
 
@@ -185,7 +188,7 @@ write_multiple_coils_pdu_server_sequence::set_request(mb_pdu::pointer_type pdu)
           req->starting_address(),
           req->quantity_of_outputs(),
           req->outputs_value());
-      const coils::pointer_type rsp_cs = event_->on_write_multiple_coils(req_cs);
+      const coils::pointer_type rsp_cs = event->on_write_multiple_coils(req_cs);
 
       if (rsp_cs->code() == success) {
         return std::make_shared<write_multiple_coils_response>(
@@ -194,7 +197,7 @@ write_multiple_coils_pdu_server_sequence::set_request(mb_pdu::pointer_type pdu)
         return std::make_shared<excep_pdu>(write_multiple_coils, rsp_cs->code());
       }
     } else {
-      event_->on_error("Invalid Write Multiple Coils Request PDU");
+      event->on_error("Invalid Write Multiple Coils Request PDU");
       return std::make_shared<excep_pdu>(
               write_multiple_coils, server_device_failure);
     }

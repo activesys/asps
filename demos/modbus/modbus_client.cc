@@ -9,9 +9,24 @@
 #include <iostream>
 #include <limits>
 #include <asps/modbus/modbus.h>
+#include <demos/modbus/boost_asio_transport_layer.h>
 
 using namespace asps::modbus;
+using namespace asps_demos::modbus_demos;
 
+int main(int argc, char* argv[])
+{
+  if (argc != 3) {
+    std::cerr << "Usage: modbus_client host port" << std::endl;
+    return 1;
+  }
+
+  boost_asio_transport_layer layer;
+  client c(1, layer);
+
+  return 0;
+}
+/*
 class my_event : public client_event
 {
 public:
@@ -121,3 +136,4 @@ int main(int argc, char* argv[])
 
   return 0;
 }
+*/

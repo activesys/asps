@@ -10,3 +10,6 @@ using namespace asps::modbus;
 
 // Global Client Event
 global_client_event* global_client_event::instance_ = nullptr;
+
+// Global Server Event
+global_server_event* global_server_event::instance_ = nullptr;
