@@ -38,7 +38,7 @@ private:
   boost::asio::io_context context_;
   tcp::acceptor acceptor_;
   server_event* event_;
-  server_session_set_type sessions_;
+  //server_session_set_type sessions_;
 };
 
 } // namespace modbus

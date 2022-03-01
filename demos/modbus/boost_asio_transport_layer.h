@@ -7,6 +7,7 @@
 #ifndef DEMOS_MODBUS_BOOST_ASIO_TRANSPORT_LAYER_H
 #define DEMOS_MODBUS_BOOST_ASIO_TRANSPORT_LAYER_H
 
+#include <vector>
 #include <boost/asio.hpp>
 #include <asps/modbus/api/transport_layer.h>
 
@@ -18,9 +19,102 @@ using namespace asps::modbus;
 class boost_asio_transport_layer : public transport_layer
 {
 public:
-  void write(const uint8_t* msg, std::size_t length) override {}
-  uint8_t* read(std::size_t length) override {return nullptr;}
-  uint8_t* glance(std::size_t length) override {return nullptr;}
+  boost_asio_transport_layer(const std::string& host, uint16_t port = 502)
+    : context_(),
+      socket_(context_)
+  {
+    tcp::resolver resolver(context_);
+    endpoint_ = resolver.resolve(host, std::to_string(port));
+  }
+
+public:
+  void connect(connect_handler on_connect, error_handler on_error) override
+  {
+    boost::system::error_code ec;
+    boost::asio::async_connect(
+      socket_,
+      endpoint_,
+      [=](boost::system::error_code ec, tcp::resolver::endpoint_type endpoint)
+      {
+        if (ec) {
+          if (on_error) {
+            on_error(ec.message());
+          }
+        } else {
+          if (on_connect) {
+            on_connect(endpoint.address().to_string(), endpoint.port());
+          }
+        }
+      });
+  }
+
+  void write(const uint8_t* buffer,
+             std::size_t length,
+             eof_handler on_eof,
+             error_handler on_error) override
+  {
+    boost::asio::async_write(
+      socket_,
+      boost::asio::buffer(buffer, length),
+      [=](boost::system::error_code ec, std::size_t length)
+      {
+        if (ec == boost::asio::error::eof && on_eof) {
+          on_eof();
+        } else if (ec && on_error) {
+          on_error(ec.message());
+        }
+      });
+  }
+
+  void read(std::size_t length,
+            read_handler on_read,
+            eof_handler on_eof,
+            error_handler on_error) override
+  {
+    std::size_t remain_length = buffer_.size();
+    buffer_.resize(length);
+    boost::asio::async_read(
+      socket_,
+      boost::asio::buffer(buffer_.data() + remain_length,
+                          buffer_.size() - remain_length),
+      [=](boost::system::error_code ec, std::size_t length)
+      {
+        if (!ec) {
+          on_read(buffer_.data());
+        } else if (ec == boost::asio::error::eof) {
+          on_eof();
+        } else {
+          on_error(ec.message());
+        }
+      });
+  }
+
+  void glance(std::size_t length,
+              glance_handler on_glance,
+              eof_handler on_eof,
+              error_handler on_error) override
+  {
+    buffer_.resize(length);
+    boost::asio::async_read(
+      socket_,
+      boost::asio::buffer(buffer_.data(), buffer_.size()),
+      [=](boost::system::error_code ec, std::size_t length)
+      {
+        if (!ec) {
+          on_glance(buffer_.data());
+        } else if (ec == boost::asio::error::eof) {
+          on_eof();
+        } else {
+          on_error(ec.message());
+        }
+      });
+  }
+
+private:
+  boost::asio::io_context context_;
+  tcp::socket socket_;
+  tcp::resolver::results_type endpoint_;
+  std::vector<uint8_t> buffer_;
 };
 
 } // modbus_demos

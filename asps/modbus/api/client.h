@@ -37,6 +37,13 @@ public:
   void receive_response();
 
 private:
+  void on_connect(const std::string& address, uint16_t port);
+  void on_error(const std::string& error_message);
+  void on_eof();
+  void on_glance(const uint8_t* buffer);
+  void on_read(const uint8_t* buffer);
+
+private:
   transport_layer& transport_layer_;
   client_session session_;
 };

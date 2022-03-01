@@ -21,7 +21,7 @@ int main(int argc, char* argv[])
     return 1;
   }
 
-  boost_asio_transport_layer layer;
+  boost_asio_transport_layer layer("127.0.0.1");
   client c(1, layer);
 
   return 0;

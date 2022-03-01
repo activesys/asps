@@ -18,9 +18,20 @@ using ::testing::Return;
 class transport_layer_test : public transport_layer
 {
 public:
-  void write(const uint8_t* buffer, std::size_t length) override {}
-  uint8_t* read(std::size_t length) override {return nullptr;}
-  uint8_t* glance(std::size_t length) override {return nullptr;}
+  void connect(connect_handler on_connect,
+               error_handler on_error) {};
+  void write(const uint8_t* buffer,
+             std::size_t length,
+             eof_handler on_eof,
+             error_handler on_error) {};
+  void read(std::size_t length,
+            read_handler on_read,
+            eof_handler on_eof,
+            error_handler on_error) {};
+  void glance(std::size_t length,
+              glance_handler on_glance,
+              eof_handler on_eof,
+              error_handler on_error) {};
 };
 
 class pdu_sequence_test : public ::testing::Test

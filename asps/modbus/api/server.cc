@@ -12,6 +12,7 @@ using namespace asps::modbus;
 // Modbus Server
 void server::async_listen()
 {
+  /*
   acceptor_.async_accept(
     [this](boost::system::error_code ec, tcp::socket socket)
     {
@@ -25,11 +26,12 @@ void server::async_listen()
           event_->on_accept(endpoint.address().to_string(), endpoint.port());
         }
         std::make_shared<server_session>(
-          std::move(socket), sessions_)->start();
+          std::move(socket))->start();
       }
 
       async_listen();
     });
+    */
 }
 
 void server::register_event(server_event* event)

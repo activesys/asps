@@ -38,7 +38,7 @@ TEST(client_session_test, read_coils_one)
   client_session session(1, layer);
   coils cs(100, 100);
 
-  EXPECT_CALL(layer, write(_, 12))
+  EXPECT_CALL(layer, write(_, 12, _, _))
     .Times(1);
 
   session.read_coils(cs);
@@ -52,7 +52,7 @@ TEST(client_session_test, read_coils_multi_times)
   config::quantity_of_coils(10);
   config::quantity_of_concurrent_requests(1000);
 
-  EXPECT_CALL(layer, write(_, 12))
+  EXPECT_CALL(layer, write(_, 12, _, _))
     .Times(10);
 
   session.read_coils(cs);
@@ -66,7 +66,7 @@ TEST(client_session_test, read_coils_5_times)
   config::quantity_of_coils(10);
   config::quantity_of_concurrent_requests(5);
 
-  EXPECT_CALL(layer, write(_, 12))
+  EXPECT_CALL(layer, write(_, 12, _, _))
     .Times(5);
 
   session.read_coils(cs);
@@ -83,7 +83,7 @@ TEST(client_session_test, receive_response)
   config::quantity_of_coils(10);
   config::quantity_of_concurrent_requests(4);
 
-  EXPECT_CALL(layer, write(_, 12))
+  EXPECT_CALL(layer, write(_, 12, _, _))
     .Times(6);
   EXPECT_CALL(ce, on_read_coils(_, _))
     .Times(2);
@@ -106,7 +106,7 @@ TEST(client_session_test, receive_response_error)
   config::quantity_of_coils(10);
   config::quantity_of_concurrent_requests(4);
 
-  EXPECT_CALL(layer, write(_, 12))
+  EXPECT_CALL(layer, write(_, 12, _, _))
     .Times(6);
   EXPECT_CALL(ce, on_read_coils(_, _))
     .Times(2);

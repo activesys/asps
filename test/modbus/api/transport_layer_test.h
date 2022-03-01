@@ -19,9 +19,10 @@ using namespace asps::modbus;
 class transport_layer_mock : public transport_layer
 {
 public:
-  MOCK_METHOD(void, write, (const uint8_t* buffer, std::size_t length), (override));
-  MOCK_METHOD(uint8_t*, read, (std::size_t length), (override));
-  MOCK_METHOD(uint8_t*, glance, (std::size_t length), (override));
+  MOCK_METHOD(void, connect, (connect_handler, error_handler), (override));
+  MOCK_METHOD(void, write, (const uint8_t*, std::size_t, eof_handler, error_handler), (override));
+  MOCK_METHOD(void, read, (std::size_t, read_handler, eof_handler, error_handler), (override));
+  MOCK_METHOD(void, glance, (std::size_t, glance_handler, eof_handler, error_handler), (override));
 };
 
 } // modbus_test

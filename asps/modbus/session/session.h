@@ -33,6 +33,9 @@ class client_session
   typedef std::deque<coils::pointer_type> coils_queue_type;
 
 public:
+  typedef std::shared_ptr<client_session> pointer_type;
+
+public:
   client_session(uint8_t unit_identifier, transport_layer& layer)
     : transaction_identifier_(0),
       unit_identifier_(unit_identifier),
@@ -48,6 +51,9 @@ public:
 private:
   void send_request();
 
+  void on_eof();
+  void on_error(const std::string& message);
+
 private:
   uint16_t transaction_identifier_;
   uint8_t unit_identifier_;
@@ -56,9 +62,26 @@ private:
   transport_layer& transport_layer_;
 };
 
-typedef std::shared_ptr<client_session> client_session_ptr;
-
 // Modbus Server Session
+class server_session
+{
+public:
+  server_session(transport_layer& layer)
+    : transport_layer_(layer)
+  {}
+
+public:
+  uint16_t mbap_header_size();
+  void receive_request(const uint8_t* buffer);
+
+private:
+  void on_eof();
+  void on_error(const std::string& message);
+
+private:
+  transport_layer& transport_layer_;
+};
+/*
 class server_session;
 typedef std::shared_ptr<server_session> server_session_ptr;
 typedef std::unordered_set<server_session_ptr> server_session_set_type;
@@ -85,6 +108,7 @@ private:
   server_session_set_type& session_set_;
   std::vector<uint8_t> buffer_;
 };
+*/
 
 } // namespace modbus
 } // namespace asps

@@ -7,12 +7,26 @@
 #include <deque>
 #include <sstream>
 #include <iterator>
+#include <functional>
 #include <asps/modbus/api/config.h>
 #include <asps/modbus/common/global_event.h>
 #include <asps/modbus/session/session.h>
 #include <asps/modbus/adu/message/tcp_adu.h>
 
 using namespace asps::modbus;
+using namespace std::placeholders;
+
+void client_session::on_eof()
+{
+
+}
+void client_session::on_error(const std::string& message)
+{
+  client_event* event = global_client_event::instance()->event();
+  if (event) {
+    event->on_error(message);
+  }
+}
 
 uint16_t client_session::mbap_header_size()
 {
@@ -47,7 +61,10 @@ void client_session::send_request()
       tcp_adu::pointer_type adu =
         sequences_[tid]->get_request(cs, function_codes::read_coils);
 
-      transport_layer_.write(adu->serialize(), adu->serialized_size());
+      transport_layer_.write(adu->serialize(),
+                             adu->serialized_size(),
+                             std::bind(&client_session::on_eof, this),
+                             std::bind(&client_session::on_error, this, _1));
     }
   }
 }
@@ -72,6 +89,34 @@ void client_session::receive_response(const uint8_t* buffer)
 }
 
 // Chat Server Session
+void server_session::on_eof()
+{
+
+}
+void server_session::on_error(const std::string& message)
+{
+  server_event* event = global_server_event::instance()->event();
+  if (event) {
+    event->on_error(message);
+  }
+}
+
+uint16_t server_session::mbap_header_size()
+{
+  return tcp_adu::mbap_header_size();
+}
+
+void server_session::receive_request(const uint8_t* buffer)
+{
+  tcp_adu::pointer_type request = tcp_adu::unserialize(buffer, true);
+  tcp_adu_server_sequence sequence;
+  tcp_adu::pointer_type response = sequence.set_request(request);
+  transport_layer_.write(response->serialize(),
+                         response->serialized_size(),
+                         std::bind(&server_session::on_eof, this),
+                         std::bind(&server_session::on_error, this, _1));
+}
+/*
 void server_session::start()
 {
   session_set_.insert(shared_from_this());
@@ -84,7 +129,7 @@ void server_session::read_mbap_header()
   boost::asio::async_read(
     socket_,
     boost::asio::buffer(buffer_.data(), buffer_.size()),
-    [this](boost::system::error_code ec, std::size_t /* length */)
+    [this](boost::system::error_code ec, std::size_t length)
     {
       server_event* event = global_server_event::instance()->event();
       if (!ec) {
@@ -103,7 +148,7 @@ void server_session::read_pdu(uint16_t length)
   boost::asio::async_read(
     socket_,
     boost::asio::buffer(buffer_.data() + tcp_adu::mbap_header_size(), length),
-    [this](boost::system::error_code ec, std::size_t /* length */)
+    [this](boost::system::error_code ec, std::size_t length)
     {
       server_event* event = global_server_event::instance()->event();
       if (!ec) {
@@ -113,7 +158,7 @@ void server_session::read_pdu(uint16_t length)
         boost::asio::async_write(
           socket_,
           boost::asio::buffer(response->serialize(), response->serialized_size()),
-          [this, event](boost::system::error_code ec, std::size_t /* length */)
+          [this, event](boost::system::error_code ec, std::size_t length)
           {
             if (ec == boost::asio::error::eof) {
               session_set_.erase(shared_from_this());
@@ -132,3 +177,4 @@ void server_session::read_pdu(uint16_t length)
       }
     });
 }
+*/
