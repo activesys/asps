@@ -28,8 +28,11 @@ public:
   typedef std::function<void ()> eof_handler;
   typedef std::function<void (const uint8_t*)> glance_handler;
   typedef std::function<void (const uint8_t*)> read_handler;
+  typedef std::function<void (const std::string&, uint16_t)> accept_handler;
 
 public:
+  virtual void listen(accept_handler on_accept,
+                      error_handler on_error) = 0;
   virtual void connect(connect_handler on_connect,
                        error_handler on_error) = 0;
   virtual void write(const uint8_t* buffer,
@@ -44,6 +47,8 @@ public:
                       glance_handler on_glance,
                       eof_handler on_eof,
                       error_handler on_error) = 0;
+  virtual void close() = 0;
+  virtual void run() = 0;
 };
 
 } // modbus

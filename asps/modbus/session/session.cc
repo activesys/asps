@@ -16,18 +16,6 @@
 using namespace asps::modbus;
 using namespace std::placeholders;
 
-void client_session::on_eof()
-{
-
-}
-void client_session::on_error(const std::string& message)
-{
-  client_event* event = global_client_event::instance()->event();
-  if (event) {
-    event->on_error(message);
-  }
-}
-
 uint16_t client_session::mbap_header_size()
 {
   return tcp_adu::mbap_header_size();
@@ -61,10 +49,7 @@ void client_session::send_request()
       tcp_adu::pointer_type adu =
         sequences_[tid]->get_request(cs, function_codes::read_coils);
 
-      transport_layer_.write(adu->serialize(),
-                             adu->serialized_size(),
-                             std::bind(&client_session::on_eof, this),
-                             std::bind(&client_session::on_error, this, _1));
+      write_(adu->serialize(), adu->serialized_size());
     }
   }
 }

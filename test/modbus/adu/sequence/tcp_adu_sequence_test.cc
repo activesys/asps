@@ -18,20 +18,24 @@ using ::testing::Return;
 class transport_layer_test : public transport_layer
 {
 public:
+  void listen(accept_handler on_accept,
+              error_handler on_error) override {}
   void connect(connect_handler on_connect,
-               error_handler on_error) {};
+               error_handler on_error) override {}
   void write(const uint8_t* buffer,
              std::size_t length,
              eof_handler on_eof,
-             error_handler on_error) {};
+             error_handler on_error) override {}
   void read(std::size_t length,
             read_handler on_read,
             eof_handler on_eof,
-            error_handler on_error) {};
+            error_handler on_error) override {}
   void glance(std::size_t length,
               glance_handler on_glance,
               eof_handler on_eof,
-              error_handler on_error) {};
+              error_handler on_error) override {}
+  void run() override {}
+  void close() override {}
 };
 
 class tcp_adu_client_sequence_test : public ::testing::Test
@@ -108,7 +112,7 @@ class tcp_adu_server_sequence_test : public ::testing::Test
 {
 protected:
   tcp_adu_server_sequence_test()
-    : s_(9502),
+    : s_(layer_),
       se_(s_)
   {
     global_server_event::instance()->event(&se_);
@@ -116,6 +120,7 @@ protected:
 
   server s_;
   server_event_mock se_;
+  transport_layer_test layer_;
 };
 
 TEST_F(tcp_adu_server_sequence_test, set_request_read_coils)

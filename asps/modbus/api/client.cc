@@ -49,6 +49,14 @@ void client::on_read(const uint8_t* buffer)
   session_.receive_response(buffer);
 }
 
+void client::write(const uint8_t* buffer, std::size_t length)
+{
+  transport_layer_.write(buffer,
+                         length,
+                         std::bind(&client::on_eof, this),
+                         std::bind(&client::on_error, this, _1));
+}
+
 void client::connect()
 {
   transport_layer_.connect(
@@ -73,6 +81,16 @@ void client::receive_response()
 void client::event(client_event* e)
 {
   global_client_event::instance()->event(e);
+}
+
+void client::run()
+{
+  transport_layer_.run();
+}
+
+void client::close()
+{
+  transport_layer_.close();
 }
 /*
 void client::register_event(client_event* event)

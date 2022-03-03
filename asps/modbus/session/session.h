@@ -12,9 +12,7 @@
 #include <deque>
 #include <vector>
 #include <unordered_map>
-#include <unordered_set>
-
-#include <boost/asio.hpp>
+#include <functional>
 
 #include <asps/modbus/api/transport_layer.h>
 #include <asps/modbus/api/event.h>
@@ -24,22 +22,22 @@
 namespace asps {
 namespace modbus {
 
-using boost::asio::ip::tcp;
-
 // Modbus client session
 class client_session
 {
-  typedef std::unordered_map<uint16_t, tcp_adu_client_sequence::pointer_type> sequence_type;
+  typedef std::unordered_map<uint16_t,
+                             tcp_adu_client_sequence::pointer_type> sequence_type;
   typedef std::deque<coils::pointer_type> coils_queue_type;
 
 public:
   typedef std::shared_ptr<client_session> pointer_type;
+  typedef std::function<void (const uint8_t*, std::size_t)> write_handler;
 
 public:
-  client_session(uint8_t unit_identifier, transport_layer& layer)
+  client_session(uint8_t unit_identifier, write_handler write)
     : transaction_identifier_(0),
       unit_identifier_(unit_identifier),
-      transport_layer_(layer)
+      write_(write)
   {}
 
 public:
@@ -51,20 +49,20 @@ public:
 private:
   void send_request();
 
-  void on_eof();
-  void on_error(const std::string& message);
-
 private:
   uint16_t transaction_identifier_;
   uint8_t unit_identifier_;
   coils_queue_type coils_queue_;
   sequence_type sequences_;
-  transport_layer& transport_layer_;
+  write_handler write_;
 };
 
 // Modbus Server Session
 class server_session
 {
+public:
+  typedef std::shared_ptr<server_session> pointer_type;
+
 public:
   server_session(transport_layer& layer)
     : transport_layer_(layer)

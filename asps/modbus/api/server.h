@@ -8,37 +8,41 @@
 #define ASPS_MODBUS_API_SERVER_H
 
 #include <cstdint>
-#include <boost/asio.hpp>
+#include <memory>
+#include <unordered_map>
 
+#include <asps/modbus/api/transport_layer.h>
 #include <asps/modbus/api/event.h>
 #include <asps/modbus/session/session.h>
 
 namespace asps {
 namespace modbus {
 
-using boost::asio::ip::tcp;
-
 // Modbus Server
 class server
 {
-public:
-  explicit server(uint16_t port = 502)
-    : context_(),
-      acceptor_(context_, tcp::endpoint(tcp::v4(), port)),
-      event_(nullptr)
-  {}
-  ~server() {delete event_;}
+  /*
+  typedef std::unordered_map<std::pair<std::string&, uint16_t>,
+                             server_session::pointer_type> sessions_type;
+                             */
 
 public:
-  void register_event(server_event* event);
-  void async_listen();
+  explicit server(transport_layer& layer)
+    : transport_layer_(layer)
+  {}
+
+public:
+  void event(server_event* e);
+  void listen();
   void run();
 
 private:
-  boost::asio::io_context context_;
-  tcp::acceptor acceptor_;
-  server_event* event_;
-  //server_session_set_type sessions_;
+  void on_accept(const std::string& host, uint16_t port);
+  void on_error(const std::string& error_message);
+
+private:
+  transport_layer& transport_layer_;
+  //sessions_type sessions_;
 };
 
 } // namespace modbus

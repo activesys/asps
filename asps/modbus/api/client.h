@@ -9,7 +9,6 @@
 
 #include <cstdint>
 #include <string>
-#include <boost/asio.hpp>
 
 #include <asps/modbus/api/transport_layer.h>
 #include <asps/modbus/api/event.h>
@@ -19,7 +18,7 @@
 namespace asps {
 namespace modbus {
 
-using boost::asio::ip::tcp;
+using namespace std::placeholders;
 
 // Modbus Client
 class client
@@ -27,7 +26,7 @@ class client
 public:
   client(uint8_t unit_identifier, transport_layer& layer)
     : transport_layer_(layer),
-      session_(unit_identifier, layer)
+      session_(unit_identifier, std::bind(&client::write, this, _1, _2))
   {}
 
 public:
@@ -35,6 +34,8 @@ public:
   void event(client_event* e);
   void read_coils(const coils& cs);
   void receive_response();
+  void close();
+  void run();
 
 private:
   void on_connect(const std::string& address, uint16_t port);
@@ -42,6 +43,8 @@ private:
   void on_eof();
   void on_glance(const uint8_t* buffer);
   void on_read(const uint8_t* buffer);
+
+  void write(const uint8_t* buffer, std::size_t length);
 
 private:
   transport_layer& transport_layer_;

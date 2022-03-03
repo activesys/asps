@@ -14,6 +14,7 @@
 namespace asps_demos {
 namespace modbus_demos {
 
+using boost::asio::ip::tcp;
 using namespace asps::modbus;
 
 class boost_asio_transport_layer : public transport_layer
@@ -21,13 +22,30 @@ class boost_asio_transport_layer : public transport_layer
 public:
   boost_asio_transport_layer(const std::string& host, uint16_t port = 502)
     : context_(),
-      socket_(context_)
+      socket_(context_),
+      acceptor_(context_, tcp::endpoint(tcp::v4(), port))
   {
     tcp::resolver resolver(context_);
     endpoint_ = resolver.resolve(host, std::to_string(port));
   }
 
 public:
+  void listen(accept_handler on_accept, error_handler on_error) override
+  {
+    acceptor_.async_accept(
+      [=](boost::system::error_code ec, tcp::socket socket)
+      {
+        if (ec) {
+          on_error(ec.message());
+        } else {
+          tcp::endpoint endpoint = socket.remote_endpoint();
+          on_accept(endpoint.address().to_string(), endpoint.port());
+        }
+
+        listen(on_accept, on_error);
+      });
+  }
+
   void connect(connect_handler on_connect, error_handler on_error) override
   {
     boost::system::error_code ec;
@@ -37,13 +55,9 @@ public:
       [=](boost::system::error_code ec, tcp::resolver::endpoint_type endpoint)
       {
         if (ec) {
-          if (on_error) {
-            on_error(ec.message());
-          }
+          on_error(ec.message());
         } else {
-          if (on_connect) {
-            on_connect(endpoint.address().to_string(), endpoint.port());
-          }
+          on_connect(endpoint.address().to_string(), endpoint.port());
         }
       });
   }
@@ -58,9 +72,9 @@ public:
       boost::asio::buffer(buffer, length),
       [=](boost::system::error_code ec, std::size_t length)
       {
-        if (ec == boost::asio::error::eof && on_eof) {
+        if (ec == boost::asio::error::eof) {
           on_eof();
-        } else if (ec && on_error) {
+        } else if (ec) {
           on_error(ec.message());
         }
       });
@@ -110,9 +124,20 @@ public:
       });
   }
 
+  void run() override
+  {
+    context_.run();
+  }
+
+  void close() override
+  {
+    socket_.close();
+  }
+
 private:
   boost::asio::io_context context_;
   tcp::socket socket_;
+  tcp::acceptor acceptor_;
   tcp::resolver::results_type endpoint_;
   std::vector<uint8_t> buffer_;
 };
