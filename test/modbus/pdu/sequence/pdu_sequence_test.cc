@@ -6,6 +6,7 @@
 
 #include <gtest/gtest.h>
 #include <asps/modbus/modbus.h>
+#include <test/modbus/api/transport_layer_test.h>
 #include <test/modbus/api/event_test.h>
 
 namespace asps_test {
@@ -15,41 +16,20 @@ using namespace asps::modbus;
 using ::testing::_;
 using ::testing::Return;
 
-class transport_layer_test : public transport_layer
-{
-public:
-  void listen(accept_handler on_accept,
-              error_handler on_error) override {}
-  void connect(connect_handler on_connect,
-               error_handler on_error) override {}
-  void write(const uint8_t* buffer,
-             std::size_t length,
-             eof_handler on_eof,
-             error_handler on_error) override {}
-  void read(std::size_t length,
-            read_handler on_read,
-            eof_handler on_eof,
-            error_handler on_error) override {}
-  void glance(std::size_t length,
-              glance_handler on_glance,
-              eof_handler on_eof,
-              error_handler on_error) override {}
-  void run() override {}
-  void close() override {}
-};
-
 class pdu_sequence_test : public ::testing::Test
 {
 protected:
   pdu_sequence_test()
-    : c_(1, layer_),
-      ce_(c_)
+    : c_(1),
+      ce_(c_),
+      layer_(c_)
   {
     cs_ = std::make_shared<coils>(100, 10, status_);
     global_client_event::instance()->event(&ce_);
+    c_.transport_layer(&layer_);
   }
 
-  transport_layer_test layer_;
+  client_transport_layer_mock layer_;
   client c_;
   client_event_mock ce_;
   coils::pointer_type cs_;
@@ -182,15 +162,17 @@ class pdu_server_sequence_test : public ::testing::Test
 {
 protected:
   pdu_server_sequence_test()
-    : s_(layer_),
-      se_(s_)
+    : s_(),
+      se_(s_),
+      layer_(s_)
   {
     global_server_event::instance()->event(&se_);
+    s_.transport_layer(&layer_);
   }
 
   server s_;
   server_event_mock se_;
-  transport_layer_test layer_;
+  server_transport_layer_mock layer_;
 };
 
 TEST_F(pdu_server_sequence_test, read_coils_pdu_server_sequence_set_request_success)

@@ -33,14 +33,16 @@ public:
   {}
 
 public:
-  tcp_adu::pointer_type get_request(
-    const coils::pointer_type cs, function_codes code);
+  tcp_adu::pointer_type get_request(const coils::pointer_type cs,
+                                    function_codes code);
   void set_response(tcp_adu::pointer_type adu);
 
 private:
   uint16_t transaction_identifier_;
   uint8_t unit_identifier_;
-  pdu_client_sequence_ptr pdu_sequence_;
+  pdu_client_sequence::pointer_type pdu_sequence_;
+  tcp_adu::pointer_type req_;
+
 };
 
 // Modbus TCP ADU Server sequence
@@ -54,6 +56,7 @@ public:
 
 private:
   pdu_server_sequence::pointer_type pdu_sequence_;
+  tcp_adu::pointer_type rsp_;
 };
 
 } // namespace modbus

@@ -41,7 +41,8 @@ public:
   virtual std::size_t serialized_size() = 0;
 
 public:
-  static mb_pdu::pointer_type unserialize(const uint8_t* buffer, bool is_request);
+  static mb_pdu::pointer_type unserialize(const uint8_t* buffer,
+                                          bool is_request);
 
 protected:
   uint8_t function_code_;

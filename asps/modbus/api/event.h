@@ -28,17 +28,15 @@ public:
 
 public:
   virtual void on_connect(const std::string& address, uint16_t port) = 0;
-  virtual void on_connect(const std::string& error_message) = 0;
-
   virtual void on_error(const std::string& error_message) = 0;
 
 public:
-  virtual void on_read_coils(
-    const coils::pointer_type cs, exception_code code) = 0;
-  virtual void on_write_single_coil(
-    const coils::pointer_type cs, exception_code code) = 0;
-  virtual void on_write_multiple_coils(
-    const coils::pointer_type cs, exception_code code) = 0;
+  virtual void on_read_coils(const coils::pointer_type cs,
+                             exception_code code) = 0;
+  virtual void on_write_single_coil(const coils::pointer_type cs,
+                                    exception_code code) = 0;
+  virtual void on_write_multiple_coils(const coils::pointer_type cs,
+                                       exception_code code) = 0;
 
 protected:
   client& modbus_client;

@@ -10,7 +10,8 @@
 using namespace asps::modbus;
 
 // Modbus PDU
-mb_pdu::pointer_type mb_pdu::unserialize(const uint8_t* buffer, bool is_request)
+mb_pdu::pointer_type
+mb_pdu::unserialize(const uint8_t* buffer, bool is_request)
 {
   // decode function code
   uint8_t function_code = *buffer;
@@ -41,13 +42,15 @@ mb_pdu::pointer_type mb_pdu::unserialize(const uint8_t* buffer, bool is_request)
 }
 
 // Modbus Exception PDU
-std::size_t excep_pdu::serialized_size()
+std::size_t
+excep_pdu::serialized_size()
 {
   return function_code_field_length +
          exception_code_field_length;
 }
 
-uint8_t* excep_pdu::serialize()
+uint8_t*
+excep_pdu::serialize()
 {
   buffer_.resize(serialized_size());
   uint8_t* pos = buffer_.data();
@@ -61,7 +64,8 @@ uint8_t* excep_pdu::serialize()
   return buffer_.data();
 }
 
-mb_pdu::pointer_type excep_pdu::unserialize(const uint8_t* buffer)
+mb_pdu::pointer_type
+excep_pdu::unserialize(const uint8_t* buffer)
 {
   const uint8_t* pos = buffer;
   // decode function code
@@ -75,14 +79,16 @@ mb_pdu::pointer_type excep_pdu::unserialize(const uint8_t* buffer)
 }
 
 // Modbus Read Coils request PDU
-std::size_t read_coils_request::serialized_size()
+std::size_t
+read_coils_request::serialized_size()
 {
   return function_code_field_length +
          starting_address_field_length +
          quantity_of_coils_field_length;
 }
 
-uint8_t* read_coils_request::serialize()
+uint8_t*
+read_coils_request::serialize()
 {
   buffer_.resize(serialized_size());
   uint8_t* pos = buffer_.data();
@@ -99,7 +105,8 @@ uint8_t* read_coils_request::serialize()
   return buffer_.data();
 }
 
-mb_pdu::pointer_type read_coils_request::unserialize(const uint8_t* buffer)
+mb_pdu::pointer_type
+read_coils_request::unserialize(const uint8_t* buffer)
 {
   const uint8_t* pos = buffer;
   // decode function code
@@ -114,19 +121,21 @@ mb_pdu::pointer_type read_coils_request::unserialize(const uint8_t* buffer)
     ntohs(*reinterpret_cast<uint16_t*>(const_cast<uint8_t*>(pos)));
   pos += quantity_of_coils_field_length;
 
-  return std::make_shared<read_coils_request>(
-           starting_address, quantity_of_coils);
+  return std::make_shared<read_coils_request>(starting_address,
+                                              quantity_of_coils);
 }
 
 // Modbus Read Coils Response PDU
-std::size_t read_coils_response::serialized_size()
+std::size_t
+read_coils_response::serialized_size()
 {
   return function_code_field_length +
          byte_count_field_length +
          byte_count_;
 }
 
-uint8_t* read_coils_response::serialize()
+uint8_t*
+read_coils_response::serialize()
 {
   buffer_.resize(serialized_size());
   uint8_t* pos = buffer_.data();
@@ -137,7 +146,7 @@ uint8_t* read_coils_response::serialize()
   *pos = byte_count_;
   pos += byte_count_field_length;
   // ecnode coils status
-  for (uint8_t i = 0; i < coils_status_.size(); ++i) {
+  for (std::size_t i = 0; i < coils_status_.size(); ++i) {
     uint8_t value = coils_status_.at(i);
     pos[i/8] |= value << i % 8;
   }
@@ -146,7 +155,8 @@ uint8_t* read_coils_response::serialize()
   return buffer_.data();
 }
 
-mb_pdu::pointer_type read_coils_response::unserialize(const uint8_t* buffer)
+mb_pdu::pointer_type
+read_coils_response::unserialize(const uint8_t* buffer)
 {
   const uint8_t* pos = buffer;
   // decode function code
@@ -159,7 +169,7 @@ mb_pdu::pointer_type read_coils_response::unserialize(const uint8_t* buffer)
   // We assume that all the bits in coils status byte are valid,
   // so we may have more data than we actually have.
   bits_type coils_status(byte_count * 8);
-  for (uint8_t i = 0; i < byte_count * 8; ++i) {
+  for (std::size_t i = 0; i < byte_count * 8; ++i) {
     coils_status[i] = (pos[i/8] >> i%8) & 0x01;
   }
   pos += byte_count;
@@ -168,14 +178,16 @@ mb_pdu::pointer_type read_coils_response::unserialize(const uint8_t* buffer)
 }
 
 // Modbus Write Single Coil
-std::size_t write_single_coil_request::serialized_size()
+std::size_t
+write_single_coil_request::serialized_size()
 {
   return function_code_field_length +
          output_address_field_length +
          output_value_field_length;
 }
 
-uint8_t* write_single_coil_request::serialize()
+uint8_t*
+write_single_coil_request::serialize()
 {
   buffer_.resize(serialized_size());
   uint8_t* pos = buffer_.data();
@@ -196,7 +208,8 @@ uint8_t* write_single_coil_request::serialize()
   return buffer_.data();
 }
 
-mb_pdu::pointer_type write_single_coil_request::unserialize(const uint8_t* buffer)
+mb_pdu::pointer_type
+write_single_coil_request::unserialize(const uint8_t* buffer)
 {
   const uint8_t* pos = buffer;
   // decode function code
@@ -212,12 +225,13 @@ mb_pdu::pointer_type write_single_coil_request::unserialize(const uint8_t* buffe
     output_value_on;
   pos += output_value_field_length;
 
-  return std::make_shared<write_single_coil_request>(
-           output_address, output_value);
+  return std::make_shared<write_single_coil_request>(output_address,
+                                                     output_value);
 }
 
 // Modbus Write Multiple Coils
-std::size_t write_multiple_coils_request::serialized_size()
+std::size_t
+write_multiple_coils_request::serialized_size()
 {
   return function_code_field_length +
          starting_address_field_length +
@@ -226,7 +240,8 @@ std::size_t write_multiple_coils_request::serialized_size()
          byte_count_;
 }
 
-uint8_t* write_multiple_coils_request::serialize()
+uint8_t*
+write_multiple_coils_request::serialize()
 {
   buffer_.resize(serialized_size());
   uint8_t* pos = buffer_.data();
@@ -243,7 +258,7 @@ uint8_t* write_multiple_coils_request::serialize()
   *pos = byte_count_;
   pos += byte_count_field_length;
   // encode output values
-  for (uint8_t i = 0; i < quantity_of_outputs_; ++i) {
+  for (std::size_t i = 0; i < quantity_of_outputs_; ++i) {
     uint8_t value = outputs_value_[i];
     pos[i/8] |= value << i % 8;
   }
@@ -252,7 +267,8 @@ uint8_t* write_multiple_coils_request::serialize()
   return buffer_.data();
 }
 
-mb_pdu::pointer_type write_multiple_coils_request::unserialize(const uint8_t* buffer)
+mb_pdu::pointer_type
+write_multiple_coils_request::unserialize(const uint8_t* buffer)
 {
   const uint8_t* pos = buffer;
   // decode function code
@@ -273,23 +289,26 @@ mb_pdu::pointer_type write_multiple_coils_request::unserialize(const uint8_t* bu
   // We assume that all the bits in coils status byte are valid,
   // so we may have more data than we actually have.
   bits_type outputs_value(byte_count * 8);
-  for (uint8_t i = 0; i < byte_count * 8; ++i) {
+  for (std::size_t i = 0; i < byte_count * 8; ++i) {
     outputs_value[i] = (pos[i/8] >> i%8) & 0x01;
   }
   pos += byte_count;
 
-  return std::make_shared<write_multiple_coils_request>(
-           starting_address, quantity_of_outputs, outputs_value);
+  return std::make_shared<write_multiple_coils_request>(starting_address,
+                                                        quantity_of_outputs,
+                                                        outputs_value);
 }
 
-std::size_t write_multiple_coils_response::serialized_size()
+std::size_t
+write_multiple_coils_response::serialized_size()
 {
   return function_code_field_length +
          starting_address_field_length +
          quantity_of_outputs_field_length;
 }
 
-uint8_t* write_multiple_coils_response::serialize()
+uint8_t*
+write_multiple_coils_response::serialize()
 {
   buffer_.resize(serialized_size());
   uint8_t* pos = buffer_.data();
@@ -306,7 +325,8 @@ uint8_t* write_multiple_coils_response::serialize()
   return buffer_.data();
 }
 
-mb_pdu::pointer_type write_multiple_coils_response::unserialize(const uint8_t* buffer)
+mb_pdu::pointer_type
+write_multiple_coils_response::unserialize(const uint8_t* buffer)
 {
   const uint8_t* pos = buffer;
   // decode function code
@@ -321,6 +341,6 @@ mb_pdu::pointer_type write_multiple_coils_response::unserialize(const uint8_t* b
     ntohs(*reinterpret_cast<uint16_t*>(const_cast<uint8_t*>(pos)));
   pos += quantity_of_outputs_field_length;
 
-  return std::make_shared<write_multiple_coils_response>(
-           starting_address, quantity_of_outputs);
+  return std::make_shared<write_multiple_coils_response>(starting_address,
+                                                         quantity_of_outputs);
 }

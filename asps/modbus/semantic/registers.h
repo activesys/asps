@@ -17,8 +17,9 @@ namespace modbus {
 class holding_registers : public read_write_model<uint16_t>
 {
 public:
-  holding_registers(
-    uint16_t starting_address, uint16_t count, uint16_t* values)
+  holding_registers(uint16_t starting_address,
+                    uint16_t count,
+                    uint16_t* values)
     : read_write_model(starting_address, count, values)
   {}
 };
@@ -27,8 +28,9 @@ public:
 class input_registers : public read_only_model<uint16_t>
 {
 public:
-  input_registers(
-    uint16_t starting_address, uint16_t count, const uint16_t* values)
+  input_registers(uint16_t starting_address,
+                  uint16_t count,
+                  const uint16_t* values)
     : read_only_model(starting_address, count, values)
   {}
 };

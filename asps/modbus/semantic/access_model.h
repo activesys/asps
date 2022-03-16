@@ -28,19 +28,17 @@ public:
   typedef std::shared_ptr<accessing_model<T>> pointer_type;
 
 public:
-  accessing_model(
-    uint16_t starting_address,
-    uint16_t count,
-    const memory_type& memory)
+  accessing_model(uint16_t starting_address,
+                  uint16_t count,
+                  const memory_type& memory)
     : starting_address_(starting_address),
       count_(count),
       memory_(memory),
       code_(success)
   {}
-  accessing_model(
-    uint16_t starting_address,
-    uint16_t count,
-    const value_type* values = nullptr)
+  accessing_model(uint16_t starting_address,
+                  uint16_t count,
+                  const value_type* values = nullptr)
     : starting_address_(starting_address),
       count_(count),
       code_(success)

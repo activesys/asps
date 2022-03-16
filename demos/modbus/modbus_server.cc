@@ -6,8 +6,10 @@
 
 #include <iostream>
 #include <asps/modbus/modbus.h>
+#include <demos/modbus/boost_asio_transport_layer.h>
 
 using namespace asps::modbus;
+using namespace asps_demos::modbus_demos;
 
 class my_event : public server_event
 {
@@ -62,14 +64,17 @@ bool my_event::my_memory_[0xffff];
 
 int main(int argc, char* argv[])
 {
-  if (argc != 2) {
+  if (argc != 3) {
     std::cerr << "Usage: modbus_server port" << std::endl;
     return 1;
   }
 
-  server s(std::atoi(argv[1]));
-  s.register_event(new my_event(s));
-  s.async_listen();
+  server s;
+  my_event e(s);
+  boost_asio_server_transport_layer layer(s, argv[1], std::atoi(argv[2]));
+  s.event(&e);
+  s.transport_layer(&layer);
+  s.listen();
   s.run();
 
   return 0;

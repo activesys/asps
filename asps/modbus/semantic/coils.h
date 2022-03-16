@@ -20,10 +20,15 @@ namespace modbus {
 class coils : public read_write_model<bit_type>
 {
 public:
-  coils(uint16_t starting_address, uint16_t count, const bits_type& status)
+  coils(uint16_t starting_address,
+        uint16_t count,
+        const bits_type& status)
     : read_write_model(starting_address, count, status)
   {}
-  coils(uint16_t starting_address, uint16_t count, const bit_type* status = nullptr)
+  coils(uint16_t starting_address,
+        uint16_t count,
+        const bit_type*
+        status = nullptr)
     : read_write_model(starting_address, count, status)
   {}
 };
@@ -34,13 +39,17 @@ public:
   typedef std::shared_ptr<coils> pointer_type;
 
 public:
-  coils(uint16_t starting_address, uint16_t count, const bits_type& status)
+  coils(uint16_t starting_address,
+        uint16_t count,
+        const bits_type& status)
     : starting_address_(starting_address),
       count_(count),
       status_(status),
       code_(success)
   {}
-  coils(uint16_t starting_address, uint16_t count, const bit_type* status = nullptr)
+  coils(uint16_t starting_address,
+        uint16_t count,
+        const bit_type* status = nullptr)
     : starting_address_(starting_address),
       count_(count),
       code_(success)
@@ -61,8 +70,11 @@ public:
     for (uint16_t i = 0; i < cs.count_; i += count) {
       uint16_t starting_address = cs.starting_address_ + i;
       uint16_t min_count = std::min<uint16_t>(count, cs.count_ - i);
-      bits_type status(cs.status_.begin() + i, cs.status_.begin() + i + min_count);
-      csv.push_back(std::make_shared<coils>(starting_address, min_count, status));
+      bits_type status(cs.status_.begin() + i,
+                       cs.status_.begin() + i + min_count);
+      csv.push_back(std::make_shared<coils>(starting_address,
+                                            min_count,
+                                            status));
     }
 
     std::move(csv.begin(), csv.end(), pos);

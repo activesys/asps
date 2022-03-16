@@ -12,7 +12,8 @@
 using namespace asps::modbus;
 
 // Modbus TCP ADU
-std::size_t tcp_adu::mbap_header_size()
+std::size_t
+tcp_adu::mbap_header_size()
 {
   return transaction_identifier_field_length +
          protocol_identifier_field_length +
@@ -20,7 +21,8 @@ std::size_t tcp_adu::mbap_header_size()
          unit_identifier_field_length;
 }
 
-std::size_t tcp_adu::serialized_size()
+std::size_t
+tcp_adu::serialized_size()
 {
   return transaction_identifier_field_length +
          protocol_identifier_field_length +
@@ -29,7 +31,8 @@ std::size_t tcp_adu::serialized_size()
          pdu_->serialized_size();
 }
 
-uint16_t tcp_adu::pdu_size(const uint8_t* buffer)
+uint16_t
+tcp_adu::pdu_size(const uint8_t* buffer)
 {
   const uint8_t* pos = buffer;
   pos += transaction_identifier_field_length + protocol_identifier_field_length;
@@ -38,7 +41,8 @@ uint16_t tcp_adu::pdu_size(const uint8_t* buffer)
          unit_identifier_field_length;
 }
 
-uint8_t* tcp_adu::serialize()
+uint8_t*
+tcp_adu::serialize()
 {
   buffer_.resize(serialized_size());
   uint8_t* pos = buffer_.data();
@@ -62,7 +66,8 @@ uint8_t* tcp_adu::serialize()
   return buffer_.data();
 }
 
-tcp_adu::pointer_type tcp_adu::unserialize(const uint8_t* buffer, bool is_request)
+tcp_adu::pointer_type
+tcp_adu::unserialize(const uint8_t* buffer, bool is_request)
 {
   const uint8_t* pos = buffer;
   // decode transaction identifier
@@ -84,5 +89,7 @@ tcp_adu::pointer_type tcp_adu::unserialize(const uint8_t* buffer, bool is_reques
   mb_pdu::pointer_type pdu = mb_pdu::unserialize(pos, is_request);
   pos += length - 1;
 
-  return std::make_shared<tcp_adu>(transaction_identifier, unit_identifier, pdu);
+  return std::make_shared<tcp_adu>(transaction_identifier,
+                                   unit_identifier,
+                                   pdu);
 }

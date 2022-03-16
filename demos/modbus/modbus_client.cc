@@ -14,19 +14,6 @@
 using namespace asps::modbus;
 using namespace asps_demos::modbus_demos;
 
-int main(int argc, char* argv[])
-{
-  if (argc != 3) {
-    std::cerr << "Usage: modbus_client host port" << std::endl;
-    return 1;
-  }
-
-  boost_asio_transport_layer layer("127.0.0.1");
-  client c(1, layer);
-
-  return 0;
-}
-/*
 class my_event : public client_event
 {
 public:
@@ -39,12 +26,6 @@ public:
   {
     std::cout << "modbus_client> connect to " << address << ":" << port << std::endl;
     get_cmd();
-  }
-  void on_connect(const std::string& error_message) override
-  {
-    std::cerr << "modbus_client> failed to connect server. error message: "
-              << error_message << std::endl;
-    modbus_client.async_connect();
   }
   void on_error(const std::string& error_message) override
   {
@@ -92,9 +73,6 @@ private:
     uint16_t cmd;
     std::cin >> cmd;
     if (cmd == 1) {
-      std::cout << "modbus_client> unit identifier(0~65535): ";
-      uint16_t uid;
-      std::cin >> uid;
       std::cout << "modbus_client> starting address(0~65535): ";
       uint16_t address;
       std::cin >> address;
@@ -102,7 +80,8 @@ private:
       uint16_t quantity;
       std::cin >> quantity;
       coils cs(address, quantity, my_memory_+address);
-      modbus_client.read_coils(uid, cs);
+      modbus_client.read_coils(cs);
+      modbus_client.receive_response();
     } else {
       modbus_client.close();
       coils cs();
@@ -111,12 +90,6 @@ private:
 
 private:
   static bool my_memory_[0xffff];
-};
-
-class my_transport_layer : public transport_layer
-{
-public:
-  virtual void send(const uint8_t* msg, std::size_t length) override {}
 };
 
 bool my_event::my_memory_[0xffff];
@@ -128,12 +101,13 @@ int main(int argc, char* argv[])
     return 1;
   }
 
-  my_transport_layer layer;
-  client c(layer, argv[1], std::atoi(argv[2]));
-  c.register_event(new my_event(c));
-  c.async_connect();
+  client c(1);
+  boost_asio_client_transport_layer layer(c, argv[1], std::atoi(argv[2]));
+  my_event event(c);
+  c.event(&event);
+  c.transport_layer(&layer);
+  c.connect();
   c.run();
 
   return 0;
 }
-*/

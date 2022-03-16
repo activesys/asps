@@ -16,16 +16,36 @@ namespace modbus_test {
 
 using namespace asps::modbus;
 
-class transport_layer_mock : public transport_layer
+class client_transport_layer_mock : public client_transport_layer
 {
 public:
-  MOCK_METHOD(void, listen, (accept_handler, error_handler), (override));
-  MOCK_METHOD(void, connect, (connect_handler, error_handler), (override));
-  MOCK_METHOD(void, write, (const uint8_t*, std::size_t, eof_handler, error_handler), (override));
-  MOCK_METHOD(void, read, (std::size_t, read_handler, eof_handler, error_handler), (override));
-  MOCK_METHOD(void, glance, (std::size_t, glance_handler, eof_handler, error_handler), (override));
-  MOCK_METHOD(void, run, (), (override));
+  client_transport_layer_mock(client_transport_event& event)
+    : client_transport_layer(event)
+  {}
+
+public:
+  MOCK_METHOD(void, connect, (), (override));
+  MOCK_METHOD(void, write, (const uint8_t* buffer, std::size_t length), (override));
+  MOCK_METHOD(void, read, (std::size_t length), (override));
+  MOCK_METHOD(void, glance, (std::size_t length), (override));
   MOCK_METHOD(void, close, (), (override));
+  MOCK_METHOD(void, run, (), (override));
+};
+
+class server_transport_layer_mock : public server_transport_layer
+{
+public:
+  server_transport_layer_mock(server_transport_event& event)
+    : server_transport_layer(event)
+  {}
+
+public:
+  MOCK_METHOD(void, listen, (), (override));
+  MOCK_METHOD(void, write, (const std::string& host, uint16_t port, const uint8_t* buffer, std::size_t length), (override));
+  MOCK_METHOD(void, read, (const std::string& host, uint16_t port, std::size_t length), (override));
+  MOCK_METHOD(void, glance, (const std::string& host, uint16_t port, std::size_t length), (override));
+  MOCK_METHOD(void, close, (const std::string& host, uint16_t port), (override));
+  MOCK_METHOD(void, run, (), (override));
 };
 
 } // modbus_test

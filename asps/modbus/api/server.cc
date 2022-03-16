@@ -13,59 +13,87 @@ using namespace asps::modbus;
 using namespace std::placeholders;
 
 // Modbus Server
-void server::on_accept(const std::string& host, uint16_t port)
+void
+server::on_accept(const std::string& host, uint16_t port)
 {
   server_event* event = global_server_event::instance()->event();
   if (event) {
     event->on_accept(host, port);
   }
   // create session
-  /*
-  sessions_.emplace(std::make_pair(host, port),
-                    std::make_shared<server_session>(transport_layer_));
-                    */
-}
-
-void server::on_error(const std::string& error_message)
-{
-  server_event* event = global_server_event::instance()->event();
-  if (event) {
-    event->on_error(error_message);
+  sessions_[address(host, port)] = std::make_shared<server_session>();
+  if (transport_layer_) {
+    transport_layer_->glance(host, port, server_session::mbap_header_size());
   }
 }
 
-void server::listen()
+void
+server::on_error(const std::string& host, uint16_t port, const std::string& msg)
 {
-  transport_layer_.listen(std::bind(&server::on_accept, this, _1, _2),
-                          std::bind(&server::on_error, this, _1));
+  server_event* event = global_server_event::instance()->event();
+  if (event) {
+    event->on_error(msg);
+  }
+  // delete session
+  sessions_.erase(address(host, port));
 }
-  /*
-  acceptor_.async_accept(
-    [this](boost::system::error_code ec, tcp::socket socket)
-    {
-      if (ec) {
-        if (event_) {
-          event_->on_accept(ec.message());
-        }
-      } else {
-        tcp::endpoint endpoint = socket.remote_endpoint();
-        if (event_) {
-          event_->on_accept(endpoint.address().to_string(), endpoint.port());
-        }
-        std::make_shared<server_session>(
-          std::move(socket))->start();
-      }
 
-      async_listen();
-    });
-    */
+void
+server::on_eof(const std::string& host, uint16_t port)
+{
+  // delete session
+  sessions_.erase(address(host, port));
+}
 
-void server::event(server_event* e)
+void
+server::on_read(const std::string& host, uint16_t port, const uint8_t* buffer)
+{
+  //get session
+  server_session::pointer_type session = sessions_[address(host, port)];
+  buffer_list buffers = session->receive_request(buffer);
+
+  if (transport_layer_) {
+    for (auto buf : buffers) {
+      transport_layer_->write(host, port, buf.first, buf.second);
+    }
+
+    transport_layer_->glance(host, port, server_session::mbap_header_size());
+  }
+}
+
+void
+server::on_glance(const std::string& host, uint16_t port, const uint8_t* buffer)
+{
+  // get session
+  if (transport_layer_) {
+    transport_layer_->read(host, port, server_session::adu_size(buffer));
+  }
+}
+
+void
+server::listen()
+{
+  if (transport_layer_) {
+    transport_layer_->listen();
+  }
+}
+
+void
+server::transport_layer(server_transport_layer* layer)
+{
+  transport_layer_ = layer;
+}
+
+void
+server::event(server_event* e)
 {
   global_server_event::instance()->event(e);
 }
 
-void server::run()
+void
+server::run()
 {
-  transport_layer_.run();
+  if (transport_layer_) {
+    transport_layer_->run();
+  }
 }

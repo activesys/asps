@@ -10,7 +10,7 @@
 #include <cstdint>
 #include <memory>
 #include <deque>
-#include <vector>
+#include <list>
 #include <unordered_map>
 #include <functional>
 
@@ -22,6 +22,9 @@
 namespace asps {
 namespace modbus {
 
+typedef std::pair<uint8_t*, uint16_t> buffer_type;
+typedef std::list<buffer_type> buffer_list;
+
 // Modbus client session
 class client_session
 {
@@ -31,30 +34,29 @@ class client_session
 
 public:
   typedef std::shared_ptr<client_session> pointer_type;
-  typedef std::function<void (const uint8_t*, std::size_t)> write_handler;
 
 public:
-  client_session(uint8_t unit_identifier, write_handler write)
+  client_session(uint8_t unit_identifier)
     : transaction_identifier_(0),
-      unit_identifier_(unit_identifier),
-      write_(write)
+      unit_identifier_(unit_identifier)
   {}
 
 public:
-  uint16_t mbap_header_size();
-  uint16_t adu_size(const uint8_t* buffer);
-  void read_coils(const coils& cs);
-  void receive_response(const uint8_t* buffer);
+  static uint16_t mbap_header_size();
+  static uint16_t adu_size(const uint8_t* buffer);
+
+public:
+  buffer_list read_coils(const coils& cs);
+  buffer_list receive_response(const uint8_t* buffer);
 
 private:
-  void send_request();
+  buffer_list send_request();
 
 private:
   uint16_t transaction_identifier_;
   uint8_t unit_identifier_;
   coils_queue_type coils_queue_;
   sequence_type sequences_;
-  write_handler write_;
 };
 
 // Modbus Server Session
@@ -64,20 +66,19 @@ public:
   typedef std::shared_ptr<server_session> pointer_type;
 
 public:
-  server_session(transport_layer& layer)
-    : transport_layer_(layer)
+  server_session()
+    : sequence_(std::make_shared<tcp_adu_server_sequence>())
   {}
 
 public:
-  uint16_t mbap_header_size();
-  void receive_request(const uint8_t* buffer);
+  static uint16_t mbap_header_size();
+  static uint16_t adu_size(const uint8_t* buffer);
+
+public:
+  buffer_list receive_request(const uint8_t* buffer);
 
 private:
-  void on_eof();
-  void on_error(const std::string& message);
-
-private:
-  transport_layer& transport_layer_;
+  tcp_adu_server_sequence::pointer_type sequence_;
 };
 /*
 class server_session;

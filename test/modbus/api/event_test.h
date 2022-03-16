@@ -25,7 +25,6 @@ public:
 
 public:
   MOCK_METHOD(void, on_connect, (const std::string& address, uint16_t port), (override));
-  MOCK_METHOD(void, on_connect, (const std::string& error_message), (override));
   MOCK_METHOD(void, on_error, (const std::string& error_message), (override));
   MOCK_METHOD(void, on_read_coils, (const coils::pointer_type cs, exception_code code), (override));
   MOCK_METHOD(void, on_write_single_coil, (const coils::pointer_type cs, exception_code code), (override));

@@ -51,7 +51,8 @@ public:
 public:
   static std::size_t mbap_header_size();
   static uint16_t pdu_size(const uint8_t* buffer);
-  static tcp_adu::pointer_type unserialize(const uint8_t* buffer, bool is_request);
+  static tcp_adu::pointer_type unserialize(const uint8_t* buffer,
+                                           bool is_request);
 
 private:
   uint16_t transaction_identifier_;

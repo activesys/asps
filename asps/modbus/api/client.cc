@@ -12,7 +12,8 @@ using namespace asps::modbus;
 using namespace std::placeholders;
 
 // Modbus Client
-void client::on_connect(const std::string& address, uint16_t port)
+void
+client::on_connect(const std::string& address, uint16_t port)
 {
   client_event* event = global_client_event::instance()->event();
   if (event) {
@@ -20,7 +21,8 @@ void client::on_connect(const std::string& address, uint16_t port)
   }
 }
 
-void client::on_error(const std::string& error_message)
+void
+client::on_error(const std::string& error_message)
 {
   client_event* event = global_client_event::instance()->event();
   if (event) {
@@ -28,111 +30,84 @@ void client::on_error(const std::string& error_message)
   }
 }
 
-void client::on_eof()
+void
+client::on_eof()
 {
-  transport_layer_.connect(
-    std::bind(&client::on_connect, this, _1, _2),
-    std::bind(&client::on_error, this, _1));
+  if (transport_layer_) {
+    transport_layer_->connect();
+  }
 }
 
-void client::on_glance(const uint8_t* buffer)
+void
+client::on_glance(const uint8_t* buffer)
 {
-  transport_layer_.read(
-    session_.adu_size(buffer),
-    std::bind(&client::on_read, this, _1),
-    std::bind(&client::on_eof, this),
-    std::bind(&client::on_error, this, _1));
+  if (transport_layer_) {
+    transport_layer_->read(client_session::adu_size(buffer));
+  }
 }
 
-void client::on_read(const uint8_t* buffer)
+void
+client::on_read(const uint8_t* buffer)
 {
-  session_.receive_response(buffer);
+  buffer_list&& buffers = session_.receive_response(buffer);
+  if (transport_layer_) {
+    for (auto& buf : buffers) {
+      transport_layer_->write(buf.first, buf.second);
+    }
+  }
 }
 
-void client::write(const uint8_t* buffer, std::size_t length)
+void
+client::connect()
 {
-  transport_layer_.write(buffer,
-                         length,
-                         std::bind(&client::on_eof, this),
-                         std::bind(&client::on_error, this, _1));
+  if (transport_layer_) {
+    transport_layer_->connect();
+  }
 }
 
-void client::connect()
+void
+client::read_coils(const coils& cs)
 {
-  transport_layer_.connect(
-    std::bind(&client::on_connect, this, _1, _2),
-    std::bind(&client::on_error, this, _1));
+  buffer_list&& buffers = session_.read_coils(cs);
+  if (transport_layer_) {
+    for (auto& buf : buffers) {
+      transport_layer_->write(buf.first, buf.second);
+    }
+  }
 }
 
-void client::read_coils(const coils& cs)
+void
+client::receive_response()
 {
-  session_.read_coils(cs);
+  if (transport_layer_) {
+    transport_layer_->glance(client_session::mbap_header_size());
+  }
 }
 
-void client::receive_response()
+void
+client::transport_layer(client_transport_layer* layer)
 {
-  transport_layer_.glance(
-    session_.mbap_header_size(),
-    std::bind(&client::on_glance, this, _1),
-    std::bind(&client::on_eof, this),
-    std::bind(&client::on_error, this, _1));
+  transport_layer_ = layer;
 }
 
-void client::event(client_event* e)
+void
+client::event(client_event* e)
 {
   global_client_event::instance()->event(e);
 }
 
-void client::run()
+void
+client::run()
 {
-  transport_layer_.run();
+  if (transport_layer_) {
+    transport_layer_->run();
+  }
 }
 
-void client::close()
+void
+client::close()
 {
-  transport_layer_.close();
+  if (transport_layer_) {
+    transport_layer_->close();
+  }
 }
-/*
-void client::register_event(client_event* event)
-{
-  event_ = event;
-}
-
-void client::async_connect()
-{
-  boost::system::error_code ec;
-  boost::asio::async_connect(
-    socket_,
-    endpoint_,
-    [this](boost::system::error_code ec, tcp::resolver::endpoint_type endpoint)
-    {
-      if (ec) {
-        if (event_) {
-          event_->on_connect(ec.message());
-        }
-      } else {
-        session_ = std::make_shared<client_session>(1, transport_layer_, event_);
-        //session_->start();
-
-        if (event_) {
-          event_->on_connect(endpoint.address().to_string(), endpoint.port());
-        }
-      }
-    });
-}
-
-void client::close()
-{
-  socket_.close();
-}
-
-void client::run()
-{
-  context_.run();
-}
-
-void client::read_coils(uint8_t unit_identifier, const coils& cs)
-{
-  session_->read_coils(cs);
-}
-*/

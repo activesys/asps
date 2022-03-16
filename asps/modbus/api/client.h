@@ -21,33 +21,32 @@ namespace modbus {
 using namespace std::placeholders;
 
 // Modbus Client
-class client
+class client : public client_transport_event
 {
 public:
-  client(uint8_t unit_identifier, transport_layer& layer)
-    : transport_layer_(layer),
-      session_(unit_identifier, std::bind(&client::write, this, _1, _2))
+  client(uint8_t unit_identifier)
+    : client_transport_event(),
+      session_(unit_identifier)
   {}
 
 public:
-  void connect();
+  void transport_layer(client_transport_layer* layer);
   void event(client_event* e);
+  void connect();
   void read_coils(const coils& cs);
   void receive_response();
   void close();
   void run();
 
 private:
-  void on_connect(const std::string& address, uint16_t port);
-  void on_error(const std::string& error_message);
-  void on_eof();
-  void on_glance(const uint8_t* buffer);
-  void on_read(const uint8_t* buffer);
-
-  void write(const uint8_t* buffer, std::size_t length);
+  virtual void on_connect(const std::string& address, uint16_t port) override;
+  virtual void on_error(const std::string& error_message) override;
+  virtual void on_glance(const uint8_t* buffer) override;
+  virtual void on_read(const uint8_t* buffer) override;
+  virtual void on_eof() override;
 
 private:
-  transport_layer& transport_layer_;
+  client_transport_layer* transport_layer_;
   client_session session_;
 };
 /*

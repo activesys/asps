@@ -12,8 +12,8 @@ using namespace asps::modbus;
 
 // Modbus TCP ADU Client Sequence
 tcp_adu::pointer_type
-tcp_adu_client_sequence::get_request(
-  const coils::pointer_type cs, function_codes code)
+tcp_adu_client_sequence::get_request(const coils::pointer_type cs,
+                                     function_codes code)
 {
   switch (code) {
   case read_coils:
@@ -37,13 +37,14 @@ tcp_adu_client_sequence::get_request(
     break;
   }
 
-  return std::make_shared<tcp_adu>(
-          transaction_identifier_,
-          unit_identifier_,
-          pdu_sequence_->get_request());
+  req_ = std::make_shared<tcp_adu>(transaction_identifier_,
+                                   unit_identifier_,
+                                   pdu_sequence_->get_request());
+  return req_;
 }
 
-void tcp_adu_client_sequence::set_response(tcp_adu::pointer_type adu)
+void
+tcp_adu_client_sequence::set_response(tcp_adu::pointer_type adu)
 {
   client_event* event = global_client_event::instance()->event();
   if (event) {
@@ -83,8 +84,8 @@ tcp_adu_server_sequence::set_request(tcp_adu::pointer_type adu)
     break;
   }
 
-  return std::make_shared<tcp_adu>(
-          adu->transaction_identifier(),
-          adu->unit_identifier(),
-          pdu_sequence_->set_request(adu->pdu()));
+  rsp_ = std::make_shared<tcp_adu>(adu->transaction_identifier(),
+                                   adu->unit_identifier(),
+                                   pdu_sequence_->set_request(adu->pdu()));
+  return rsp_;
 }

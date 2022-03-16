@@ -19,6 +19,9 @@ namespace modbus {
 class pdu_client_sequence
 {
 public:
+  typedef std::shared_ptr<pdu_client_sequence> pointer_type;
+
+public:
   pdu_client_sequence() {}
   virtual ~pdu_client_sequence() {}
 
@@ -29,8 +32,6 @@ public:
 protected:
   mb_pdu::pointer_type req_;
 };
-
-typedef std::shared_ptr<pdu_client_sequence> pdu_client_sequence_ptr;
 
 // Modbus read coils pdu client sequence
 class read_coils_pdu_client_sequence : public pdu_client_sequence
