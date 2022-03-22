@@ -8,5 +8,5 @@ add_subdirectory(chat)
 # Build modbus
 add_subdirectory(modbus)
 
-# Build iec60870
-# add_subdirectory(iec60870)
+# Build demo
+add_subdirectory(demo)

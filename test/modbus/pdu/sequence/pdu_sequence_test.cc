@@ -81,7 +81,8 @@ TEST_F(pdu_sequence_test, write_single_coil_pdu_client_sequence_get_request)
 {
   write_single_coil_pdu_client_sequence seq(cs_);
   mb_pdu::pointer_type p = seq.get_request();
-  write_single_coil_request* req = dynamic_cast<write_single_coil_request*>(p.get());
+  write_single_coil_request* req =
+    dynamic_cast<write_single_coil_request*>(p.get());
   EXPECT_NE(req, nullptr);
 }
 
@@ -89,7 +90,8 @@ TEST_F(pdu_sequence_test, write_single_coil_pdu_client_sequence_set_response)
 {
   write_single_coil_pdu_client_sequence seq(cs_);
   mb_pdu::pointer_type req = seq.get_request();
-  mb_pdu::pointer_type p = std::make_shared<write_single_coil_response>(100, false);
+  mb_pdu::pointer_type p =
+    std::make_shared<write_single_coil_response>(100, false);
   EXPECT_CALL(ce_, on_write_single_coil(_, success))
     .Times(1);
   seq.set_response(p);
@@ -99,7 +101,8 @@ TEST_F(pdu_sequence_test, write_single_coil_pdu_client_sequence_set_response_exc
 {
   write_single_coil_pdu_client_sequence seq(cs_);
   mb_pdu::pointer_type req = seq.get_request();
-  mb_pdu::pointer_type p = std::make_shared<excep_pdu>(write_single_coil, illegal_function);
+  mb_pdu::pointer_type p =
+    std::make_shared<excep_pdu>(write_single_coil, illegal_function);
   EXPECT_CALL(ce_, on_write_single_coil(_, illegal_function))
     .Times(1);
   seq.set_response(p);

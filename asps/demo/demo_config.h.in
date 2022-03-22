@@ -1,0 +1,10 @@
+// Copyright (c) 2021 The asps Authors. All rights reserved.
+// Use of this source code is governed by a MIT license that can be
+// found in the LICENSE file. See the AUTHORS file for names of contributors.
+//
+// Version for ASPS Demo
+
+#define ASPS_DEMO_VERSION       @ASPS_DEMO_VERSION@
+#define ASPS_DEMO_VERSION_MAJOR @ASPS_DEMO_VERSION_MAJOR@
+#define ASPS_DEMO_VERSION_MINOR @ASPS_DEMO_VERSION_MINOR@
+#define ASPS_DEMO_VERSION_PATCH @ASPS_DEMO_VERSION_PATCH@

@@ -43,7 +43,6 @@ set_target_properties(asmodbus
     VERSION     ${ASPS_MODBUS_VERSION_TEXT}
     SOVERSION   ${ASPS_MODBUS_SOVERSION_TEXT}
 )
-target_link_libraries(asmodbus Boost::system pthread)
 
 ##################################
 # Install library

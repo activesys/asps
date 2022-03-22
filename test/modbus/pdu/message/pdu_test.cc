@@ -235,6 +235,14 @@ TEST(write_single_coil_request, unserialize)
   EXPECT_NE(req, nullptr);
   EXPECT_EQ(req->output_address(), 100);
   EXPECT_TRUE(req->output_value());
+
+  msg[2] = 0x1a;
+  msg[3] = 0x00;
+  p = write_single_coil_request::unserialize(msg);
+  req = dynamic_cast<write_single_coil_request*>(p.get());
+  EXPECT_NE(req, nullptr);
+  EXPECT_EQ(req->output_address(), 26);
+  EXPECT_FALSE(req->output_value());
 }
 
 // TEST write_multiple_coils_request

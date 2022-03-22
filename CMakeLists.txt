@@ -41,7 +41,7 @@ check_include_file("netinet/in.h" HAVE_NETINET_IN_H)
 
 ##################################
 # Checking boost libraries
-find_package(Boost REQUIRED COMPONENTS system)
+find_package(Boost REQUIRED COMPONENTS system program_options)
 if (Boost_FOUND)
   include_directories(${Boost_INCLUDE_DIRS})
   if (${CMAKE_BUILD_TYPE} MATCHES "Debug")

@@ -27,6 +27,14 @@ TEST(tcp_adu_test, serialized_size_read_coils_request)
   EXPECT_EQ(adu.serialized_size(), 12);
 }
 
+TEST(tcp_adu_test, serialized_size_read_coils_response)
+{
+  bits_type status{1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 1, 0, 1, 1};
+  mb_pdu::pointer_type p = std::make_shared<read_coils_response>(status);
+  tcp_adu adu(2, 1, p);
+  EXPECT_EQ(adu.serialized_size(), 12);
+}
+
 TEST(tcp_adu_test, serialize_excep_pdu)
 {
   mb_pdu::pointer_type p = std::make_shared<excep_pdu>(read_coils, illegal_function);
@@ -42,6 +50,27 @@ TEST(tcp_adu_test, serialize_excep_pdu)
   EXPECT_EQ(msg[6], 0x01);
   EXPECT_EQ(msg[7], 0x81);
   EXPECT_EQ(msg[8], 0x01);
+}
+
+TEST(tcp_adu_test, serialize_read_coils_response)
+{
+  bits_type status{1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 1, 0, 1, 1};
+  mb_pdu::pointer_type p = std::make_shared<read_coils_response>(status);
+  tcp_adu adu(8, 1, p);
+  uint8_t* msg = adu.serialize();
+  EXPECT_NE(msg, nullptr);
+  EXPECT_EQ(msg[0], 0x00);
+  EXPECT_EQ(msg[1], 0x08);
+  EXPECT_EQ(msg[2], 0x00);
+  EXPECT_EQ(msg[3], 0x00);
+  EXPECT_EQ(msg[4], 0x00);
+  EXPECT_EQ(msg[5], 0x06);
+  EXPECT_EQ(msg[6], 0x01);
+  EXPECT_EQ(msg[7], 0x01);
+  EXPECT_EQ(msg[8], 0x03);
+  EXPECT_EQ(msg[9], 0xf1);
+  EXPECT_EQ(msg[10], 0x91);
+  EXPECT_EQ(msg[11], 0x06);
 }
 
 TEST(tcp_adu_test, serialize_read_coils_request)

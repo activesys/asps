@@ -7,5 +7,5 @@
 # Build modbus test
 add_subdirectory(modbus)
 
-# Build iec60870 test
-# add_subdirectory(iec60870)
+# Build demo test
+add_subdirectory(demo)

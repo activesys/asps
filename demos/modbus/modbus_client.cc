@@ -7,9 +7,11 @@
 #include <cstdint>
 #include <iomanip>
 #include <iostream>
+#include <fstream>
 #include <limits>
 #include <asps/modbus/modbus.h>
 #include <demos/modbus/boost_asio_transport_layer.h>
+#include <demos/modbus/options_parser.h>
 
 using namespace asps::modbus;
 using namespace asps_demos::modbus_demos;
@@ -96,13 +98,15 @@ bool my_event::my_memory_[0xffff];
 
 int main(int argc, char* argv[])
 {
-  if (argc != 3) {
-    std::cerr << "Usage: modbus_client host port" << std::endl;
+  options_parser op(argc, argv);
+
+  if (!op) {
+    op.usage();
     return 1;
   }
 
-  client c(1);
-  boost_asio_client_transport_layer layer(c, argv[1], std::atoi(argv[2]));
+  client c(op.unit_identifier());
+  boost_asio_client_transport_layer layer(c, op.host(), op.port());
   my_event event(c);
   c.event(&event);
   c.transport_layer(&layer);
