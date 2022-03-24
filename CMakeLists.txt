@@ -31,6 +31,16 @@ configure_file(
 )
 
 ##################################
+# Check if the system is big endian or little endian
+include(TestBigEndian)
+TEST_BIG_ENDIAN(BIG_ENDIAN)
+if(BIG_ENDIAN)
+    set(ASPS_BIG_ENDIAN 1)
+else(BIG_ENDIAN)
+    set(ASPS_BIG_ENDIAN 0)
+endif(BIG_ENDIAN)
+
+##################################
 # Set include directories
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 

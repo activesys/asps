@@ -43,11 +43,13 @@ TEST_F(demo_client_test, network_connect)
   demo_client dcf("127.0.0.1", 9902);
   EXPECT_FALSE(dcf.connect());
   EXPECT_FALSE(dcf.is_connected());
+  demo_data<uint64_t> d{1234, 1154789657886957455, 1647761782000};
+  EXPECT_FALSE(dcf.send(d));
 
   server_.wait();
 }
 
-TEST_F(demo_client_test, send_data_of_integer_type)
+TEST_F(demo_client_test, send_data_of_uint64_type)
 {
   server_.start();
 
@@ -55,7 +57,66 @@ TEST_F(demo_client_test, send_data_of_integer_type)
   dc.connect();
   EXPECT_TRUE(dc.is_connected());
 
-  demo_data<uint32_t> d{1234, 9876, 1647761782000};
+  demo_data<uint64_t> d{1234, 1154789657886957455, 1647761782000};
+  EXPECT_TRUE(dc.send(d));
+  dc.close();
+  server_.wait();
+
+  const std::vector<uint8_t>& buffer = server_.message();
+  // check length
+  EXPECT_EQ(buffer.size(), 32);
+  // check header
+  EXPECT_EQ(buffer[0], 0x44);
+  EXPECT_EQ(buffer[1], 0x45);
+  EXPECT_EQ(buffer[2], 0x4d);
+  EXPECT_EQ(buffer[3], 0x4f);
+  // check length field
+  EXPECT_EQ(buffer[4], 0x00);
+  EXPECT_EQ(buffer[5], 0x20);
+  // check count field
+  EXPECT_EQ(buffer[6], 0x00);
+  EXPECT_EQ(buffer[7], 0x01);
+  // check attribute
+  EXPECT_EQ(buffer[8], 0x00);
+  EXPECT_EQ(buffer[9], 0x00);
+  EXPECT_EQ(buffer[10], 0x00);
+  EXPECT_EQ(buffer[11], 0x00);
+  // check data
+  // check type field
+  EXPECT_EQ(buffer[12], 0x08);
+  // check key field
+  EXPECT_EQ(buffer[13], 0x00);
+  EXPECT_EQ(buffer[14], 0x04);
+  EXPECT_EQ(buffer[15], 0xd2);
+  // check timestamp field
+  EXPECT_EQ(buffer[16], 0x00);
+  EXPECT_EQ(buffer[17], 0x00);
+  EXPECT_EQ(buffer[18], 0x01);
+  EXPECT_EQ(buffer[19], 0x7f);
+  EXPECT_EQ(buffer[20], 0xa6);
+  EXPECT_EQ(buffer[21], 0x41);
+  EXPECT_EQ(buffer[22], 0x74);
+  EXPECT_EQ(buffer[23], 0xf0);
+  // check value field
+  EXPECT_EQ(buffer[24], 0x10);
+  EXPECT_EQ(buffer[25], 0x06);
+  EXPECT_EQ(buffer[26], 0xa3);
+  EXPECT_EQ(buffer[27], 0x13);
+  EXPECT_EQ(buffer[28], 0x54);
+  EXPECT_EQ(buffer[29], 0xa5);
+  EXPECT_EQ(buffer[30], 0x9f);
+  EXPECT_EQ(buffer[31], 0x8f);
+}
+
+TEST_F(demo_client_test, send_data_of_int32_type)
+{
+  server_.start();
+
+  demo_client dc("127.0.0.1", 9901);
+  dc.connect();
+  EXPECT_TRUE(dc.is_connected());
+
+  demo_data<int32_t> d{1234, 9876, 1647761782000};
   EXPECT_TRUE(dc.send(d));
   dc.close();
   server_.wait();
@@ -81,7 +142,7 @@ TEST_F(demo_client_test, send_data_of_integer_type)
   EXPECT_EQ(buffer[11], 0x00);
   // check data
   // check type field
-  EXPECT_EQ(buffer[12], 0x06);
+  EXPECT_EQ(buffer[12], 0x05);
   // check key field
   EXPECT_EQ(buffer[13], 0x00);
   EXPECT_EQ(buffer[14], 0x04);
@@ -100,6 +161,163 @@ TEST_F(demo_client_test, send_data_of_integer_type)
   EXPECT_EQ(buffer[25], 0x00);
   EXPECT_EQ(buffer[26], 0x26);
   EXPECT_EQ(buffer[27], 0x94);
+}
+
+TEST_F(demo_client_test, send_data_of_uint16_type)
+{
+  server_.start();
+
+  demo_client dc("127.0.0.1", 9901);
+  dc.connect();
+  EXPECT_TRUE(dc.is_connected());
+
+  demo_data<uint16_t> d{1234, 9876, 1647761782000};
+  EXPECT_TRUE(dc.send(d));
+  dc.close();
+  server_.wait();
+
+  const std::vector<uint8_t>& buffer = server_.message();
+  // check length
+  EXPECT_EQ(buffer.size(), 26);
+  // check header
+  EXPECT_EQ(buffer[0], 0x44);
+  EXPECT_EQ(buffer[1], 0x45);
+  EXPECT_EQ(buffer[2], 0x4d);
+  EXPECT_EQ(buffer[3], 0x4f);
+  // check length field
+  EXPECT_EQ(buffer[4], 0x00);
+  EXPECT_EQ(buffer[5], 0x1a);
+  // check count field
+  EXPECT_EQ(buffer[6], 0x00);
+  EXPECT_EQ(buffer[7], 0x01);
+  // check attribute
+  EXPECT_EQ(buffer[8], 0x00);
+  EXPECT_EQ(buffer[9], 0x00);
+  EXPECT_EQ(buffer[10], 0x00);
+  EXPECT_EQ(buffer[11], 0x00);
+  // check data
+  // check type field
+  EXPECT_EQ(buffer[12], 0x04);
+  // check key field
+  EXPECT_EQ(buffer[13], 0x00);
+  EXPECT_EQ(buffer[14], 0x04);
+  EXPECT_EQ(buffer[15], 0xd2);
+  // check timestamp field
+  EXPECT_EQ(buffer[16], 0x00);
+  EXPECT_EQ(buffer[17], 0x00);
+  EXPECT_EQ(buffer[18], 0x01);
+  EXPECT_EQ(buffer[19], 0x7f);
+  EXPECT_EQ(buffer[20], 0xa6);
+  EXPECT_EQ(buffer[21], 0x41);
+  EXPECT_EQ(buffer[22], 0x74);
+  EXPECT_EQ(buffer[23], 0xf0);
+  // check value field
+  EXPECT_EQ(buffer[24], 0x26);
+  EXPECT_EQ(buffer[25], 0x94);
+}
+
+TEST_F(demo_client_test, send_data_of_uint8_type)
+{
+  server_.start();
+
+  demo_client dc("127.0.0.1", 9901);
+  dc.connect();
+  EXPECT_TRUE(dc.is_connected());
+
+  demo_data<uint8_t> d{1234, 255, 1647761782000};
+  EXPECT_TRUE(dc.send(d));
+  dc.close();
+  server_.wait();
+
+  const std::vector<uint8_t>& buffer = server_.message();
+  // check length
+  EXPECT_EQ(buffer.size(), 25);
+  // check header
+  EXPECT_EQ(buffer[0], 0x44);
+  EXPECT_EQ(buffer[1], 0x45);
+  EXPECT_EQ(buffer[2], 0x4d);
+  EXPECT_EQ(buffer[3], 0x4f);
+  // check length field
+  EXPECT_EQ(buffer[4], 0x00);
+  EXPECT_EQ(buffer[5], 0x19);
+  // check count field
+  EXPECT_EQ(buffer[6], 0x00);
+  EXPECT_EQ(buffer[7], 0x01);
+  // check attribute
+  EXPECT_EQ(buffer[8], 0x00);
+  EXPECT_EQ(buffer[9], 0x00);
+  EXPECT_EQ(buffer[10], 0x00);
+  EXPECT_EQ(buffer[11], 0x00);
+  // check data
+  // check type field
+  EXPECT_EQ(buffer[12], 0x02);
+  // check key field
+  EXPECT_EQ(buffer[13], 0x00);
+  EXPECT_EQ(buffer[14], 0x04);
+  EXPECT_EQ(buffer[15], 0xd2);
+  // check timestamp field
+  EXPECT_EQ(buffer[16], 0x00);
+  EXPECT_EQ(buffer[17], 0x00);
+  EXPECT_EQ(buffer[18], 0x01);
+  EXPECT_EQ(buffer[19], 0x7f);
+  EXPECT_EQ(buffer[20], 0xa6);
+  EXPECT_EQ(buffer[21], 0x41);
+  EXPECT_EQ(buffer[22], 0x74);
+  EXPECT_EQ(buffer[23], 0xf0);
+  // check value field
+  EXPECT_EQ(buffer[24], 0xff);
+}
+
+TEST_F(demo_client_test, send_data_of_bool_type)
+{
+  server_.start();
+
+  demo_client dc("127.0.0.1", 9901);
+  dc.connect();
+  EXPECT_TRUE(dc.is_connected());
+
+  demo_data<bool> d{1234, false, 1647761782000};
+  EXPECT_TRUE(dc.send(d));
+  dc.close();
+  server_.wait();
+
+  const std::vector<uint8_t>& buffer = server_.message();
+  // check length
+  EXPECT_EQ(buffer.size(), 25);
+  // check header
+  EXPECT_EQ(buffer[0], 0x44);
+  EXPECT_EQ(buffer[1], 0x45);
+  EXPECT_EQ(buffer[2], 0x4d);
+  EXPECT_EQ(buffer[3], 0x4f);
+  // check length field
+  EXPECT_EQ(buffer[4], 0x00);
+  EXPECT_EQ(buffer[5], 0x19);
+  // check count field
+  EXPECT_EQ(buffer[6], 0x00);
+  EXPECT_EQ(buffer[7], 0x01);
+  // check attribute
+  EXPECT_EQ(buffer[8], 0x00);
+  EXPECT_EQ(buffer[9], 0x00);
+  EXPECT_EQ(buffer[10], 0x00);
+  EXPECT_EQ(buffer[11], 0x00);
+  // check data
+  // check type field
+  EXPECT_EQ(buffer[12], 0x00);
+  // check key field
+  EXPECT_EQ(buffer[13], 0x00);
+  EXPECT_EQ(buffer[14], 0x04);
+  EXPECT_EQ(buffer[15], 0xd2);
+  // check timestamp field
+  EXPECT_EQ(buffer[16], 0x00);
+  EXPECT_EQ(buffer[17], 0x00);
+  EXPECT_EQ(buffer[18], 0x01);
+  EXPECT_EQ(buffer[19], 0x7f);
+  EXPECT_EQ(buffer[20], 0xa6);
+  EXPECT_EQ(buffer[21], 0x41);
+  EXPECT_EQ(buffer[22], 0x74);
+  EXPECT_EQ(buffer[23], 0xf0);
+  // check value field
+  EXPECT_EQ(buffer[24], 0x00);
 }
 
 } // demo_test

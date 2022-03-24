@@ -26,8 +26,7 @@ public:
     : socket_(context_),
       endpoint_(ip::address::from_string(host), port),
       is_connected_(false)
-  {
-  }
+  {}
 
 public:
   bool connect();

@@ -29,19 +29,6 @@ class demo_message
     key_field_length = 3,
     timestamp_field_length = 8
   };
-  enum value_type {
-    boolean_type = 0,
-    int8_type = 1,
-    uint8_type = 2,
-    int16_type = 3,
-    uint16_type = 4,
-    int32_type = 5,
-    uint32_type = 6,
-    int64_type = 7,
-    uint64_type = 8,
-    float32_type = 10,
-    float64_type = 11
-  };
 
 public:
   demo_message(const demo_data<T>& data)
@@ -51,47 +38,66 @@ public:
 public:
   const buffer_type& serialize()
   {
-    // The size of the entire packet is the size 
-    // of the header plus the size of a packet.
-    std::size_t header_length = flag_field_length + 
-                                length_field_length +
-                                count_field_length +
-                                attribute_field_length;
-    std::size_t value_length = type_field_length +
-                               key_field_length +
-                               timestamp_field_length +
-                               sizeof(uint32_t);
-    // decode demo_value
-    buffer_.resize(header_length + value_length);
+    buffer_.resize(serialization_header_length() +
+                   serialization_value_length());
     uint8_t* pos = buffer_.data();
+
+    serialize_header(pos);
+    serialize_value(pos);
+  
+    return buffer_;
+  }
+
+private:
+  std::size_t serialization_header_length()
+  {
+    return flag_field_length + 
+           length_field_length +
+           count_field_length +
+           attribute_field_length;
+  }
+  void serialize_header(uint8_t*& pos)
+  {
     // decode header, flag field is "DEMO"
     *(pos++) = 0x44;
     *(pos++) = 0x45;
     *(pos++) = 0x4d;
     *(pos++) = 0x4f;
+
     // decode length field
-    *reinterpret_cast<uint16_t*>(pos) = htons(header_length + value_length);
+    *reinterpret_cast<uint16_t*>(pos) = htons(serialization_header_length() +
+                                              serialization_value_length());
     pos += length_field_length;
+
     // decode count field
     *reinterpret_cast<uint16_t*>(pos) = htons(1);
     pos += count_field_length;
+
     // decode attribute field
     *reinterpret_cast<uint32_t*>(pos) = 0;
     pos += attribute_field_length;
-    // decode value
+  }
+
+  std::size_t serialization_value_length()
+  {
+    return type_field_length +
+           key_field_length +
+           timestamp_field_length +
+           data_.size();
+  }
+  void serialize_value(uint8_t*& pos)
+  {
     // decode type and key field
-    *reinterpret_cast<uint32_t*>(pos) = htonl(uint32_type << 24 | data_.key);
+    *reinterpret_cast<uint32_t*>(pos) = htonl(data_.type << 24 | data_.key);
     pos += type_field_length + key_field_length;
+
     // decode timestamp field
-    *reinterpret_cast<uint64_t*>(pos) = data_.timestamp;
-    uint64_t low_part = uint64_t(htonl(*reinterpret_cast<uint32_t*>(pos))) << 32;
-    uint64_t high_part = htonl(*reinterpret_cast<uint32_t*>(pos + 4));
-    *reinterpret_cast<uint64_t*>(pos) = high_part | low_part ;
+    *reinterpret_cast<uint64_t*>(pos) = htonll(data_.timestamp);
     pos += timestamp_field_length;
+
     // decode value field
-    *reinterpret_cast<uint32_t*>(pos) = htonl(data_.value);
-  
-    return buffer_;
+    *reinterpret_cast<T*>(pos) = data_.network_sequence_of_value();
+    pos += data_.size();
   }
 
 private:

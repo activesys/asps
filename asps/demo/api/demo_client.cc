@@ -7,7 +7,9 @@
 #include <boost/asio.hpp>
 #include <asps/demo/api/demo_client.h>
 
-using namespace asps::demo;
+namespace asps {
+namespace demo {
+
 using namespace boost::asio;
 
 bool demo_client::connect()
@@ -15,7 +17,7 @@ bool demo_client::connect()
   boost::system::error_code ec;
   socket_.connect(endpoint_, ec);
   is_connected_ = !ec;
-  
+
   return is_connected();
 }
 
@@ -29,3 +31,6 @@ void demo_client::close()
   socket_.close();
   is_connected_ = false;
 }
+
+} // demo
+} // asps

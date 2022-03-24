@@ -23,6 +23,7 @@ configure_file(
 # Set sources for demo
 set(ASPS_DEMO_SOURCES
   api/demo_client.cc
+  semantic/demo_data.cc
 )
 
 ##################################
