@@ -19,50 +19,26 @@ TEST(demo_message_test, serialize_float64_type)
   demo_data<double> v{1234, 913456.230887143, 1647761782000};
   demo_message<double> msg(v);
 
- const std::vector<uint8_t>& buffer = msg.serialize();
+  const std::vector<uint8_t>& buffer = msg.serialize();
+  const uint8_t expect_buffer[] = {
+    // header
+    0x44, 0x45, 0x4d, 0x4f, 0x56, 0x31, 0x30, 0x30, // header flag
+    0x00, 0x22, // header length
+    0x00, 0x01, // header count
+    0x00, // header attr
+    // mutable
+    // data
+    0x0a, // data type
+    0x00, 0x00, 0x04, 0xd2, // data key
+    0x00, 0x00, 0x01, 0x7f, 0xa6, 0x41, 0x74, 0xf0, // data timestamp
+    0xf1, 0xd6, 0x36, 0x76, 0x60, 0xe0, 0x2b, 0x41 // data value
+  };
+
   // check length
-  EXPECT_EQ(buffer.size(), 32);
-  // check header
-  EXPECT_EQ(buffer[0], 0x44);
-  EXPECT_EQ(buffer[1], 0x45);
-  EXPECT_EQ(buffer[2], 0x4d);
-  EXPECT_EQ(buffer[3], 0x4f);
-  // check length field
-  EXPECT_EQ(buffer[4], 0x00);
-  EXPECT_EQ(buffer[5], 0x20);
-  // check count field
-  EXPECT_EQ(buffer[6], 0x00);
-  EXPECT_EQ(buffer[7], 0x01);
-  // check attribute
-  EXPECT_EQ(buffer[8], 0x00);
-  EXPECT_EQ(buffer[9], 0x00);
-  EXPECT_EQ(buffer[10], 0x00);
-  EXPECT_EQ(buffer[11], 0x00);
-  // check data
-  // check type field
-  EXPECT_EQ(buffer[12], 0x0b);
-  // check key field
-  EXPECT_EQ(buffer[13], 0x00);
-  EXPECT_EQ(buffer[14], 0x04);
-  EXPECT_EQ(buffer[15], 0xd2);
-  // check timestamp field
-  EXPECT_EQ(buffer[16], 0x00);
-  EXPECT_EQ(buffer[17], 0x00);
-  EXPECT_EQ(buffer[18], 0x01);
-  EXPECT_EQ(buffer[19], 0x7f);
-  EXPECT_EQ(buffer[20], 0xa6);
-  EXPECT_EQ(buffer[21], 0x41);
-  EXPECT_EQ(buffer[22], 0x74);
-  EXPECT_EQ(buffer[23], 0xf0);
-  // check value field
-  EXPECT_EQ(buffer[24], 0xf1);
-  EXPECT_EQ(buffer[25], 0xd6);
-  EXPECT_EQ(buffer[26], 0x36);
-  EXPECT_EQ(buffer[27], 0x76);
-  EXPECT_EQ(buffer[28], 0x60);
-  EXPECT_EQ(buffer[29], 0xe0);
-  EXPECT_EQ(buffer[30], 0x2b);
-  EXPECT_EQ(buffer[31], 0x41);
+  EXPECT_EQ(buffer.size(), 34);
+  for (std::size_t i = 0; i < buffer.size(); ++i) {
+    EXPECT_EQ(buffer[i], expect_buffer[i]);
+  }
 }
 
 TEST(demo_message_test, serialize_float32_type)
@@ -70,46 +46,26 @@ TEST(demo_message_test, serialize_float32_type)
   demo_data<float> v{1234, -98.12, 1647761782000};
   demo_message<float> msg(v);
 
- const std::vector<uint8_t>& buffer = msg.serialize();
+  const std::vector<uint8_t>& buffer = msg.serialize();
+  const uint8_t expect_buffer[] = {
+    // header
+    0x44, 0x45, 0x4d, 0x4f, 0x56, 0x31, 0x30, 0x30, // header flag
+    0x00, 0x1e, // header length
+    0x00, 0x01, // header count
+    0x00, // header attr
+    // mutable
+    // data
+    0x09, // data type
+    0x00, 0x00, 0x04, 0xd2, // data key
+    0x00, 0x00, 0x01, 0x7f, 0xa6, 0x41, 0x74, 0xf0, // data timestamp
+    0x71, 0x3d, 0xc4, 0xc2 // data value
+  };
+
   // check length
-  EXPECT_EQ(buffer.size(), 28);
-  // check header
-  EXPECT_EQ(buffer[0], 0x44);
-  EXPECT_EQ(buffer[1], 0x45);
-  EXPECT_EQ(buffer[2], 0x4d);
-  EXPECT_EQ(buffer[3], 0x4f);
-  // check length field
-  EXPECT_EQ(buffer[4], 0x00);
-  EXPECT_EQ(buffer[5], 0x1c);
-  // check count field
-  EXPECT_EQ(buffer[6], 0x00);
-  EXPECT_EQ(buffer[7], 0x01);
-  // check attribute
-  EXPECT_EQ(buffer[8], 0x00);
-  EXPECT_EQ(buffer[9], 0x00);
-  EXPECT_EQ(buffer[10], 0x00);
-  EXPECT_EQ(buffer[11], 0x00);
-  // check data
-  // check type field
-  EXPECT_EQ(buffer[12], 0x0a);
-  // check key field
-  EXPECT_EQ(buffer[13], 0x00);
-  EXPECT_EQ(buffer[14], 0x04);
-  EXPECT_EQ(buffer[15], 0xd2);
-  // check timestamp field
-  EXPECT_EQ(buffer[16], 0x00);
-  EXPECT_EQ(buffer[17], 0x00);
-  EXPECT_EQ(buffer[18], 0x01);
-  EXPECT_EQ(buffer[19], 0x7f);
-  EXPECT_EQ(buffer[20], 0xa6);
-  EXPECT_EQ(buffer[21], 0x41);
-  EXPECT_EQ(buffer[22], 0x74);
-  EXPECT_EQ(buffer[23], 0xf0);
-  // check value field
-  EXPECT_EQ(buffer[24], 0x71);
-  EXPECT_EQ(buffer[25], 0x3d);
-  EXPECT_EQ(buffer[26], 0xc4);
-  EXPECT_EQ(buffer[27], 0xc2);
+  EXPECT_EQ(buffer.size(), 30);
+  for (std::size_t i = 0; i < buffer.size(); ++i) {
+    EXPECT_EQ(buffer[i], expect_buffer[i]);
+  }
 }
 
 TEST(demo_message_test, serialize_int64_type)
@@ -117,50 +73,25 @@ TEST(demo_message_test, serialize_int64_type)
   demo_data<int64_t> v{1234, -1154789657886957455, 1647761782000};
   demo_message<int64_t> msg(v);
 
- const std::vector<uint8_t>& buffer = msg.serialize();
+  const std::vector<uint8_t>& buffer = msg.serialize();
+  const uint8_t expect_buffer[] = {
+    // header
+    0x44, 0x45, 0x4d, 0x4f, 0x56, 0x31, 0x30, 0x30, // header flag
+    0x00, 0x22, // header length
+    0x00, 0x01, // header count
+    0x00, // header attr
+    // mutable
+    // data
+    0x07, // data type
+    0x00, 0x00, 0x04, 0xd2, // data key
+    0x00, 0x00, 0x01, 0x7f, 0xa6, 0x41, 0x74, 0xf0, // data timestamp
+    0xef, 0xf9, 0x5c, 0xec, 0xab, 0x5a, 0x60, 0x71 // data value
+  };
   // check length
-  EXPECT_EQ(buffer.size(), 32);
-  // check header
-  EXPECT_EQ(buffer[0], 0x44);
-  EXPECT_EQ(buffer[1], 0x45);
-  EXPECT_EQ(buffer[2], 0x4d);
-  EXPECT_EQ(buffer[3], 0x4f);
-  // check length field
-  EXPECT_EQ(buffer[4], 0x00);
-  EXPECT_EQ(buffer[5], 0x20);
-  // check count field
-  EXPECT_EQ(buffer[6], 0x00);
-  EXPECT_EQ(buffer[7], 0x01);
-  // check attribute
-  EXPECT_EQ(buffer[8], 0x00);
-  EXPECT_EQ(buffer[9], 0x00);
-  EXPECT_EQ(buffer[10], 0x00);
-  EXPECT_EQ(buffer[11], 0x00);
-  // check data
-  // check type field
-  EXPECT_EQ(buffer[12], 0x07);
-  // check key field
-  EXPECT_EQ(buffer[13], 0x00);
-  EXPECT_EQ(buffer[14], 0x04);
-  EXPECT_EQ(buffer[15], 0xd2);
-  // check timestamp field
-  EXPECT_EQ(buffer[16], 0x00);
-  EXPECT_EQ(buffer[17], 0x00);
-  EXPECT_EQ(buffer[18], 0x01);
-  EXPECT_EQ(buffer[19], 0x7f);
-  EXPECT_EQ(buffer[20], 0xa6);
-  EXPECT_EQ(buffer[21], 0x41);
-  EXPECT_EQ(buffer[22], 0x74);
-  EXPECT_EQ(buffer[23], 0xf0);
-  // check value field
-  EXPECT_EQ(buffer[24], 0xef);
-  EXPECT_EQ(buffer[25], 0xf9);
-  EXPECT_EQ(buffer[26], 0x5c);
-  EXPECT_EQ(buffer[27], 0xec);
-  EXPECT_EQ(buffer[28], 0xab);
-  EXPECT_EQ(buffer[29], 0x5a);
-  EXPECT_EQ(buffer[30], 0x60);
-  EXPECT_EQ(buffer[31], 0x71);
+  EXPECT_EQ(buffer.size(), 34);
+  for (std::size_t i = 0; i < buffer.size(); ++i) {
+    EXPECT_EQ(buffer[i], expect_buffer[i]);
+  }
 }
 
 TEST(demo_message_test, serialize_uint32_type)
@@ -168,46 +99,25 @@ TEST(demo_message_test, serialize_uint32_type)
   demo_data<uint32_t> v{1234, 9876, 1647761782000};
   demo_message<uint32_t> msg(v);
 
- const std::vector<uint8_t>& buffer = msg.serialize();
+  const std::vector<uint8_t>& buffer = msg.serialize();
+  const uint8_t expect_buffer[] = {
+    // header
+    0x44, 0x45, 0x4d, 0x4f, 0x56, 0x31, 0x30, 0x30, // header flag
+    0x00, 0x1e, // header length
+    0x00, 0x01, // header count
+    0x00, // header attr
+    // mutable
+    // data
+    0x06, // data type
+    0x00, 0x00, 0x04, 0xd2, // data key
+    0x00, 0x00, 0x01, 0x7f, 0xa6, 0x41, 0x74, 0xf0, // data timestamp
+    0x00, 0x00, 0x26, 0x94 // data value
+  };
   // check length
-  EXPECT_EQ(buffer.size(), 28);
-  // check header
-  EXPECT_EQ(buffer[0], 0x44);
-  EXPECT_EQ(buffer[1], 0x45);
-  EXPECT_EQ(buffer[2], 0x4d);
-  EXPECT_EQ(buffer[3], 0x4f);
-  // check length field
-  EXPECT_EQ(buffer[4], 0x00);
-  EXPECT_EQ(buffer[5], 0x1c);
-  // check count field
-  EXPECT_EQ(buffer[6], 0x00);
-  EXPECT_EQ(buffer[7], 0x01);
-  // check attribute
-  EXPECT_EQ(buffer[8], 0x00);
-  EXPECT_EQ(buffer[9], 0x00);
-  EXPECT_EQ(buffer[10], 0x00);
-  EXPECT_EQ(buffer[11], 0x00);
-  // check data
-  // check type field
-  EXPECT_EQ(buffer[12], 0x06);
-  // check key field
-  EXPECT_EQ(buffer[13], 0x00);
-  EXPECT_EQ(buffer[14], 0x04);
-  EXPECT_EQ(buffer[15], 0xd2);
-  // check timestamp field
-  EXPECT_EQ(buffer[16], 0x00);
-  EXPECT_EQ(buffer[17], 0x00);
-  EXPECT_EQ(buffer[18], 0x01);
-  EXPECT_EQ(buffer[19], 0x7f);
-  EXPECT_EQ(buffer[20], 0xa6);
-  EXPECT_EQ(buffer[21], 0x41);
-  EXPECT_EQ(buffer[22], 0x74);
-  EXPECT_EQ(buffer[23], 0xf0);
-  // check value field
-  EXPECT_EQ(buffer[24], 0x00);
-  EXPECT_EQ(buffer[25], 0x00);
-  EXPECT_EQ(buffer[26], 0x26);
-  EXPECT_EQ(buffer[27], 0x94);
+  EXPECT_EQ(buffer.size(), 30);
+  for (std::size_t i = 0; i < buffer.size(); ++i) {
+    EXPECT_EQ(buffer[i], expect_buffer[i]);
+  }
 }
 
 TEST(demo_message_test, serialize_int16_type)
@@ -215,44 +125,25 @@ TEST(demo_message_test, serialize_int16_type)
   demo_data<int16_t> v{1234, 9876, 1647761782000};
   demo_message<int16_t> msg(v);
 
- const std::vector<uint8_t>& buffer = msg.serialize();
+  const std::vector<uint8_t>& buffer = msg.serialize();
+  const uint8_t expect_buffer[] = {
+    // header
+    0x44, 0x45, 0x4d, 0x4f, 0x56, 0x31, 0x30, 0x30, // header flag
+    0x00, 0x1c, // header length
+    0x00, 0x01, // header count
+    0x00, // header attr
+    // mutable
+    // data
+    0x03, // data type
+    0x00, 0x00, 0x04, 0xd2, // data key
+    0x00, 0x00, 0x01, 0x7f, 0xa6, 0x41, 0x74, 0xf0, // data timestamp
+    0x26, 0x94 // data value
+  };
   // check length
-  EXPECT_EQ(buffer.size(), 26);
-  // check header
-  EXPECT_EQ(buffer[0], 0x44);
-  EXPECT_EQ(buffer[1], 0x45);
-  EXPECT_EQ(buffer[2], 0x4d);
-  EXPECT_EQ(buffer[3], 0x4f);
-  // check length field
-  EXPECT_EQ(buffer[4], 0x00);
-  EXPECT_EQ(buffer[5], 0x1a);
-  // check count field
-  EXPECT_EQ(buffer[6], 0x00);
-  EXPECT_EQ(buffer[7], 0x01);
-  // check attribute
-  EXPECT_EQ(buffer[8], 0x00);
-  EXPECT_EQ(buffer[9], 0x00);
-  EXPECT_EQ(buffer[10], 0x00);
-  EXPECT_EQ(buffer[11], 0x00);
-  // check data
-  // check type field
-  EXPECT_EQ(buffer[12], 0x03);
-  // check key field
-  EXPECT_EQ(buffer[13], 0x00);
-  EXPECT_EQ(buffer[14], 0x04);
-  EXPECT_EQ(buffer[15], 0xd2);
-  // check timestamp field
-  EXPECT_EQ(buffer[16], 0x00);
-  EXPECT_EQ(buffer[17], 0x00);
-  EXPECT_EQ(buffer[18], 0x01);
-  EXPECT_EQ(buffer[19], 0x7f);
-  EXPECT_EQ(buffer[20], 0xa6);
-  EXPECT_EQ(buffer[21], 0x41);
-  EXPECT_EQ(buffer[22], 0x74);
-  EXPECT_EQ(buffer[23], 0xf0);
-  // check value field
-  EXPECT_EQ(buffer[24], 0x26);
-  EXPECT_EQ(buffer[25], 0x94);
+  EXPECT_EQ(buffer.size(), 28);
+  for (std::size_t i = 0; i < buffer.size(); ++i) {
+    EXPECT_EQ(buffer[i], expect_buffer[i]);
+  }
 }
 
 TEST(demo_message_test, serialize_int8_type)
@@ -260,43 +151,26 @@ TEST(demo_message_test, serialize_int8_type)
   demo_data<int8_t> v{1234, -32, 1648001566463};
   demo_message<int8_t> msg(v);
 
- const std::vector<uint8_t>& buffer = msg.serialize();
+  const std::vector<uint8_t>& buffer = msg.serialize();
+  const uint8_t expect_buffer[] = {
+    // header
+    0x44, 0x45, 0x4d, 0x4f, 0x56, 0x31, 0x30, 0x30, // header flag
+    0x00, 0x1b, // header length
+    0x00, 0x01, // header count
+    0x00, // header attr
+    // mutable
+    // data
+    0x01, // data type
+    0x00, 0x00, 0x04, 0xd2, // data key
+    0x00, 0x00, 0x01, 0x7f, 0xb4, 0x8c, 0x46, 0xff, // data timestamp
+    0xe0 // data value
+  };
+
   // check length
-  EXPECT_EQ(buffer.size(), 25);
-  // check header
-  EXPECT_EQ(buffer[0], 0x44);
-  EXPECT_EQ(buffer[1], 0x45);
-  EXPECT_EQ(buffer[2], 0x4d);
-  EXPECT_EQ(buffer[3], 0x4f);
-  // check length field
-  EXPECT_EQ(buffer[4], 0x00);
-  EXPECT_EQ(buffer[5], 0x19);
-  // check count field
-  EXPECT_EQ(buffer[6], 0x00);
-  EXPECT_EQ(buffer[7], 0x01);
-  // check attribute
-  EXPECT_EQ(buffer[8], 0x00);
-  EXPECT_EQ(buffer[9], 0x00);
-  EXPECT_EQ(buffer[10], 0x00);
-  EXPECT_EQ(buffer[11], 0x00);
-  // check data
-  // check type field
-  EXPECT_EQ(buffer[12], 0x01);
-  // check key field
-  EXPECT_EQ(buffer[13], 0x00);
-  EXPECT_EQ(buffer[14], 0x04);
-  EXPECT_EQ(buffer[15], 0xd2);
-  // check timestamp field
-  EXPECT_EQ(buffer[16], 0x00);
-  EXPECT_EQ(buffer[17], 0x00);
-  EXPECT_EQ(buffer[18], 0x01);
-  EXPECT_EQ(buffer[19], 0x7f);
-  EXPECT_EQ(buffer[20], 0xb4);
-  EXPECT_EQ(buffer[21], 0x8c);
-  EXPECT_EQ(buffer[22], 0x46);
-  EXPECT_EQ(buffer[23], 0xff);
-  // check value field
-  EXPECT_EQ(buffer[24], 0xe0);
+  EXPECT_EQ(buffer.size(), 27);
+  for (std::size_t i = 0; i < buffer.size(); ++i) {
+    EXPECT_EQ(buffer[i], expect_buffer[i]);
+  }
 }
 
 TEST(demo_message_test, serialize_bool_type)
@@ -304,45 +178,26 @@ TEST(demo_message_test, serialize_bool_type)
   demo_data<bool> v{1234, true, 1648001566463};
   demo_message<bool> msg(v);
 
- const std::vector<uint8_t>& buffer = msg.serialize();
+  const std::vector<uint8_t>& buffer = msg.serialize();
+  const uint8_t expect_buffer[] = {
+    // header
+    0x44, 0x45, 0x4d, 0x4f, 0x56, 0x31, 0x30, 0x30, // header flag
+    0x00, 0x1b, // header length
+    0x00, 0x01, // header count
+    0x00, // header attr
+    // mutable
+    // data
+    0x00, // data type
+    0x00, 0x00, 0x04, 0xd2, // data key
+    0x00, 0x00, 0x01, 0x7f, 0xb4, 0x8c, 0x46, 0xff, // data timestamp
+    0x01 // data value
+  };
   // check length
-  EXPECT_EQ(buffer.size(), 25);
-  // check header
-  EXPECT_EQ(buffer[0], 0x44);
-  EXPECT_EQ(buffer[1], 0x45);
-  EXPECT_EQ(buffer[2], 0x4d);
-  EXPECT_EQ(buffer[3], 0x4f);
-  // check length field
-  EXPECT_EQ(buffer[4], 0x00);
-  EXPECT_EQ(buffer[5], 0x19);
-  // check count field
-  EXPECT_EQ(buffer[6], 0x00);
-  EXPECT_EQ(buffer[7], 0x01);
-  // check attribute
-  EXPECT_EQ(buffer[8], 0x00);
-  EXPECT_EQ(buffer[9], 0x00);
-  EXPECT_EQ(buffer[10], 0x00);
-  EXPECT_EQ(buffer[11], 0x00);
-  // check data
-  // check type field
-  EXPECT_EQ(buffer[12], 0x00);
-  // check key field
-  EXPECT_EQ(buffer[13], 0x00);
-  EXPECT_EQ(buffer[14], 0x04);
-  EXPECT_EQ(buffer[15], 0xd2);
-  // check timestamp field
-  EXPECT_EQ(buffer[16], 0x00);
-  EXPECT_EQ(buffer[17], 0x00);
-  EXPECT_EQ(buffer[18], 0x01);
-  EXPECT_EQ(buffer[19], 0x7f);
-  EXPECT_EQ(buffer[20], 0xb4);
-  EXPECT_EQ(buffer[21], 0x8c);
-  EXPECT_EQ(buffer[22], 0x46);
-  EXPECT_EQ(buffer[23], 0xff);
-  // check value field
-  EXPECT_EQ(buffer[24], 0x01);
+  EXPECT_EQ(buffer.size(), 27);
+  for (std::size_t i = 0; i < buffer.size(); ++i) {
+    EXPECT_EQ(buffer[i], expect_buffer[i]);
+  }
 }
-
 
 } // demo_test
 } // asps_test

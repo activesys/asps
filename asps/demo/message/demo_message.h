@@ -19,14 +19,14 @@ class demo_message
   typedef std::vector<uint8_t> buffer_type;
 
   enum header_field_length {
-    flag_field_length = 4,
+    flag_field_length = 8,
     length_field_length = 2,
     count_field_length = 2,
-    attribute_field_length = 4
+    attribute_field_length = 1
   };
   enum value_field_length {
     type_field_length = 1,
-    key_field_length = 3,
+    key_field_length = 4,
     timestamp_field_length = 8
   };
 
@@ -59,10 +59,8 @@ private:
   void serialize_header(uint8_t*& pos)
   {
     // decode header, flag field is "DEMO"
-    *(pos++) = 0x44;
-    *(pos++) = 0x45;
-    *(pos++) = 0x4d;
-    *(pos++) = 0x4f;
+    memcpy(reinterpret_cast<char*>(pos), "DEMOV100", flag_field_length);
+    pos += flag_field_length;
 
     // decode length field
     *reinterpret_cast<uint16_t*>(pos) = htons(serialization_header_length() +
@@ -74,7 +72,7 @@ private:
     pos += count_field_length;
 
     // decode attribute field
-    *reinterpret_cast<uint32_t*>(pos) = 0;
+    *pos = 0;
     pos += attribute_field_length;
   }
 
@@ -87,9 +85,13 @@ private:
   }
   void serialize_value(uint8_t*& pos)
   {
-    // decode type and key field
-    *reinterpret_cast<uint32_t*>(pos) = htonl(data_.type << 24 | data_.key);
-    pos += type_field_length + key_field_length;
+    // decode type field
+    *pos = data_.type;
+    pos += type_field_length;
+  
+    // decode key field
+    *reinterpret_cast<uint32_t*>(pos) = htonl(data_.key);
+    pos += key_field_length;
 
     // decode timestamp field
     *reinterpret_cast<uint64_t*>(pos) = htonll(data_.timestamp);

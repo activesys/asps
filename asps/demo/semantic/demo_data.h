@@ -24,8 +24,8 @@ enum value_type {
   uint32_type = 6,
   int64_type = 7,
   uint64_type = 8,
-  float32_type = 10,
-  float64_type = 11
+  float32_type = 9,
+  float64_type = 10
 };
 
 // host sequence to network sequence for 64bits integer.

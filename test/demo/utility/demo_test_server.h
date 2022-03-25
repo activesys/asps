@@ -61,14 +61,14 @@ private:
   }
   std::size_t on_completion(const boost::system::error_code& ec, std::size_t bytes)
   {
-    // The header of demo protocol has a fixed length of 12 bytes
-    if (bytes < 12) {
-      return 12 - bytes;
+    // The header of demo protocol has a fixed length of 16 bytes
+    if (bytes < 13) {
+      return 13 - bytes;
     } else {
       // Parses the demo protocol package length,
       // expecting to return all demo package data.
       uint8_t* pos = buffer_.data();
-      pos += 4;
+      pos += 8;
       uint16_t length = ntohs(*reinterpret_cast<uint16_t*>(pos));
       
       if (bytes < length) {
