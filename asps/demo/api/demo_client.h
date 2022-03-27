@@ -33,11 +33,11 @@ public:
   bool is_connected();
   void close();
 
-  template <typename T>
-  bool send(const demo_data<T>& data)
+  template <typename IT>
+  bool send(IT first, IT second)
   {
-    demo_message<T> dd(data);
-    const std::vector<uint8_t>& buf = dd.serialize();
+    demo_message dm(first, second);
+    const std::vector<uint8_t>& buf = dm.serialize();
     boost::system::error_code ec;
   
     socket_.write_some(buffer(buf), ec);

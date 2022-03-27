@@ -6,6 +6,8 @@
 
 #include <cstdint>
 #include <list>
+#include <vector>
+#include <deque>
 #include <gtest/gtest.h>
 #include <asps/demo/demo.h>
 #include <boost/asio.hpp>
@@ -42,8 +44,10 @@ TEST_F(demo_client_test, network_connect)
   demo_client dcf("127.0.0.1", 9902);
   EXPECT_FALSE(dcf.connect());
   EXPECT_FALSE(dcf.is_connected());
-  demo_data<uint64_t> d{1234, 1154789657886957455, 1647761782000};
-  EXPECT_FALSE(dcf.send(d));
+  std::list<demo_data::pointer_type> p{
+    make_demo_data<uint64_t>(1234, 1154789657886957455, 1647761782000)
+  };
+  EXPECT_FALSE(dcf.send(p.begin(), p.end()));
 
   server_.wait();
 }
@@ -56,8 +60,10 @@ TEST_F(demo_client_test, send_data_of_uint64_type)
   dc.connect();
   EXPECT_TRUE(dc.is_connected());
 
-  demo_data<uint64_t> d{1234, 1154789657886957455, 1647761782000};
-  EXPECT_TRUE(dc.send(d));
+  std::list<demo_data::pointer_type> p{
+    make_demo_data<uint64_t>(1234, 1154789657886957455, 1647761782000)
+  };
+  EXPECT_TRUE(dc.send(p.begin(), p.end()));
   dc.close();
   server_.wait();
 
@@ -90,8 +96,10 @@ TEST_F(demo_client_test, send_data_of_int32_type)
   dc.connect();
   EXPECT_TRUE(dc.is_connected());
 
-  demo_data<int32_t> d{1234, 9876, 1647761782000};
-  EXPECT_TRUE(dc.send(d));
+  std::vector<demo_data::pointer_type> p{
+    make_demo_data<int32_t>(1234, 9876, 1647761782000)
+  };
+  EXPECT_TRUE(dc.send(p.begin(), p.end()));
   dc.close();
   server_.wait();
 
@@ -124,8 +132,10 @@ TEST_F(demo_client_test, send_data_of_uint16_type)
   dc.connect();
   EXPECT_TRUE(dc.is_connected());
 
-  demo_data<uint16_t> d{1234, 9876, 1647761782000};
-  EXPECT_TRUE(dc.send(d));
+  std::vector<demo_data::pointer_type> p{
+    make_demo_data<uint16_t>(1234, 9876, 1647761782000)
+  };
+  EXPECT_TRUE(dc.send(p.begin(), p.end()));
   dc.close();
   server_.wait();
 
@@ -158,8 +168,10 @@ TEST_F(demo_client_test, send_data_of_uint8_type)
   dc.connect();
   EXPECT_TRUE(dc.is_connected());
 
-  demo_data<uint8_t> d{1234, 255, 1647761782000};
-  EXPECT_TRUE(dc.send(d));
+  std::deque<demo_data::pointer_type> p{
+    make_demo_data<uint8_t>(1234, 255, 1647761782000)
+  };
+  EXPECT_TRUE(dc.send(p.begin(), p.end()));
   dc.close();
   server_.wait();
 
@@ -192,8 +204,10 @@ TEST_F(demo_client_test, send_data_of_bool_type)
   dc.connect();
   EXPECT_TRUE(dc.is_connected());
 
-  demo_data<bool> d{1234, false, 1647761782000};
-  EXPECT_TRUE(dc.send(d));
+  std::list<demo_data::pointer_type> p{
+    make_demo_data<bool>(1234, false, 1647761782000)
+  };
+  EXPECT_TRUE(dc.send(p.begin(), p.end()));
   dc.close();
   server_.wait();
 
@@ -213,6 +227,114 @@ TEST_F(demo_client_test, send_data_of_bool_type)
   };
   // check length
   EXPECT_EQ(buffer.size(), 27);
+  for (std::size_t i = 0; i < buffer.size(); ++i) {
+    EXPECT_EQ(buffer[i], expect_buffer[i]);
+  }
+}
+
+TEST_F(demo_client_test, send_datas_of_int32_type)
+{
+  server_.start();
+
+  demo_client dc("127.0.0.1", 9901);
+  dc.connect();
+  EXPECT_TRUE(dc.is_connected());
+
+  std::vector<demo_data::pointer_type> ds{
+    make_demo_data<int32_t>(1000, 9000, 1648363193268),
+    make_demo_data<int32_t>(1001, 9001, 1648363193268),
+    make_demo_data<int32_t>(1002, 9002, 1648363193268),
+    make_demo_data<int32_t>(1003, 9003, 1648363193268)
+  };
+  EXPECT_TRUE(dc.send(ds.begin(), ds.end()));
+  dc.close();
+  server_.wait();
+
+  const std::vector<uint8_t>& buffer = server_.message();
+  const uint8_t expect_buffer[] = {
+    // header
+    0x44, 0x45, 0x4d, 0x4f, 0x56, 0x31, 0x30, 0x30, // header flag
+    0x00, 0x51, // header length
+    0x00, 0x04, // header count
+    0x00, // header attr
+    // mutable
+    // data 1
+    0x05, // data type
+    0x00, 0x00, 0x03, 0xe8, // data key
+    0x00, 0x00, 0x01, 0x7f, 0xca, 0x1a, 0x43, 0xb4, // data timestamp
+    0x00, 0x00, 0x23, 0x28, // data value
+    // data 2
+    0x05, // data type
+    0x00, 0x00, 0x03, 0xe9, // data key
+    0x00, 0x00, 0x01, 0x7f, 0xca, 0x1a, 0x43, 0xb4, // data timestamp
+    0x00, 0x00, 0x23, 0x29, // data value
+    // data 3
+    0x05, // data type
+    0x00, 0x00, 0x03, 0xea, // data key
+    0x00, 0x00, 0x01, 0x7f, 0xca, 0x1a, 0x43, 0xb4, // data timestamp
+    0x00, 0x00, 0x23, 0x2a, // data value
+    // data 4
+    0x05, // data type
+    0x00, 0x00, 0x03, 0xeb, // data key
+    0x00, 0x00, 0x01, 0x7f, 0xca, 0x1a, 0x43, 0xb4, // data timestamp
+    0x00, 0x00, 0x23, 0x2b // data value
+  };
+  // check length
+  EXPECT_EQ(buffer.size(), 81);
+  for (std::size_t i = 0; i < buffer.size(); ++i) {
+    EXPECT_EQ(buffer[i], expect_buffer[i]);
+  }
+}
+
+TEST_F(demo_client_test, send_datas_of_multiple_types)
+{
+  server_.start();
+
+  demo_client dc("127.0.0.1", 9901);
+  dc.connect();
+  EXPECT_TRUE(dc.is_connected());
+
+  std::vector<demo_data::pointer_type> ds{
+    make_demo_data<int32_t>(1000, 9000, 1648363193268),
+    make_demo_data<uint32_t>(1001, 9001, 1648363193268),
+    make_demo_data<int16_t>(1002, 9002, 1648363193268),
+    make_demo_data<uint16_t>(1003, 9003, 1648363193268)
+  };
+  EXPECT_TRUE(dc.send(ds.begin(), ds.end()));
+  dc.close();
+  server_.wait();
+
+  const std::vector<uint8_t>& buffer = server_.message();
+  const uint8_t expect_buffer[] = {
+    // header
+    0x44, 0x45, 0x4d, 0x4f, 0x56, 0x31, 0x30, 0x30, // header flag
+    0x00, 0x4d, // header length
+    0x00, 0x04, // header count
+    0x00, // header attr
+    // mutable
+    // data 1
+    0x05, // data type
+    0x00, 0x00, 0x03, 0xe8, // data key
+    0x00, 0x00, 0x01, 0x7f, 0xca, 0x1a, 0x43, 0xb4, // data timestamp
+    0x00, 0x00, 0x23, 0x28, // data value
+    // data 2
+    0x06, // data type
+    0x00, 0x00, 0x03, 0xe9, // data key
+    0x00, 0x00, 0x01, 0x7f, 0xca, 0x1a, 0x43, 0xb4, // data timestamp
+    0x00, 0x00, 0x23, 0x29, // data value
+    // data 3
+    0x03, // data type
+    0x00, 0x00, 0x03, 0xea, // data key
+    0x00, 0x00, 0x01, 0x7f, 0xca, 0x1a, 0x43, 0xb4, // data timestamp
+    0x23, 0x2a, // data value
+    // data 4
+    0x04, // data type
+    0x00, 0x00, 0x03, 0xeb, // data key
+    0x00, 0x00, 0x01, 0x7f, 0xca, 0x1a, 0x43, 0xb4, // data timestamp
+    0x23, 0x2b // data value
+  };
+  // check length
+  EXPECT_EQ(buffer.size(), 77);
   for (std::size_t i = 0; i < buffer.size(); ++i) {
     EXPECT_EQ(buffer[i], expect_buffer[i]);
   }
