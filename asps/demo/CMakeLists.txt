@@ -24,6 +24,7 @@ configure_file(
 set(ASPS_DEMO_SOURCES
   api/demo_client.cc
   semantic/demo_data.cc
+  message/demo_message.cc
 )
 
 ##################################

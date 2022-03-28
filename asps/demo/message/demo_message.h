@@ -7,6 +7,7 @@
 #ifndef ASPS_DEMO_MESSAGE_DEMO_MESSAGE_H
 #define ASPS_DEMO_MESSAGE_DEMO_MESSAGE_H
 
+#include <cstring>
 #include <vector>
 #include <arpa/inet.h>
 #include <asps/demo/semantic/demo_data.h>
@@ -24,96 +25,61 @@ class demo_message
     count_field_length = 2,
     attribute_field_length = 1
   };
-  enum value_field_length {
+  enum mutable_field_length {
+    mutable_type_field_length = 1,
+    mutable_key_field_length = 4,
+    mutable_timestamp_field_length = 8
+  };
+  enum data_field_length {
     type_field_length = 1,
     key_field_length = 4,
     timestamp_field_length = 8
   };
+  enum attribute {
+    attr_same_type = 0x01,
+    attr_key_sequence = 0x02,
+    attr_same_timestamp = 0x04
+  };
 
 public:
   template <typename IT>
-  demo_message(IT first, IT second)
-    : datas_(first, second)
+  demo_message(IT first,
+               IT second,
+               bool compress_same_type = false,
+               bool compress_same_timestamp = false)
+    : datas_(first, second),
+      compress_same_type_(compress_same_type),
+      compress_same_timestamp_(compress_same_timestamp)
   {}
 
 public:
-  const buffer_type& serialize()
-  {
-    buffer_.resize(serialization_header_length() +
-                   serialization_datas_length());
-    uint8_t* pos = buffer_.data();
-
-    serialize_header(pos);
-    serialize_datas(pos);
-
-    return buffer_;
-  }
+  const buffer_type& serialize();
 
 private:
-  std::size_t serialization_header_length()
-  {
-    return flag_field_length + 
-           length_field_length +
-           count_field_length +
-           attribute_field_length;
-  }
-
-  void serialize_header(uint8_t*& pos)
-  {
-    // decode header, flag field is "DEMOV100"
-    memcpy(reinterpret_cast<char*>(pos), "DEMOV100", flag_field_length);
-    pos += flag_field_length;
-
-    // decode length field
-    *reinterpret_cast<uint16_t*>(pos) = htons(serialization_header_length() +
-                                              serialization_datas_length());
-    pos += length_field_length;
-
-    // decode count field
-    *reinterpret_cast<uint16_t*>(pos) = htons(datas_.size());
-    pos += count_field_length;
-
-    // decode attribute field
-    *pos = 0;
-    pos += attribute_field_length;
-  }
-
-  std::size_t serialization_datas_length()
-  {
-    std::size_t length = 0;
-
-    for (auto& data : datas_) {
-      length += type_field_length +
-                key_field_length +
-                timestamp_field_length +
-                data->size();
-    }
-
-    return length;
-  }
-
-  void serialize_datas(uint8_t*& pos)
-  {
-    for (auto& data : datas_) {
-      // decode type field
-      *pos = data->type();
-      pos += type_field_length;
-    
-      // decode key field
-      *reinterpret_cast<uint32_t*>(pos) = htonl(data->key());
-      pos += key_field_length;
-
-      // decode timestamp field
-      *reinterpret_cast<uint64_t*>(pos) = htonll(data->timestamp());
-      pos += timestamp_field_length;
-
-      // decode value field
-      data->assign_network_sequence_value(pos);
-      pos += data->size();
-    }
-  }
+  std::size_t serialization_header_length();
+  std::size_t serialization_mutable_length();
+  std::size_t serialization_datas_length();
+  // decode header
+  void serialize_header(uint8_t*& pos);
+  void serialize_header_flag(uint8_t*& pos);
+  void serialize_header_length(uint8_t*& pos);
+  void serialize_header_count(uint8_t*& pos);
+  void serialize_header_attribute(uint8_t*& pos);
+  // decode mutable
+  void serialize_mutable(uint8_t*& pos);
+  void serialize_mutable_type(uint8_t*& pos);
+  void serialize_mutable_timestamp(uint8_t*& pos);
+  // decode datas
+  void serialize_datas(uint8_t*& pos);
+  void serialize_one_data(demo_data::pointer_type& data, uint8_t*& pos);
+  void serialize_data_type(demo_data::pointer_type& data, uint8_t*& pos);
+  void serialize_data_key(demo_data::pointer_type& data, uint8_t*& pos);
+  void serialize_data_timestamp(demo_data::pointer_type& data, uint8_t*& pos);
+  void serialize_data_value(demo_data::pointer_type& data, uint8_t*& pos);
 
 private:
+  bool compress_same_type_;
+  bool compress_same_timestamp_;
   std::vector<demo_data::pointer_type> datas_;
   buffer_type buffer_;
 };

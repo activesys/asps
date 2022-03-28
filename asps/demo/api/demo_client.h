@@ -12,7 +12,7 @@
 #include <boost/asio.hpp>
 
 #include <asps/demo/semantic/demo_data.h>
-#include <asps/demo/message/demo_message.h>
+#include <asps/demo/session/demo_session.h>
 
 namespace asps {
 namespace demo {
@@ -25,19 +25,21 @@ public:
   demo_client(const std::string& host, uint16_t port)
     : socket_(context_),
       endpoint_(ip::address::from_string(host), port),
-      is_connected_(false)
+      is_connected_(false),
+      session_(false, false)
   {}
 
 public:
   bool connect();
   bool is_connected();
   void close();
+  void compress_same_type(bool flag);
+  void compress_same_timestamp(bool flag);
 
   template <typename IT>
   bool send(IT first, IT second)
   {
-    demo_message dm(first, second);
-    const std::vector<uint8_t>& buf = dm.serialize();
+    const std::vector<uint8_t>& buf = session_.send(first, second);
     boost::system::error_code ec;
   
     socket_.write_some(buffer(buf), ec);
@@ -49,6 +51,7 @@ private:
   ip::tcp::socket socket_;
   ip::tcp::endpoint endpoint_;
   bool is_connected_;
+  demo_session session_;
 };
 
 } // demo
