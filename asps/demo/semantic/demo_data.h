@@ -61,7 +61,7 @@ protected:
   uint64_t timestamp_;
 };
 
-template <typename T> inline
+template <typename T>
 demo_data::pointer_type make_demo_data(uint32_t k, T v, uint64_t t)
 {
   return std::make_shared<demo_data>(demo_data::invalid_type, k, t);

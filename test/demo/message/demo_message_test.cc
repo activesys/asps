@@ -24,9 +24,9 @@ TEST(demo_message_test, serialize_float64_type)
   demo_data::pointer_type p[]{
     make_demo_data<double>(1234, 913456.230887143, 1647761782000)
   };
-  demo_message msg(p, p+1);
+  demo_message::pointer_type msg = make_demo_message(p, p+1);
 
-  const std::vector<uint8_t>& buffer = msg.serialize();
+  const std::vector<uint8_t>& buffer = msg->serialize();
   const uint8_t expect_buffer[] = {
     // header
     0x44, 0x45, 0x4d, 0x4f, 0x56, 0x31, 0x30, 0x30, // header flag
@@ -53,9 +53,9 @@ TEST(demo_message_test, serialize_float32_type)
   std::array<demo_data::pointer_type, 1> p{
     make_demo_data<float>(1234, -98.12, 1647761782000)
   };
-  demo_message msg(p.begin(), p.end());
+  demo_message::pointer_type msg = make_demo_message(p.begin(), p.end());
 
-  const std::vector<uint8_t>& buffer = msg.serialize();
+  const std::vector<uint8_t>& buffer = msg->serialize();
   const uint8_t expect_buffer[] = {
     // header
     0x44, 0x45, 0x4d, 0x4f, 0x56, 0x31, 0x30, 0x30, // header flag
@@ -82,9 +82,9 @@ TEST(demo_message_test, serialize_int64_type)
   std::deque<demo_data::pointer_type> p{
     make_demo_data<int64_t>(1234, -1154789657886957455, 1647761782000)
   };
-  demo_message msg(p.begin(), p.end());
+  demo_message::pointer_type msg = make_demo_message(p.begin(), p.end());
 
-  const std::vector<uint8_t>& buffer = msg.serialize();
+  const std::vector<uint8_t>& buffer = msg->serialize();
   const uint8_t expect_buffer[] = {
     // header
     0x44, 0x45, 0x4d, 0x4f, 0x56, 0x31, 0x30, 0x30, // header flag
@@ -110,9 +110,9 @@ TEST(demo_message_test, serialize_uint32_type)
   std::forward_list<demo_data::pointer_type> p{
     make_demo_data<uint32_t>(1234, 9876, 1647761782000)
   };
-  demo_message msg(p.begin(), p.end());
+  demo_message::pointer_type msg = make_demo_message(p.begin(), p.end());
 
-  const std::vector<uint8_t>& buffer = msg.serialize();
+  const std::vector<uint8_t>& buffer = msg->serialize();
   const uint8_t expect_buffer[] = {
     // header
     0x44, 0x45, 0x4d, 0x4f, 0x56, 0x31, 0x30, 0x30, // header flag
@@ -138,9 +138,9 @@ TEST(demo_message_test, serialize_int16_type)
   std::list<demo_data::pointer_type> p{
     make_demo_data<int16_t>(1234, 9876, 1647761782000)
   };
-  demo_message msg(p.begin(), p.end());
+  demo_message::pointer_type msg = make_demo_message(p.begin(), p.end());
 
-  const std::vector<uint8_t>& buffer = msg.serialize();
+  const std::vector<uint8_t>& buffer = msg->serialize();
   const uint8_t expect_buffer[] = {
     // header
     0x44, 0x45, 0x4d, 0x4f, 0x56, 0x31, 0x30, 0x30, // header flag
@@ -166,9 +166,9 @@ TEST(demo_message_test, serialize_int8_type)
   std::vector<demo_data::pointer_type> p{
     make_demo_data<int8_t>(1234, -32, 1648001566463)
   };
-  demo_message msg(p.begin(), p.end());
+  demo_message::pointer_type msg = make_demo_message(p.begin(), p.end());
 
-  const std::vector<uint8_t>& buffer = msg.serialize();
+  const std::vector<uint8_t>& buffer = msg->serialize();
   const uint8_t expect_buffer[] = {
     // header
     0x44, 0x45, 0x4d, 0x4f, 0x56, 0x31, 0x30, 0x30, // header flag
@@ -195,9 +195,9 @@ TEST(demo_message_test, serialize_bool_type)
   std::list<demo_data::pointer_type> p{
     make_demo_data<bool>(1234, true, 1648001566463)
   };
-  demo_message msg(p.begin(), p.end());
+  demo_message::pointer_type msg = make_demo_message(p.begin(), p.end());
 
-  const std::vector<uint8_t>& buffer = msg.serialize();
+  const std::vector<uint8_t>& buffer = msg->serialize();
   const uint8_t expect_buffer[] = {
     // header
     0x44, 0x45, 0x4d, 0x4f, 0x56, 0x31, 0x30, 0x30, // header flag
@@ -225,9 +225,9 @@ TEST(demo_message_test, serialize_multi_int8_type)
     make_demo_data<int8_t>(1112, 12, 1648001566463),
     make_demo_data<int8_t>(1113, 13, 1648001566463)
   };
-  demo_message msg(vs.begin(), vs.end());
+  demo_message::pointer_type msg = make_demo_message(vs.begin(), vs.end());
 
-  const std::vector<uint8_t>& buffer = msg.serialize();
+  const std::vector<uint8_t>& buffer = msg->serialize();
   const uint8_t expect_buffer[] = {
     // header
     0x44, 0x45, 0x4d, 0x4f, 0x56, 0x31, 0x30, 0x30, // header flag
@@ -266,9 +266,9 @@ TEST(demo_message_test, serialize_multi_types)
     make_demo_data<int16_t>(1112, 12, 1648001566463),
     make_demo_data<uint32_t>(1113, 13, 1648001566463)
   };
-  demo_message msg(vs.begin(), vs.end());
+  demo_message::pointer_type msg = make_demo_message(vs.begin(), vs.end());
 
-  const std::vector<uint8_t>& buffer = msg.serialize();
+  const std::vector<uint8_t>& buffer = msg->serialize();
   const uint8_t expect_buffer[] = {
     // header
     0x44, 0x45, 0x4d, 0x4f, 0x56, 0x31, 0x30, 0x30, // header flag

@@ -9,14 +9,20 @@
 
 #include <cstring>
 #include <vector>
+#include <memory>
 #include <arpa/inet.h>
 #include <asps/demo/semantic/demo_data.h>
 
 namespace asps {
 namespace demo {
 
+// demo_message without compression
 class demo_message
 {
+public:
+  typedef std::shared_ptr<demo_message> pointer_type;
+
+protected:
   typedef std::vector<uint8_t> buffer_type;
 
   enum header_field_length {
@@ -36,6 +42,7 @@ class demo_message
     timestamp_field_length = 8
   };
   enum attribute {
+    attr_none = 0x00,
     attr_same_type = 0x01,
     attr_key_sequence = 0x02,
     attr_same_timestamp = 0x04
@@ -43,46 +50,113 @@ class demo_message
 
 public:
   template <typename IT>
-  demo_message(IT first,
-               IT second,
-               bool compress_same_type = false,
-               bool compress_same_timestamp = false)
-    : datas_(first, second),
-      compress_same_type_(compress_same_type),
-      compress_same_timestamp_(compress_same_timestamp)
+  demo_message(IT first, IT second)
+    : datas_(first, second)
   {}
+  virtual ~demo_message() {}
 
 public:
   const buffer_type& serialize();
 
-private:
-  std::size_t serialization_header_length();
-  std::size_t serialization_mutable_length();
-  std::size_t serialization_datas_length();
+protected:
+  virtual std::size_t serialization_header_length();
+  virtual std::size_t serialization_mutable_length();
+  virtual std::size_t serialization_datas_length();
   // decode header
-  void serialize_header(uint8_t*& pos);
-  void serialize_header_flag(uint8_t*& pos);
-  void serialize_header_length(uint8_t*& pos);
-  void serialize_header_count(uint8_t*& pos);
-  void serialize_header_attribute(uint8_t*& pos);
+  virtual void serialize_header(uint8_t*& pos);
+  virtual void serialize_header_flag(uint8_t*& pos);
+  virtual void serialize_header_length(uint8_t*& pos);
+  virtual void serialize_header_count(uint8_t*& pos);
+  virtual void serialize_header_attribute(uint8_t*& pos);
   // decode mutable
-  void serialize_mutable(uint8_t*& pos);
-  void serialize_mutable_type(uint8_t*& pos);
-  void serialize_mutable_timestamp(uint8_t*& pos);
+  virtual void serialize_mutable(uint8_t*& pos);
+  virtual void serialize_mutable_type(uint8_t*& pos);
+  virtual void serialize_mutable_timestamp(uint8_t*& pos);
   // decode datas
-  void serialize_datas(uint8_t*& pos);
-  void serialize_one_data(demo_data::pointer_type& data, uint8_t*& pos);
-  void serialize_data_type(demo_data::pointer_type& data, uint8_t*& pos);
-  void serialize_data_key(demo_data::pointer_type& data, uint8_t*& pos);
-  void serialize_data_timestamp(demo_data::pointer_type& data, uint8_t*& pos);
-  void serialize_data_value(demo_data::pointer_type& data, uint8_t*& pos);
+  virtual void serialize_datas(uint8_t*& pos);
+  virtual void serialize_one_data(demo_data::pointer_type& data, uint8_t*& pos);
+  virtual void serialize_data_type(demo_data::pointer_type& data, uint8_t*& pos);
+  virtual void serialize_data_key(demo_data::pointer_type& data, uint8_t*& pos);
+  virtual void serialize_data_timestamp(demo_data::pointer_type& data, uint8_t*& pos);
+  virtual void serialize_data_value(demo_data::pointer_type& data, uint8_t*& pos);
 
-private:
-  bool compress_same_type_;
-  bool compress_same_timestamp_;
+protected:
   std::vector<demo_data::pointer_type> datas_;
   buffer_type buffer_;
 };
+
+// demo_message with same type compression
+class demo_message_same_type_compression : public demo_message
+{
+public:
+  template <typename IT>
+  demo_message_same_type_compression(IT first, IT second)
+    : demo_message(first, second)
+  {}
+
+public:
+  virtual std::size_t serialization_mutable_length();
+  virtual std::size_t serialization_datas_length();
+  virtual void serialize_header_attribute(uint8_t*& pos);
+  virtual void serialize_mutable(uint8_t*& pos);
+  virtual void serialize_mutable_type(uint8_t*& pos);
+  virtual void serialize_one_data(demo_data::pointer_type& data, uint8_t*& pos);
+};
+
+// demo_message with key sequence compression
+class demo_message_key_sequence_compression : public demo_message
+{
+public:
+  template <typename IT>
+  demo_message_key_sequence_compression(IT first, IT second)
+    : demo_message(first, second)
+  {}
+
+public:
+  virtual std::size_t serialization_mutable_length();
+  virtual std::size_t serialization_datas_length();
+  virtual void serialize_header_attribute(uint8_t*& pos);
+  virtual void serialize_mutable(uint8_t*& pos);
+  virtual void serialize_mutable_key(uint8_t*& pos);
+  virtual void serialize_one_data(demo_data::pointer_type& data, uint8_t*& pos);
+};
+
+// demo_message with same timestamp compression
+class demo_message_same_timestamp_compression : public demo_message
+{
+public:
+  template <typename IT>
+  demo_message_same_timestamp_compression(IT first, IT second)
+    : demo_message(first, second)
+  {}
+
+public:
+  virtual std::size_t serialization_mutable_length();
+  virtual std::size_t serialization_datas_length();
+  virtual void serialize_header_attribute(uint8_t*& pos);
+  virtual void serialize_mutable(uint8_t*& pos);
+  virtual void serialize_mutable_timestamp(uint8_t*& pos);
+  virtual void serialize_one_data(demo_data::pointer_type& data, uint8_t*& pos);
+};
+
+template <typename IT>
+demo_message::pointer_type
+make_demo_message(IT first,
+                  IT second,
+                  bool compress_same_type = false,
+                  bool compress_same_timestamp = false,
+                  bool compress_key_sequence = false)
+{
+  if (compress_same_type) {
+    return std::make_shared<demo_message_same_type_compression>(first, second);
+  } else if (compress_same_timestamp) {
+    return std::make_shared<demo_message_same_timestamp_compression>(first, second);
+  } else if (compress_key_sequence) {
+    return std::make_shared<demo_message_key_sequence_compression>(first, second);
+  } else {
+    return std::make_shared<demo_message>(first, second);
+  }
+}
 
 } // demo
 } // asps

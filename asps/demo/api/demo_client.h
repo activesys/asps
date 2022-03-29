@@ -26,7 +26,7 @@ public:
     : socket_(context_),
       endpoint_(ip::address::from_string(host), port),
       is_connected_(false),
-      session_(false, false)
+      session_(false, false, false)
   {}
 
 public:
@@ -35,6 +35,7 @@ public:
   void close();
   void compress_same_type(bool flag);
   void compress_same_timestamp(bool flag);
+  void compress_key_sequence(bool flag);
 
   template <typename IT>
   bool send(IT first, IT second)

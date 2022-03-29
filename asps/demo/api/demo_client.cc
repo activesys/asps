@@ -42,5 +42,10 @@ void demo_client::compress_same_timestamp(bool flag)
   session_.compress_same_timestamp(flag);
 }
 
+void demo_client::compress_key_sequence(bool flag)
+{
+  session_.compress_key_sequence(flag);
+}
+
 } // demo
 } // asps

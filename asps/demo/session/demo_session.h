@@ -20,28 +20,34 @@ class demo_session
 {
 public:
   demo_session(bool compress_same_type,
-               bool compress_same_timestamp)
+               bool compress_same_timestamp,
+               bool compress_key_sequence)
     : compress_same_type_(compress_same_type),
-      compress_same_timestamp_(compress_same_timestamp)
+      compress_same_timestamp_(compress_same_timestamp),
+      compress_key_sequence_(compress_key_sequence)
   {}
 
 public:
   void compress_same_type(bool flag) {compress_same_type_ = flag;}
   void compress_same_timestamp(bool flag) {compress_same_timestamp_ = flag;}
+  void compress_key_sequence(bool flag) {compress_key_sequence_ = flag;}
 
   template <typename IT>
   const std::vector<uint8_t> send(IT first, IT second)
   {
-    demo_message dm(first,
-                    second,
-                    compress_same_type_,
-                    compress_same_timestamp_);
-    return dm.serialize();
+    demo_message::pointer_type dm =
+      make_demo_message(first,
+                        second,
+                        compress_same_type_,
+                        compress_same_timestamp_,
+                        compress_key_sequence_);
+    return dm->serialize();
   }
 
 private:
   bool compress_same_type_;
   bool compress_same_timestamp_;
+  bool compress_key_sequence_;
 };
 
 } // demo

@@ -33,16 +33,7 @@ std::size_t demo_message::serialization_header_length()
 
 std::size_t demo_message::serialization_mutable_length()
 {
-  std::size_t length = 0;
-
-  if (compress_same_type_) {
-    length += mutable_type_field_length;
-  }
-  if (compress_same_timestamp_) {
-    length += mutable_timestamp_field_length;
-  }
-
-  return length;
+  return 0;
 }
 
 std::size_t demo_message::serialization_datas_length()
@@ -50,17 +41,10 @@ std::size_t demo_message::serialization_datas_length()
   std::size_t length = 0;
 
   for (auto& data : datas_) {
-    if (!compress_same_type_) {
-      length += type_field_length;
-    }
-
-    length += key_field_length;
-
-    if (!compress_same_timestamp_) {
-      length += timestamp_field_length;
-    }
-
-    length += data->size();
+    length += type_field_length +
+              key_field_length +
+              timestamp_field_length +
+              data->size();
   }
 
   return length;
@@ -98,37 +82,21 @@ void demo_message::serialize_header_count(uint8_t*& pos)
 
 void demo_message::serialize_header_attribute(uint8_t*& pos)
 {
-  *pos = 0;
-  if (compress_same_type_) {
-    *pos |= attr_same_type;
-  }
-  if (compress_same_timestamp_) {
-    *pos |= attr_same_timestamp;
-  }
+  *pos = attr_none;
   pos += attribute_field_length;
 }
 
 // decode mutable
 void demo_message::serialize_mutable(uint8_t*& pos)
 {
-  serialize_mutable_type(pos);
-  serialize_mutable_timestamp(pos);
 }
 
 void demo_message::serialize_mutable_type(uint8_t*& pos)
 {
-  if (compress_same_type_) {
-    *pos = datas_[0]->type();
-    pos += mutable_type_field_length;
-  }
 }
 
 void demo_message::serialize_mutable_timestamp(uint8_t*& pos)
 {
-  if (compress_same_timestamp_) {
-    *reinterpret_cast<uint64_t*>(pos) = htonll(datas_[0]->timestamp());
-    pos += mutable_timestamp_field_length;
-  }
 }
 
 // decode datas
@@ -151,10 +119,8 @@ void demo_message::serialize_one_data(demo_data::pointer_type& data,
 void demo_message::serialize_data_type(demo_data::pointer_type& data,
                                        uint8_t*& pos)
 {
-  if (!compress_same_type_) {
-    *pos = data->type();
-    pos += type_field_length;
-  }
+  *pos = data->type();
+  pos += type_field_length;
 }
 
 void demo_message::serialize_data_key(demo_data::pointer_type& data,
@@ -167,10 +133,8 @@ void demo_message::serialize_data_key(demo_data::pointer_type& data,
 void demo_message::serialize_data_timestamp(demo_data::pointer_type& data,
                                             uint8_t*& pos)
 {
-  if (!compress_same_timestamp_) {
-    *reinterpret_cast<uint64_t*>(pos) = htonll(data->timestamp());
-    pos += timestamp_field_length;
-  }
+  *reinterpret_cast<uint64_t*>(pos) = htonll(data->timestamp());
+  pos += timestamp_field_length;
 }
 
 void demo_message::serialize_data_value(demo_data::pointer_type& data,
@@ -178,6 +142,138 @@ void demo_message::serialize_data_value(demo_data::pointer_type& data,
 {
   data->assign_network_sequence_value(pos);
   pos += data->size();
+}
+
+// demo_message with same type compression
+std::size_t demo_message_same_type_compression::serialization_mutable_length()
+{
+  return mutable_type_field_length;
+}
+
+std::size_t demo_message_same_type_compression::serialization_datas_length()
+{
+  std::size_t length = 0;
+
+  for (auto& data : datas_) {
+    length += key_field_length +
+              timestamp_field_length +
+              data->size();
+  }
+
+  return length;
+}
+
+void demo_message_same_type_compression::serialize_header_attribute(uint8_t*& pos)
+{
+  *pos = attr_same_type;
+  pos += attribute_field_length;
+}
+
+void demo_message_same_type_compression::serialize_mutable(uint8_t*& pos)
+{
+  serialize_mutable_type(pos);
+}
+
+void demo_message_same_type_compression::serialize_mutable_type(uint8_t*& pos)
+{
+  *pos = datas_[0]->type();
+  pos += mutable_type_field_length;
+}
+
+void demo_message_same_type_compression::serialize_one_data(demo_data::pointer_type& data,
+                                                            uint8_t*& pos)
+{
+  serialize_data_key(data, pos);
+  serialize_data_timestamp(data, pos);
+  serialize_data_value(data, pos);
+}
+
+// demo_message with same timestamp compression
+std::size_t demo_message_same_timestamp_compression::serialization_mutable_length()
+{
+  return mutable_timestamp_field_length;
+}
+
+std::size_t demo_message_same_timestamp_compression::serialization_datas_length()
+{
+  std::size_t length = 0;
+
+  for (auto& data : datas_) {
+    length += type_field_length +
+              key_field_length +
+              data->size();
+  }
+
+  return length;
+}
+
+void demo_message_same_timestamp_compression::serialize_header_attribute(uint8_t*& pos)
+{
+  *pos = attr_same_timestamp;
+  pos += attribute_field_length;
+}
+
+void demo_message_same_timestamp_compression::serialize_mutable(uint8_t*& pos)
+{
+  serialize_mutable_timestamp(pos);
+}
+
+void demo_message_same_timestamp_compression::serialize_mutable_timestamp(uint8_t*& pos)
+{
+  *reinterpret_cast<uint64_t*>(pos) = htonll(datas_[0]->timestamp());
+  pos += mutable_timestamp_field_length;
+}
+
+void demo_message_same_timestamp_compression::serialize_one_data(demo_data::pointer_type& data,
+                                                                 uint8_t*& pos)
+{
+  serialize_data_type(data, pos);
+  serialize_data_key(data, pos);
+  serialize_data_value(data, pos);
+}
+
+// demo_message with key sequence compression
+std::size_t demo_message_key_sequence_compression::serialization_mutable_length()
+{
+  return mutable_key_field_length;
+}
+
+std::size_t demo_message_key_sequence_compression::serialization_datas_length()
+{
+  std::size_t length = 0;
+
+  for (auto& data : datas_) {
+    length += type_field_length +
+              timestamp_field_length +
+              data->size();
+  }
+
+  return length;
+}
+
+void demo_message_key_sequence_compression::serialize_header_attribute(uint8_t*& pos)
+{
+  *pos = attr_key_sequence;
+  pos += attribute_field_length;
+}
+
+void demo_message_key_sequence_compression::serialize_mutable(uint8_t*& pos)
+{
+  serialize_mutable_key(pos);
+}
+
+void demo_message_key_sequence_compression::serialize_mutable_key(uint8_t*& pos)
+{
+  *reinterpret_cast<uint32_t*>(pos) = htonl(datas_[0]->key());
+  pos += mutable_key_field_length;
+}
+
+void demo_message_key_sequence_compression::serialize_one_data(demo_data::pointer_type& data,
+                                                               uint8_t*& pos)
+{
+  serialize_data_type(data, pos);
+  serialize_data_timestamp(data, pos);
+  serialize_data_value(data, pos);
 }
 
 } // demo
