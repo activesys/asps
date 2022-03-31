@@ -392,6 +392,96 @@ TEST_F(demo_client_test, send_datas_of_same_type)
   }
 }
 
+TEST_F(demo_client_test, send_datas_of_multiple_packages_containing_same_type)
+{
+  server_.expect_length(168);
+  server_.start();
+
+  demo_client dc("127.0.0.1", 9901);
+  dc.compress_same_type(true);
+  dc.connect();
+  EXPECT_TRUE(dc.is_connected());
+
+  std::vector<demo_data::pointer_type> ds{
+    make_demo_data<int32_t>(1000, 9000, 1648363193268),
+    make_demo_data<int32_t>(1002, 9001, 1648363193268),
+    make_demo_data<int32_t>(1004, 9002, 1648363193268),
+    make_demo_data<uint32_t>(1000, 9000, 1648363193268),
+    make_demo_data<uint32_t>(1002, 9001, 1648363193268),
+    make_demo_data<int32_t>(1006, 9003, 1648363193268),
+    make_demo_data<uint16_t>(1004, 9002, 1648363193268),
+    make_demo_data<uint32_t>(1006, 9003, 1648363193268)
+  };
+  EXPECT_TRUE(dc.send(ds.begin(), ds.end()));
+  dc.close();
+  server_.wait();
+
+  const std::vector<uint8_t>& buffer = server_.message();
+  const uint8_t expect_buffer[] = {
+    // package 1: k uint16_t
+    // header
+    0x44, 0x45, 0x4d, 0x4f, 0x56, 0x31, 0x30, 0x30, // header flag
+    0x00, 0x1c, // header length
+    0x00, 0x01, // header count
+    0x01, // header attr
+    // mutable
+    0x04,
+    // data 1
+    0x00, 0x00, 0x03, 0xec, // data key
+    0x00, 0x00, 0x01, 0x7f, 0xca, 0x1a, 0x43, 0xb4, // data timestamp
+    0x23, 0x2a, // data value
+    // package 2: k int32_t
+    // header
+    0x44, 0x45, 0x4d, 0x4f, 0x56, 0x31, 0x30, 0x30, // header flag
+    0x00, 0x4e, // header length
+    0x00, 0x04, // header count
+    0x01, // header attr
+    // mutable
+    0x05,
+    // data 1
+    0x00, 0x00, 0x03, 0xe8, // data key
+    0x00, 0x00, 0x01, 0x7f, 0xca, 0x1a, 0x43, 0xb4, // data timestamp
+    0x00, 0x00, 0x23, 0x28, // data value
+    // data 2
+    0x00, 0x00, 0x03, 0xea, // data key
+    0x00, 0x00, 0x01, 0x7f, 0xca, 0x1a, 0x43, 0xb4, // data timestamp
+    0x00, 0x00, 0x23, 0x29, // data value
+    // data 3
+    0x00, 0x00, 0x03, 0xec, // data key
+    0x00, 0x00, 0x01, 0x7f, 0xca, 0x1a, 0x43, 0xb4, // data timestamp
+    0x00, 0x00, 0x23, 0x2a, // data value
+    // data 4
+    0x00, 0x00, 0x03, 0xee, // data key
+    0x00, 0x00, 0x01, 0x7f, 0xca, 0x1a, 0x43, 0xb4, // data timestamp
+    0x00, 0x00, 0x23, 0x2b, // data value
+    // package 2: k uint32_t
+    // header
+    0x44, 0x45, 0x4d, 0x4f, 0x56, 0x31, 0x30, 0x30, // header flag
+    0x00, 0x3e, // header length
+    0x00, 0x03, // header count
+    0x01, // header attr
+    // mutable
+    0x06,
+    // data 1
+    0x00, 0x00, 0x03, 0xe8, // data key
+    0x00, 0x00, 0x01, 0x7f, 0xca, 0x1a, 0x43, 0xb4, // data timestamp
+    0x00, 0x00, 0x23, 0x28, // data value
+    // data 2
+    0x00, 0x00, 0x03, 0xea, // data key
+    0x00, 0x00, 0x01, 0x7f, 0xca, 0x1a, 0x43, 0xb4, // data timestamp
+    0x00, 0x00, 0x23, 0x29, // data value
+    // data 4
+    0x00, 0x00, 0x03, 0xee, // data key
+    0x00, 0x00, 0x01, 0x7f, 0xca, 0x1a, 0x43, 0xb4, // data timestamp
+    0x00, 0x00, 0x23, 0x2b // data value
+  };
+  // check length
+  EXPECT_EQ(buffer.size(), 168);
+  for (std::size_t i = 0; i < buffer.size(); ++i) {
+    EXPECT_EQ(buffer[i], expect_buffer[i]);
+  }
+}
+
 TEST_F(demo_client_test, send_datas_of_same_timestamp)
 {
   server_.start();
@@ -439,6 +529,88 @@ TEST_F(demo_client_test, send_datas_of_same_timestamp)
   };
   // check length
   EXPECT_EQ(buffer.size(), 53);
+  for (std::size_t i = 0; i < buffer.size(); ++i) {
+    EXPECT_EQ(buffer[i], expect_buffer[i]);
+  }
+}
+
+TEST_F(demo_client_test, send_datas_of_multiple_packages_containing_same_timestamp)
+{
+  server_.expect_length(106);
+  server_.start();
+
+  demo_client dc("127.0.0.1", 9901);
+  dc.compress_same_timestamp(true);
+  dc.connect();
+  EXPECT_TRUE(dc.is_connected());
+
+  std::vector<demo_data::pointer_type> ds{
+    make_demo_data<int32_t>(1000, 9000, 1648363193268),
+    make_demo_data<uint32_t>(1002, 9001, 1648363193268),
+    make_demo_data<int32_t>(1000, 9000, 1648363193270),
+    make_demo_data<uint32_t>(1002, 9001, 1648363193270),
+    make_demo_data<int16_t>(1004, 9002, 1648363193268),
+    make_demo_data<uint16_t>(1006, 9003, 1648363193268),
+    make_demo_data<int16_t>(1004, 9002, 1648363193270),
+    make_demo_data<uint16_t>(1006, 9003, 1648363193270)
+  };
+  EXPECT_TRUE(dc.send(ds.begin(), ds.end()));
+  dc.close();
+  server_.wait();
+
+  const std::vector<uint8_t>& buffer = server_.message();
+  const uint8_t expect_buffer[] = {
+    // package 1: t 1648363193268
+    // header
+    0x44, 0x45, 0x4d, 0x4f, 0x56, 0x31, 0x30, 0x30, // header flag
+    0x00, 0x35, // header length
+    0x00, 0x04, // header count
+    0x04, // header attr
+    // mutable
+    0x00, 0x00, 0x01, 0x7f, 0xca, 0x1a, 0x43, 0xb4, // data timestamp
+    // data 1
+    0x05, // data type
+    0x00, 0x00, 0x03, 0xe8, // data key
+    0x00, 0x00, 0x23, 0x28, // data value
+    // data 2
+    0x06, // data type
+    0x00, 0x00, 0x03, 0xea, // data key
+    0x00, 0x00, 0x23, 0x29, // data value
+    // data 3
+    0x03, // data type
+    0x00, 0x00, 0x03, 0xec, // data key
+    0x23, 0x2a, // data value
+    // data 4
+    0x04, // data type
+    0x00, 0x00, 0x03, 0xee, // data key
+    0x23, 0x2b, // data value
+    // package 2: t 1648363193270
+    // header
+    0x44, 0x45, 0x4d, 0x4f, 0x56, 0x31, 0x30, 0x30, // header flag
+    0x00, 0x35, // header length
+    0x00, 0x04, // header count
+    0x04, // header attr
+    // mutable
+    0x00, 0x00, 0x01, 0x7f, 0xca, 0x1a, 0x43, 0xb6, // data timestamp
+    // data 1
+    0x05, // data type
+    0x00, 0x00, 0x03, 0xe8, // data key
+    0x00, 0x00, 0x23, 0x28, // data value
+    // data 2
+    0x06, // data type
+    0x00, 0x00, 0x03, 0xea, // data key
+    0x00, 0x00, 0x23, 0x29, // data value
+    // data 3
+    0x03, // data type
+    0x00, 0x00, 0x03, 0xec, // data key
+    0x23, 0x2a, // data value
+    // data 4
+    0x04, // data type
+    0x00, 0x00, 0x03, 0xee, // data key
+    0x23, 0x2b // data value
+  };
+  // check length
+  EXPECT_EQ(buffer.size(), 106);
   for (std::size_t i = 0; i < buffer.size(); ++i) {
     EXPECT_EQ(buffer[i], expect_buffer[i]);
   }
@@ -496,21 +668,28 @@ TEST_F(demo_client_test, send_datas_of_key_sequence)
   }
 }
 
-TEST_F(demo_client_test, send_datas_of_same_type_and_same_timestamp)
+TEST_F(demo_client_test, send_datas_of_multiple_packages_containing_key_sequence)
 {
+  server_.expect_length(180);
   server_.start();
 
   demo_client dc("127.0.0.1", 9901);
-  dc.compress_same_type(true);
-  dc.compress_same_timestamp(true);
+  dc.compress_key_sequence(true);
   dc.connect();
   EXPECT_TRUE(dc.is_connected());
 
   std::vector<demo_data::pointer_type> ds{
     make_demo_data<int32_t>(1000, 9000, 1648363193268),
-    make_demo_data<int32_t>(1002, 9001, 1648363193268),
-    make_demo_data<int32_t>(1004, 9002, 1648363193268),
-    make_demo_data<int32_t>(1006, 9003, 1648363193268)
+    make_demo_data<uint32_t>(1001, 9001, 1648363193269),
+    make_demo_data<int16_t>(1002, 9002, 1648363193270),
+    make_demo_data<uint16_t>(1003, 9003, 1648363193271),
+    make_demo_data<int32_t>(1000, 9000, 1648363193268),
+    make_demo_data<uint32_t>(1001, 9001, 1648363193269),
+    make_demo_data<int16_t>(1002, 9002, 1648363193270),
+    make_demo_data<uint16_t>(1003, 9003, 1648363193271),
+    make_demo_data<int16_t>(1004, 9002, 1648363193270),
+    make_demo_data<uint16_t>(999, 9003, 1648363193271),
+    make_demo_data<uint16_t>(9999, 9003, 1648363193271)
   };
   EXPECT_TRUE(dc.send(ds.begin(), ds.end()));
   dc.close();
@@ -518,34 +697,81 @@ TEST_F(demo_client_test, send_datas_of_same_type_and_same_timestamp)
 
   const std::vector<uint8_t>& buffer = server_.message();
   const uint8_t expect_buffer[] = {
+    // package 1: k 999 ~ 1004
     // header
     0x44, 0x45, 0x4d, 0x4f, 0x56, 0x31, 0x30, 0x30, // header flag
-    0x00, 0x36, // header length
-    0x00, 0x04, // header count
-    0x05, // header attr
+    0x00, 0x57, // header length
+    0x00, 0x06, // header count
+    0x02, // header attr
     // mutable
+    0x00, 0x00, 0x03, 0xe7, // data key
+    // data 1
+    0x04, // data type
+    0x00, 0x00, 0x01, 0x7f, 0xca, 0x1a, 0x43, 0xb7, // data timestamp
+    0x23, 0x2b, // data value
+    // data 2
     0x05, // data type
     0x00, 0x00, 0x01, 0x7f, 0xca, 0x1a, 0x43, 0xb4, // data timestamp
-    // data 1
+    0x00, 0x00, 0x23, 0x28, // data value
+    // data 3
+    0x06, // data type
+    0x00, 0x00, 0x01, 0x7f, 0xca, 0x1a, 0x43, 0xb5, // data timestamp
+    0x00, 0x00, 0x23, 0x29, // data value
+    // data 4
+    0x03, // data type
+    0x00, 0x00, 0x01, 0x7f, 0xca, 0x1a, 0x43, 0xb6, // data timestamp
+    0x23, 0x2a, // data value
+    // data 5
+    0x04, // data type
+    0x00, 0x00, 0x01, 0x7f, 0xca, 0x1a, 0x43, 0xb7, // data timestamp
+    0x23, 0x2b, // data value
+    // data 6
+    0x03, // data type
+    0x00, 0x00, 0x01, 0x7f, 0xca, 0x1a, 0x43, 0xb6, // data timestamp
+    0x23, 0x2a, // data value
+    // pacakge 2: k 1000 ~ 1003
+    // header
+    0x44, 0x45, 0x4d, 0x4f, 0x56, 0x31, 0x30, 0x30, // header flag
+    0x00, 0x41, // header length
+    0x00, 0x04, // header count
+    0x02, // header attr
+    // mutable
     0x00, 0x00, 0x03, 0xe8, // data key
+    // data 1
+    0x05, // data type
+    0x00, 0x00, 0x01, 0x7f, 0xca, 0x1a, 0x43, 0xb4, // data timestamp
     0x00, 0x00, 0x23, 0x28, // data value
     // data 2
-    0x00, 0x00, 0x03, 0xea, // data key
+    0x06, // data type
+    0x00, 0x00, 0x01, 0x7f, 0xca, 0x1a, 0x43, 0xb5, // data timestamp
     0x00, 0x00, 0x23, 0x29, // data value
     // data 3
-    0x00, 0x00, 0x03, 0xec, // data key
-    0x00, 0x00, 0x23, 0x2a, // data value
+    0x03, // data type
+    0x00, 0x00, 0x01, 0x7f, 0xca, 0x1a, 0x43, 0xb6, // data timestamp
+    0x23, 0x2a, // data value
     // data 4
-    0x00, 0x00, 0x03, 0xee, // data key
-    0x00, 0x00, 0x23, 0x2b // data value
+    0x04, // data type
+    0x00, 0x00, 0x01, 0x7f, 0xca, 0x1a, 0x43, 0xb7, // data timestamp
+    0x23, 0x2b, // data value
+    // pacakge 3: k 9999
+    // header
+    0x44, 0x45, 0x4d, 0x4f, 0x56, 0x31, 0x30, 0x30, // header flag
+    0x00, 0x1c, // header length
+    0x00, 0x01, // header count
+    0x02, // header attr
+    // mutable
+    0x00, 0x00, 0x27, 0x0f, // data key
+    // data 1
+    0x04, // data type
+    0x00, 0x00, 0x01, 0x7f, 0xca, 0x1a, 0x43, 0xb7, // data timestamp
+    0x23, 0x2b // data value
   };
   // check length
-  EXPECT_EQ(buffer.size(), 54);
+  EXPECT_EQ(buffer.size(), 180);
   for (std::size_t i = 0; i < buffer.size(); ++i) {
     EXPECT_EQ(buffer[i], expect_buffer[i]);
   }
 }
-
 
 } // demo_test
 } // asps_test

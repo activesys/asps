@@ -24,13 +24,15 @@ class demo_test_server
 {
 public:
   demo_test_server(const std::string& host, uint16_t port)
-    : acceptor_(context_, ip::tcp::endpoint(ip::address::from_string(host), port))
+    : acceptor_(context_, ip::tcp::endpoint(ip::address::from_string(host), port)),
+      expect_length_(0)
   {
     // A package must contain at least one piece of data.
     buffer_.resize(1024);
   }
 
 public:
+  void expect_length(std::size_t length) {expect_length_ = length;}
   void start(bool need_read_data = true)
   {
     need_read_data_ = need_read_data;
@@ -61,6 +63,10 @@ private:
   }
   std::size_t on_completion(const boost::system::error_code& ec, std::size_t bytes)
   {
+    if (expect_length_ > 0 && bytes < expect_length_) {
+      return expect_length_ - bytes;
+    }
+
     // The header of demo protocol has a fixed length of 16 bytes
     if (bytes < 13) {
       return 13 - bytes;
@@ -91,6 +97,7 @@ private:
   }
 
 private:
+  std::size_t expect_length_;
   std::thread server_thread_;
   io_context context_;
   ip::tcp::acceptor acceptor_;

@@ -8,6 +8,7 @@
 #define ASPS_DEMO_MESSAGE_DEMO_MESSAGE_H
 
 #include <cstring>
+#include <list>
 #include <vector>
 #include <memory>
 #include <arpa/inet.h>
@@ -24,6 +25,7 @@ public:
 
 protected:
   typedef std::vector<uint8_t> buffer_type;
+  typedef std::vector<demo_data::pointer_type> data_group_type;
 
   enum header_field_length {
     flag_field_length = 8,
@@ -51,7 +53,7 @@ protected:
 public:
   template <typename IT>
   demo_message(IT first, IT second)
-    : datas_(first, second)
+    : datas_{{first, second}}
   {}
   virtual ~demo_message() {}
 
@@ -59,21 +61,25 @@ public:
   const buffer_type& serialize();
 
 protected:
-  virtual std::size_t serialization_header_length();
-  virtual std::size_t serialization_mutable_length();
-  virtual std::size_t serialization_datas_length();
+  // group
+  virtual void group();
+  // length
+  virtual std::size_t serialization_header_length(data_group_type& group);
+  virtual std::size_t serialization_mutable_length(data_group_type& group);
+  virtual std::size_t serialization_datas_length(data_group_type& group);
   // decode header
-  virtual void serialize_header(uint8_t*& pos);
-  virtual void serialize_header_flag(uint8_t*& pos);
-  virtual void serialize_header_length(uint8_t*& pos);
-  virtual void serialize_header_count(uint8_t*& pos);
-  virtual void serialize_header_attribute(uint8_t*& pos);
+  virtual void serialize_header(data_group_type& group, uint8_t*& pos);
+  virtual void serialize_header_flag(data_group_type& group, uint8_t*& pos);
+  virtual void serialize_header_length(data_group_type& group, uint8_t*& pos);
+  virtual void serialize_header_count(data_group_type& group, uint8_t*& pos);
+  virtual void serialize_header_attribute(data_group_type& group, uint8_t*& pos);
   // decode mutable
-  virtual void serialize_mutable(uint8_t*& pos);
-  virtual void serialize_mutable_type(uint8_t*& pos);
-  virtual void serialize_mutable_timestamp(uint8_t*& pos);
+  virtual void serialize_mutable(data_group_type& group, uint8_t*& pos);
+  virtual void serialize_mutable_type(data_group_type& group, uint8_t*& pos);
+  virtual void serialize_mutable_key(data_group_type& group, uint8_t*& pos);
+  virtual void serialize_mutable_timestamp(data_group_type& group, uint8_t*& pos);
   // decode datas
-  virtual void serialize_datas(uint8_t*& pos);
+  virtual void serialize_datas(data_group_type& group, uint8_t*& pos);
   virtual void serialize_one_data(demo_data::pointer_type& data, uint8_t*& pos);
   virtual void serialize_data_type(demo_data::pointer_type& data, uint8_t*& pos);
   virtual void serialize_data_key(demo_data::pointer_type& data, uint8_t*& pos);
@@ -81,7 +87,7 @@ protected:
   virtual void serialize_data_value(demo_data::pointer_type& data, uint8_t*& pos);
 
 protected:
-  std::vector<demo_data::pointer_type> datas_;
+  std::list<data_group_type> datas_;
   buffer_type buffer_;
 };
 
@@ -95,12 +101,13 @@ public:
   {}
 
 public:
-  virtual std::size_t serialization_mutable_length();
-  virtual std::size_t serialization_datas_length();
-  virtual void serialize_header_attribute(uint8_t*& pos);
-  virtual void serialize_mutable(uint8_t*& pos);
-  virtual void serialize_mutable_type(uint8_t*& pos);
-  virtual void serialize_one_data(demo_data::pointer_type& data, uint8_t*& pos);
+  virtual void group() override;
+  virtual std::size_t serialization_mutable_length(data_group_type& group) override;
+  virtual std::size_t serialization_datas_length(data_group_type& group) override;
+  virtual void serialize_header_attribute(data_group_type& group, uint8_t*& pos) override;
+  virtual void serialize_mutable(data_group_type& group, uint8_t*& pos) override;
+  virtual void serialize_mutable_type(data_group_type& group, uint8_t*& pos) override;
+  virtual void serialize_one_data(demo_data::pointer_type& data, uint8_t*& pos) override;
 };
 
 // demo_message with key sequence compression
@@ -113,12 +120,23 @@ public:
   {}
 
 public:
-  virtual std::size_t serialization_mutable_length();
-  virtual std::size_t serialization_datas_length();
-  virtual void serialize_header_attribute(uint8_t*& pos);
-  virtual void serialize_mutable(uint8_t*& pos);
-  virtual void serialize_mutable_key(uint8_t*& pos);
-  virtual void serialize_one_data(demo_data::pointer_type& data, uint8_t*& pos);
+  virtual void group() override;
+  virtual std::size_t serialization_mutable_length(data_group_type& group) override;
+  virtual std::size_t serialization_datas_length(data_group_type& group) override;
+  virtual void serialize_header_attribute(data_group_type& group, uint8_t*& pos) override;
+  virtual void serialize_mutable(data_group_type& group, uint8_t*& pos) override;
+  virtual void serialize_mutable_key(data_group_type& group, uint8_t*& pos) override;
+  virtual void serialize_one_data(demo_data::pointer_type& data, uint8_t*& pos) override;
+
+private:
+  struct compare
+  {
+    bool operator()(demo_data::pointer_type& first,
+                    demo_data::pointer_type& second)
+    {
+      return first->key() < second->key();
+    }
+  };
 };
 
 // demo_message with same timestamp compression
@@ -131,12 +149,13 @@ public:
   {}
 
 public:
-  virtual std::size_t serialization_mutable_length();
-  virtual std::size_t serialization_datas_length();
-  virtual void serialize_header_attribute(uint8_t*& pos);
-  virtual void serialize_mutable(uint8_t*& pos);
-  virtual void serialize_mutable_timestamp(uint8_t*& pos);
-  virtual void serialize_one_data(demo_data::pointer_type& data, uint8_t*& pos);
+  virtual void group() override;
+  virtual std::size_t serialization_mutable_length(data_group_type& group) override;
+  virtual std::size_t serialization_datas_length(data_group_type& group) override;
+  virtual void serialize_header_attribute(data_group_type& group, uint8_t*& pos) override;
+  virtual void serialize_mutable(data_group_type& group, uint8_t*& pos) override;
+  virtual void serialize_mutable_timestamp(data_group_type& group, uint8_t*& pos) override;
+  virtual void serialize_one_data(demo_data::pointer_type& data, uint8_t*& pos) override;
 };
 
 template <typename IT>
