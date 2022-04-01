@@ -9,6 +9,7 @@
 
 #include <cstdint>
 #include <memory>
+#include <vector>
 #include <arpa/inet.h>
 
 namespace asps {
@@ -101,6 +102,9 @@ MAKE_DEMO_DATA_SPECILICATION(float, float32_type, float)
 MAKE_DEMO_DATA_SPECILICATION(double, float64_type, double)
 
 #undef MAKE_DEMO_DATA_SPECILICATION
+
+// Demo data group
+typedef std::vector<demo_data::pointer_type> data_group_type;
 
 } // demo
 } // asps

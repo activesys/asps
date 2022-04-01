@@ -32,19 +32,19 @@ void demo_client::close()
   is_connected_ = false;
 }
 
-void demo_client::compress_same_type(bool flag)
+void demo_client::same_type(bool flag)
 {
-  session_.compress_same_type(flag);
+  session_.same_type(flag);
 }
 
-void demo_client::compress_same_timestamp(bool flag)
+void demo_client::key_sequence(bool flag)
 {
-  session_.compress_same_timestamp(flag);
+  session_.key_sequence(flag);
 }
 
-void demo_client::compress_key_sequence(bool flag)
+void demo_client::same_timestamp(bool flag)
 {
-  session_.compress_key_sequence(flag);
+  session_.same_timestamp(flag);
 }
 
 } // demo

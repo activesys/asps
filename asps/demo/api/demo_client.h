@@ -33,9 +33,9 @@ public:
   bool connect();
   bool is_connected();
   void close();
-  void compress_same_type(bool flag);
-  void compress_same_timestamp(bool flag);
-  void compress_key_sequence(bool flag);
+  void same_type(bool flag);
+  void key_sequence(bool flag);
+  void same_timestamp(bool flag);
 
   template <typename IT>
   bool send(IT first, IT second)
