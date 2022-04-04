@@ -300,5 +300,210 @@ TEST(demo_message_test, serialize_multi_types)
   }
 }
 
+TEST(demo_message_test, serialize_bool_type_compress_same_type_and_key_sequence)
+{
+  std::list<demo_data::pointer_type> p{
+    make_demo_data<bool>(1234, true, 1648001566463),
+    make_demo_data<bool>(1235, false, 1648001566463),
+    make_demo_data<bool>(1236, true, 1648001566463),
+    make_demo_data<bool>(1237, false, 1648001566463),
+    make_demo_data<bool>(1238, true, 1648001566463),
+  };
+  demo_message msg(p.begin(), p.end(), true, true, false);
+
+  const std::vector<uint8_t>& buffer = msg.serialize();
+  const uint8_t expect_buffer[] = {
+    // header
+    0x44, 0x45, 0x4d, 0x4f, 0x56, 0x31, 0x30, 0x30, // header flag
+    0x00, 0x3f, // header length
+    0x00, 0x05, // header count
+    0x03, // header attr
+    // mutable
+    0x00, // data type
+    0x00, 0x00, 0x04, 0xd2, // data key
+    // data 1
+    0x00, 0x00, 0x01, 0x7f, 0xb4, 0x8c, 0x46, 0xff, // data timestamp
+    0x01, // data value
+    // data 2
+    0x00, 0x00, 0x01, 0x7f, 0xb4, 0x8c, 0x46, 0xff, // data timestamp
+    0x00, // data value
+    // data 3
+    0x00, 0x00, 0x01, 0x7f, 0xb4, 0x8c, 0x46, 0xff, // data timestamp
+    0x01, // data value
+    // data 4
+    0x00, 0x00, 0x01, 0x7f, 0xb4, 0x8c, 0x46, 0xff, // data timestamp
+    0x00, // data value
+    // data 5
+    0x00, 0x00, 0x01, 0x7f, 0xb4, 0x8c, 0x46, 0xff, // data timestamp
+    0x01 // data value
+  };
+  // check length
+  EXPECT_EQ(buffer.size(), 63);
+  for (std::size_t i = 0; i < buffer.size(); ++i) {
+    EXPECT_EQ(buffer[i], expect_buffer[i]);
+  }
+}
+
+TEST(demo_message_test, serialize_bool_type_compress_same_type_and_same_timestampe)
+{
+  std::list<demo_data::pointer_type> p{
+    make_demo_data<bool>(1234, true, 1648001566463),
+    make_demo_data<bool>(1235, false, 1648001566463),
+    make_demo_data<bool>(1236, true, 1648001566463),
+    make_demo_data<bool>(1237, false, 1648001566463),
+    make_demo_data<bool>(1238, true, 1648001566463),
+  };
+  demo_message msg(p.begin(), p.end(), true, false, true);
+
+  const std::vector<uint8_t>& buffer = msg.serialize();
+  const uint8_t expect_buffer[] = {
+    // header
+    0x44, 0x45, 0x4d, 0x4f, 0x56, 0x31, 0x30, 0x30, // header flag
+    0x00, 0x2f, // header length
+    0x00, 0x05, // header count
+    0x05, // header attr
+    // mutable
+    0x00, // data type
+    0x00, 0x00, 0x01, 0x7f, 0xb4, 0x8c, 0x46, 0xff, // data timestamp
+    // data 1
+    0x00, 0x00, 0x04, 0xd2, // data key
+    0x01, // data value
+    // data 2
+    0x00, 0x00, 0x04, 0xd3, // data key
+    0x00, // data value
+    // data 3
+    0x00, 0x00, 0x04, 0xd4, // data key
+    0x01, // data value
+    // data 4
+    0x00, 0x00, 0x04, 0xd5, // data key
+    0x00, // data value
+    // data 5
+    0x00, 0x00, 0x04, 0xd6, // data key
+    0x01 // data value
+  };
+  // check length
+  EXPECT_EQ(buffer.size(), 47);
+  for (std::size_t i = 0; i < buffer.size(); ++i) {
+    EXPECT_EQ(buffer[i], expect_buffer[i]);
+  }
+}
+
+TEST(demo_message_test, serialize_bool_type_compress_key_sequence_and_same_timestampe)
+{
+  std::list<demo_data::pointer_type> p{
+    make_demo_data<bool>(1234, true, 1648001566463),
+    make_demo_data<bool>(1235, false, 1648001566463),
+    make_demo_data<bool>(1236, true, 1648001566463),
+    make_demo_data<bool>(1237, false, 1648001566463),
+    make_demo_data<bool>(1238, true, 1648001566463),
+  };
+  demo_message msg(p.begin(), p.end(), false, true, true);
+
+  const std::vector<uint8_t>& buffer = msg.serialize();
+  const uint8_t expect_buffer[] = {
+    // header
+    0x44, 0x45, 0x4d, 0x4f, 0x56, 0x31, 0x30, 0x30, // header flag
+    0x00, 0x23, // header length
+    0x00, 0x05, // header count
+    0x06, // header attr
+    // mutable
+    0x00, 0x00, 0x04, 0xd2, // data key
+    0x00, 0x00, 0x01, 0x7f, 0xb4, 0x8c, 0x46, 0xff, // data timestamp
+    // data 1
+    0x00, // data type
+    0x01, // data value
+    // data 2
+    0x00, // data type
+    0x00, // data value
+    // data 3
+    0x00, // data type
+    0x01, // data value
+    // data 4
+    0x00, // data type
+    0x00, // data value
+    // data 5
+    0x00, // data type
+    0x01 // data value
+  };
+  // check length
+  EXPECT_EQ(buffer.size(), 35);
+  for (std::size_t i = 0; i < buffer.size(); ++i) {
+    EXPECT_EQ(buffer[i], expect_buffer[i]);
+  }
+}
+
+TEST(demo_message_test, serialize_bool_type_compress_all_attributes)
+{
+  std::list<demo_data::pointer_type> p{
+    make_demo_data<bool>(1234, true, 1648001566463),
+    make_demo_data<bool>(1235, false, 1648001566463),
+    make_demo_data<bool>(1236, true, 1648001566463),
+    make_demo_data<bool>(1237, false, 1648001566463),
+    make_demo_data<bool>(1238, true, 1648001566463),
+  };
+  demo_message msg(p.begin(), p.end(), true, true, true);
+
+  const std::vector<uint8_t>& buffer = msg.serialize();
+  const uint8_t expect_buffer[] = {
+    // header
+    0x44, 0x45, 0x4d, 0x4f, 0x56, 0x31, 0x30, 0x30, // header flag
+    0x00, 0x1b, // header length
+    0x00, 0x05, // header count
+    0x07, // header attr
+    // mutable
+    0x00, // data type
+    0x00, 0x00, 0x04, 0xd2, // data key
+    0x00, 0x00, 0x01, 0x7f, 0xb4, 0x8c, 0x46, 0xff, // data timestamp
+    // datas
+    0x15 // data value
+  };
+  // check length
+  EXPECT_EQ(buffer.size(), 27);
+  for (std::size_t i = 0; i < buffer.size(); ++i) {
+    EXPECT_EQ(buffer[i], expect_buffer[i]);
+  }
+}
+
+TEST(demo_message_test, serialize_bool_type_compress_all_attributes_multiple_bytes)
+{
+  std::list<demo_data::pointer_type> p{
+    make_demo_data<bool>(1234, true, 1648001566463),
+    make_demo_data<bool>(1235, true, 1648001566463),
+    make_demo_data<bool>(1236, true, 1648001566463),
+    make_demo_data<bool>(1237, true, 1648001566463),
+    make_demo_data<bool>(1238, true, 1648001566463),
+    make_demo_data<bool>(1239, true, 1648001566463),
+    make_demo_data<bool>(1240, true, 1648001566463),
+    make_demo_data<bool>(1241, true, 1648001566463),
+    make_demo_data<bool>(1242, true, 1648001566463),
+    make_demo_data<bool>(1243, true, 1648001566463),
+    make_demo_data<bool>(1244, true, 1648001566463),
+    make_demo_data<bool>(1245, true, 1648001566463),
+    make_demo_data<bool>(1246, true, 1648001566463)
+  };
+  demo_message msg(p.begin(), p.end(), true, true, true);
+
+  const std::vector<uint8_t>& buffer = msg.serialize();
+  const uint8_t expect_buffer[] = {
+    // header
+    0x44, 0x45, 0x4d, 0x4f, 0x56, 0x31, 0x30, 0x30, // header flag
+    0x00, 0x1c, // header length
+    0x00, 0x0d, // header count
+    0x07, // header attr
+    // mutable
+    0x00, // data type
+    0x00, 0x00, 0x04, 0xd2, // data key
+    0x00, 0x00, 0x01, 0x7f, 0xb4, 0x8c, 0x46, 0xff, // data timestamp
+    // datas
+    0xff,
+    0x1f
+  };
+  // check length
+  EXPECT_EQ(buffer.size(), 28);
+  for (std::size_t i = 0; i < buffer.size(); ++i) {
+    EXPECT_EQ(buffer[i], expect_buffer[i]);
+  }
+}
+
 } // demo_test
 } // asps_test

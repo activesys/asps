@@ -6,13 +6,10 @@
 
 #include <algorithm>
 #include <map>
-#include <functional>
 #include <asps/demo/message/demo_message.h>
 
 namespace asps {
 namespace demo {
-
-using namespace std::placeholders;
 
 const demo_message::buffer_type& demo_message::serialize()
 {
@@ -149,17 +146,28 @@ std::size_t demo_message::serialization_datas_length(data_group_type& group)
 {
   std::size_t length = 0;
 
-  for (auto& data : group) {
-    if (!same_type_) {
-      length += data_type_field_length;
+  /*
+   * When all three attributes are set and the current group
+   * contains data of type bool, bit compression is required.
+   */
+  if (group.front()->type() == demo_data::boolean_type &&
+      same_type_ &&
+      key_sequence_ &&
+      same_timestamp_) {
+    length = (group.size() + 7) / 8;
+  } else {
+    for (auto& data : group) {
+      if (!same_type_) {
+        length += data_type_field_length;
+      }
+      if (!key_sequence_) {
+        length += data_key_field_length;
+      }
+      if (!same_timestamp_) {
+        length += data_timestamp_field_length;
+      }
+      length += data->size();
     }
-    if (!key_sequence_) {
-      length += data_key_field_length;
-    }
-    if (!same_timestamp_) {
-      length += data_timestamp_field_length;
-    }
-    length += data->size();
   }
 
   return length;
@@ -253,8 +261,24 @@ void demo_message::serialize_mutable_timestamp(data_group_type& group,
 void demo_message::serialize_datas(data_group_type& group,
                                    uint8_t*& pos)
 {
-  for (auto& data : group) {
-    serialize_one_data(data, pos);
+  /*
+   * When all three attributes are set and the current group
+   * contains data of type bool, bit compression is required.
+   */
+  if (group.front()->type() == demo_data::boolean_type &&
+      same_type_ &&
+      key_sequence_ &&
+      same_timestamp_) {
+    std::size_t byte_count = (group.size() + 7) / 8;
+    for (std::size_t i = 0; i < group.size(); ++i) {
+      uint8_t value;
+      group.at(i)->assign_network_sequence_value(&value);
+      pos[i/8] |= value << i % 8;
+    }
+  } else {
+    for (auto& data : group) {
+      serialize_one_data(data, pos);
+    }
   }
 }
 
