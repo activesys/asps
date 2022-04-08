@@ -21,10 +21,10 @@ using namespace asps::demo;
 
 TEST(demo_message_test, serialize_float64_type)
 {
-  demo_data::pointer_type p[]{
+  data_group_type p{
     make_demo_data<double>(1234, 913456.230887143, 1647761782000)
   };
-  demo_message msg(p, p+1);
+  demo_message msg(p);
 
   const std::vector<uint8_t>& buffer = msg.serialize();
   const uint8_t expect_buffer[] = {
@@ -50,10 +50,10 @@ TEST(demo_message_test, serialize_float64_type)
 
 TEST(demo_message_test, serialize_float32_type)
 {
-  std::array<demo_data::pointer_type, 1> p{
+  data_group_type p{
     make_demo_data<float>(1234, -98.12, 1647761782000)
   };
-  demo_message msg(p.begin(), p.end());
+  demo_message msg(p);
 
   const std::vector<uint8_t>& buffer = msg.serialize();
   const uint8_t expect_buffer[] = {
@@ -79,10 +79,10 @@ TEST(demo_message_test, serialize_float32_type)
 
 TEST(demo_message_test, serialize_int64_type)
 {
-  std::deque<demo_data::pointer_type> p{
+  data_group_type p{
     make_demo_data<int64_t>(1234, -1154789657886957455, 1647761782000)
   };
-  demo_message msg(p.begin(), p.end());
+  demo_message msg(p);
 
   const std::vector<uint8_t>& buffer = msg.serialize();
   const uint8_t expect_buffer[] = {
@@ -107,10 +107,10 @@ TEST(demo_message_test, serialize_int64_type)
 
 TEST(demo_message_test, serialize_uint32_type)
 {
-  std::forward_list<demo_data::pointer_type> p{
+  data_group_type p{
     make_demo_data<uint32_t>(1234, 9876, 1647761782000)
   };
-  demo_message msg(p.begin(), p.end());
+  demo_message msg(p);
 
   const std::vector<uint8_t>& buffer = msg.serialize();
   const uint8_t expect_buffer[] = {
@@ -135,10 +135,10 @@ TEST(demo_message_test, serialize_uint32_type)
 
 TEST(demo_message_test, serialize_int16_type)
 {
-  std::list<demo_data::pointer_type> p{
+  data_group_type p{
     make_demo_data<int16_t>(1234, 9876, 1647761782000)
   };
-  demo_message msg(p.begin(), p.end());
+  demo_message msg(p);
 
   const std::vector<uint8_t>& buffer = msg.serialize();
   const uint8_t expect_buffer[] = {
@@ -163,10 +163,10 @@ TEST(demo_message_test, serialize_int16_type)
 
 TEST(demo_message_test, serialize_int8_type)
 {
-  std::vector<demo_data::pointer_type> p{
+  data_group_type p{
     make_demo_data<int8_t>(1234, -32, 1648001566463)
   };
-  demo_message msg(p.begin(), p.end());
+  demo_message msg(p);
 
   const std::vector<uint8_t>& buffer = msg.serialize();
   const uint8_t expect_buffer[] = {
@@ -192,10 +192,10 @@ TEST(demo_message_test, serialize_int8_type)
 
 TEST(demo_message_test, serialize_bool_type)
 {
-  std::list<demo_data::pointer_type> p{
+  data_group_type p{
     make_demo_data<bool>(1234, true, 1648001566463)
   };
-  demo_message msg(p.begin(), p.end());
+  demo_message msg(p);
 
   const std::vector<uint8_t>& buffer = msg.serialize();
   const uint8_t expect_buffer[] = {
@@ -220,12 +220,12 @@ TEST(demo_message_test, serialize_bool_type)
 
 TEST(demo_message_test, serialize_multi_int8_type)
 {
-  std::vector<demo_data::pointer_type> vs{
+  data_group_type vs{
     make_demo_data<int8_t>(1111, 11, 1648001566463),
     make_demo_data<int8_t>(1112, 12, 1648001566463),
     make_demo_data<int8_t>(1113, 13, 1648001566463)
   };
-  demo_message msg(vs.begin(), vs.end());
+  demo_message msg(vs);
 
   const std::vector<uint8_t>& buffer = msg.serialize();
   const uint8_t expect_buffer[] = {
@@ -261,12 +261,12 @@ TEST(demo_message_test, serialize_multi_int8_type)
 
 TEST(demo_message_test, serialize_multi_types)
 {
-  std::vector<demo_data::pointer_type> vs{
+  data_group_type vs{
     make_demo_data<uint8_t>(1111, 11, 1648001566463),
     make_demo_data<int16_t>(1112, 12, 1648001566463),
     make_demo_data<uint32_t>(1113, 13, 1648001566463)
   };
-  demo_message msg(vs.begin(), vs.end());
+  demo_message msg(vs);
 
   const std::vector<uint8_t>& buffer = msg.serialize();
   const uint8_t expect_buffer[] = {
@@ -302,14 +302,14 @@ TEST(demo_message_test, serialize_multi_types)
 
 TEST(demo_message_test, serialize_bool_type_compress_same_type_and_key_sequence)
 {
-  std::list<demo_data::pointer_type> p{
+  data_group_type p{
     make_demo_data<bool>(1234, true, 1648001566463),
     make_demo_data<bool>(1235, false, 1648001566463),
     make_demo_data<bool>(1236, true, 1648001566463),
     make_demo_data<bool>(1237, false, 1648001566463),
     make_demo_data<bool>(1238, true, 1648001566463),
   };
-  demo_message msg(p.begin(), p.end(), true, true, false);
+  demo_message msg(p, true, true, false);
 
   const std::vector<uint8_t>& buffer = msg.serialize();
   const uint8_t expect_buffer[] = {
@@ -346,14 +346,14 @@ TEST(demo_message_test, serialize_bool_type_compress_same_type_and_key_sequence)
 
 TEST(demo_message_test, serialize_bool_type_compress_same_type_and_same_timestampe)
 {
-  std::list<demo_data::pointer_type> p{
+  data_group_type p{
     make_demo_data<bool>(1234, true, 1648001566463),
     make_demo_data<bool>(1235, false, 1648001566463),
     make_demo_data<bool>(1236, true, 1648001566463),
     make_demo_data<bool>(1237, false, 1648001566463),
     make_demo_data<bool>(1238, true, 1648001566463),
   };
-  demo_message msg(p.begin(), p.end(), true, false, true);
+  demo_message msg(p, true, false, true);
 
   const std::vector<uint8_t>& buffer = msg.serialize();
   const uint8_t expect_buffer[] = {
@@ -390,14 +390,14 @@ TEST(demo_message_test, serialize_bool_type_compress_same_type_and_same_timestam
 
 TEST(demo_message_test, serialize_bool_type_compress_key_sequence_and_same_timestampe)
 {
-  std::list<demo_data::pointer_type> p{
+  data_group_type p{
     make_demo_data<bool>(1234, true, 1648001566463),
     make_demo_data<bool>(1235, false, 1648001566463),
     make_demo_data<bool>(1236, true, 1648001566463),
     make_demo_data<bool>(1237, false, 1648001566463),
     make_demo_data<bool>(1238, true, 1648001566463),
   };
-  demo_message msg(p.begin(), p.end(), false, true, true);
+  demo_message msg(p, false, true, true);
 
   const std::vector<uint8_t>& buffer = msg.serialize();
   const uint8_t expect_buffer[] = {
@@ -434,14 +434,14 @@ TEST(demo_message_test, serialize_bool_type_compress_key_sequence_and_same_times
 
 TEST(demo_message_test, serialize_bool_type_compress_all_attributes)
 {
-  std::list<demo_data::pointer_type> p{
+  data_group_type p{
     make_demo_data<bool>(1234, true, 1648001566463),
     make_demo_data<bool>(1235, false, 1648001566463),
     make_demo_data<bool>(1236, true, 1648001566463),
     make_demo_data<bool>(1237, false, 1648001566463),
     make_demo_data<bool>(1238, true, 1648001566463),
   };
-  demo_message msg(p.begin(), p.end(), true, true, true);
+  demo_message msg(p, true, true, true);
 
   const std::vector<uint8_t>& buffer = msg.serialize();
   const uint8_t expect_buffer[] = {
@@ -466,7 +466,7 @@ TEST(demo_message_test, serialize_bool_type_compress_all_attributes)
 
 TEST(demo_message_test, serialize_bool_type_compress_all_attributes_multiple_bytes)
 {
-  std::list<demo_data::pointer_type> p{
+  data_group_type p{
     make_demo_data<bool>(1234, true, 1648001566463),
     make_demo_data<bool>(1235, true, 1648001566463),
     make_demo_data<bool>(1236, true, 1648001566463),
@@ -481,7 +481,7 @@ TEST(demo_message_test, serialize_bool_type_compress_all_attributes_multiple_byt
     make_demo_data<bool>(1245, true, 1648001566463),
     make_demo_data<bool>(1246, true, 1648001566463)
   };
-  demo_message msg(p.begin(), p.end(), true, true, true);
+  demo_message msg(p, true, true, true);
 
   const std::vector<uint8_t>& buffer = msg.serialize();
   const uint8_t expect_buffer[] = {

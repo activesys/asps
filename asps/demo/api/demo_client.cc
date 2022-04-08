@@ -18,6 +18,11 @@ bool demo_client::connect()
   socket_.connect(endpoint_, ec);
   is_connected_ = !ec;
 
+  if (is_connected()) {
+    session_ = make_session_service();
+    session_->register_observer(this);
+  }
+
   return is_connected();
 }
 
@@ -30,21 +35,22 @@ void demo_client::close()
 {
   socket_.close();
   is_connected_ = false;
+  session_.reset();
 }
 
 void demo_client::same_type(bool flag)
 {
-  session_.same_type(flag);
+  session_->same_type(flag);
 }
 
 void demo_client::key_sequence(bool flag)
 {
-  session_.key_sequence(flag);
+  session_->key_sequence(flag);
 }
 
 void demo_client::same_timestamp(bool flag)
 {
-  session_.same_timestamp(flag);
+  session_->same_timestamp(flag);
 }
 
 } // demo

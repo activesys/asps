@@ -7,9 +7,33 @@
 #include <algorithm>
 #include <map>
 #include <asps/demo/message/demo_message.h>
+#include <asps/demo/message/keepalive.h>
 
 namespace asps {
 namespace demo {
+
+message_serialization_service::pointer_type
+make_message_serialization_service(const data_group_type& group,
+                                   bool same_type,
+                                   bool key_sequence,
+                                   bool same_timestamp)
+{
+  return std::make_shared<demo_message>(group,
+                                        same_type,
+                                        key_sequence,
+                                        same_timestamp);
+}
+message_serialization_service::pointer_type
+make_message_serialization_service()
+{
+  return std::make_shared<positive_keepalive>();
+}
+
+message_unserialization_service::pointer_type
+make_message_unserialization_service(uint8_t flag)
+{
+  return std::make_shared<positive_keepalive_ack>(flag);
+}
 
 const demo_message::buffer_type& demo_message::serialize()
 {
@@ -87,7 +111,7 @@ void demo_message::group_according_to_key_sequence()
         }
       }
 
-      datas_.merge(std::move(group_datas));
+      datas_.splice(datas_.end(), group_datas);
     }
   }
 }

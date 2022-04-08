@@ -11,22 +11,21 @@
 #include <string>
 #include <boost/asio.hpp>
 
+#include <asps/demo/api/session_service.h>
 #include <asps/demo/semantic/demo_data.h>
-#include <asps/demo/session/demo_session.h>
 
 namespace asps {
 namespace demo {
 
 using namespace boost::asio;
 
-class demo_client
+class demo_client : public observer
 {
 public:
   demo_client(const std::string& host, uint16_t port)
     : socket_(context_),
       endpoint_(ip::address::from_string(host), port),
-      is_connected_(false),
-      session_(false, false, false)
+      is_connected_(false)
   {}
 
 public:
@@ -37,14 +36,35 @@ public:
   void key_sequence(bool flag);
   void same_timestamp(bool flag);
 
-  template <typename IT>
-  bool send(IT first, IT second)
+  bool send(const data_group_type& group)
   {
-    const std::vector<uint8_t>& buf = session_.send(first, second);
+    if (is_connected()) {
+      const std::vector<uint8_t>& buf = session_->serialize_datas(group);
+      boost::system::error_code ec;
+    
+      socket_.write_some(buffer(buf), ec);
+      return !ec;
+    } else {
+      return false;
+    }
+  }
+
+  bool receive(const uint8_t* buffer)
+  {
+    return session_->receive(buffer);
+  }
+
+  void update_positive_keepalive()
+  {
+    const std::vector<uint8_t>& buf = session_->serialize_keepalive();
     boost::system::error_code ec;
   
     socket_.write_some(buffer(buf), ec);
-    return !ec;
+  }
+
+  void update_missing_positive_keepalive_ack()
+  {
+    close();
   }
 
 private:
@@ -52,7 +72,7 @@ private:
   ip::tcp::socket socket_;
   ip::tcp::endpoint endpoint_;
   bool is_connected_;
-  demo_session session_;
+  session_service::pointer_type session_;
 };
 
 } // demo

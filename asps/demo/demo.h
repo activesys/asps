@@ -8,6 +8,7 @@
 #define ASPS_DEMO_DEMO_H
 
 #include <asps/demo/semantic/demo_data.h>
+#include <asps/demo/message/keepalive.h>
 #include <asps/demo/message/demo_message.h>
 #include <asps/demo/api/demo_client.h>
 

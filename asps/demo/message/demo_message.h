@@ -7,18 +7,19 @@
 #ifndef ASPS_DEMO_MESSAGE_DEMO_MESSAGE_H
 #define ASPS_DEMO_MESSAGE_DEMO_MESSAGE_H
 
+#include <cstdint>
 #include <cstring>
 #include <list>
 #include <vector>
 #include <memory>
 #include <arpa/inet.h>
-#include <asps/demo/semantic/demo_data.h>
+#include <asps/demo/session/message_service.h>
 
 namespace asps {
 namespace demo {
 
 // demo_message without compression
-class demo_message
+class demo_message : public message_serialization_service
 {
   enum header_field_length {
     header_flag_field_length = 8,
@@ -44,7 +45,6 @@ class demo_message
   };
 
   typedef std::list<data_group_type> data_groups_type;
-  typedef std::vector<uint8_t> buffer_type;
 
   // for sort demo_data
   struct compare
@@ -57,20 +57,19 @@ class demo_message
   };
 
 public:
-  template <typename IT>
-  demo_message(IT first,
-               IT second,
+  demo_message(const data_group_type& group,
                bool same_type = false,
                bool key_sequence = false,
                bool same_timestamp = false)
-    : datas_{{first, second}},
+    : message_serialization_service(),
+      datas_{group},
       same_type_(same_type),
       key_sequence_(key_sequence),
       same_timestamp_(same_timestamp)
   {}
 
 public:
-  const buffer_type& serialize();
+  const buffer_type& serialize() override;
 
 private:
   // group

@@ -63,6 +63,10 @@ private:
   }
   std::size_t on_completion(const boost::system::error_code& ec, std::size_t bytes)
   {
+    if (expect_length_ == SIZE_MAX) {
+      return 0;
+    }
+
     if (expect_length_ > 0 && bytes < expect_length_) {
       return expect_length_ - bytes;
     }
