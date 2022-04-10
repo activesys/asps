@@ -59,6 +59,9 @@ TEST_F(demo_client_test, send_data_of_uint64_type)
   demo_client dc("127.0.0.1", 9901);
   dc.connect();
   EXPECT_TRUE(dc.is_connected());
+  config::same_type(false);
+  config::key_sequence(false);
+  config::same_timestamp(false);
 
   data_group_type p{
     make_demo_data<uint64_t>(1234, 1154789657886957455, 1647761782000)
@@ -95,6 +98,9 @@ TEST_F(demo_client_test, send_data_of_int32_type)
   demo_client dc("127.0.0.1", 9901);
   dc.connect();
   EXPECT_TRUE(dc.is_connected());
+  config::same_type(false);
+  config::key_sequence(false);
+  config::same_timestamp(false);
 
   data_group_type p{
     make_demo_data<int32_t>(1234, 9876, 1647761782000)
@@ -131,6 +137,9 @@ TEST_F(demo_client_test, send_data_of_uint16_type)
   demo_client dc("127.0.0.1", 9901);
   dc.connect();
   EXPECT_TRUE(dc.is_connected());
+  config::same_type(false);
+  config::key_sequence(false);
+  config::same_timestamp(false);
 
   data_group_type p{
     make_demo_data<uint16_t>(1234, 9876, 1647761782000)
@@ -167,6 +176,9 @@ TEST_F(demo_client_test, send_data_of_uint8_type)
   demo_client dc("127.0.0.1", 9901);
   dc.connect();
   EXPECT_TRUE(dc.is_connected());
+  config::same_type(false);
+  config::key_sequence(false);
+  config::same_timestamp(false);
 
   data_group_type p{
     make_demo_data<uint8_t>(1234, 255, 1647761782000)
@@ -203,6 +215,9 @@ TEST_F(demo_client_test, send_data_of_bool_type)
   demo_client dc("127.0.0.1", 9901);
   dc.connect();
   EXPECT_TRUE(dc.is_connected());
+  config::same_type(false);
+  config::key_sequence(false);
+  config::same_timestamp(false);
 
   data_group_type p{
     make_demo_data<bool>(1234, false, 1647761782000)
@@ -239,6 +254,9 @@ TEST_F(demo_client_test, send_datas_of_int32_type)
   demo_client dc("127.0.0.1", 9901);
   dc.connect();
   EXPECT_TRUE(dc.is_connected());
+  config::same_type(false);
+  config::key_sequence(false);
+  config::same_timestamp(false);
 
   data_group_type ds{
     make_demo_data<int32_t>(1000, 9000, 1648363193268),
@@ -293,6 +311,9 @@ TEST_F(demo_client_test, send_datas_of_multiple_types)
   demo_client dc("127.0.0.1", 9901);
   dc.connect();
   EXPECT_TRUE(dc.is_connected());
+  config::same_type(false);
+  config::key_sequence(false);
+  config::same_timestamp(false);
 
   data_group_type ds{
     make_demo_data<int32_t>(1000, 9000, 1648363193268),
@@ -347,7 +368,10 @@ TEST_F(demo_client_test, send_datas_of_same_type)
   demo_client dc("127.0.0.1", 9901);
   dc.connect();
   EXPECT_TRUE(dc.is_connected());
-  dc.same_type(true);
+  config::same_type(false);
+  config::key_sequence(false);
+  config::same_timestamp(false);
+  config::same_type(true);
 
   data_group_type ds{
     make_demo_data<int32_t>(1000, 9000, 1648363193268),
@@ -400,7 +424,10 @@ TEST_F(demo_client_test, send_datas_of_multiple_packages_containing_same_type)
   demo_client dc("127.0.0.1", 9901);
   dc.connect();
   EXPECT_TRUE(dc.is_connected());
-  dc.same_type(true);
+  config::same_type(false);
+  config::key_sequence(false);
+  config::same_timestamp(false);
+  config::same_type(true);
 
   data_group_type ds{
     make_demo_data<int32_t>(1000, 9000, 1648363193268),
@@ -489,7 +516,10 @@ TEST_F(demo_client_test, send_datas_of_same_timestamp)
   demo_client dc("127.0.0.1", 9901);
   dc.connect();
   EXPECT_TRUE(dc.is_connected());
-  dc.same_timestamp(true);
+  config::same_type(false);
+  config::key_sequence(false);
+  config::same_timestamp(false);
+  config::same_timestamp(true);
 
   data_group_type ds{
     make_demo_data<int32_t>(1000, 9000, 1648363193268),
@@ -542,7 +572,10 @@ TEST_F(demo_client_test, send_datas_of_multiple_packages_containing_same_timesta
   demo_client dc("127.0.0.1", 9901);
   dc.connect();
   EXPECT_TRUE(dc.is_connected());
-  dc.same_timestamp(true);
+  config::same_type(false);
+  config::key_sequence(false);
+  config::same_timestamp(false);
+  config::same_timestamp(true);
 
   data_group_type ds{
     make_demo_data<int32_t>(1000, 9000, 1648363193268),
@@ -623,7 +656,10 @@ TEST_F(demo_client_test, send_datas_of_key_sequence)
   demo_client dc("127.0.0.1", 9901);
   dc.connect();
   EXPECT_TRUE(dc.is_connected());
-  dc.key_sequence(true);
+  config::same_type(false);
+  config::key_sequence(false);
+  config::same_timestamp(false);
+  config::key_sequence(true);
 
   data_group_type ds{
     make_demo_data<int32_t>(1000, 9000, 1648363193268),
@@ -676,7 +712,10 @@ TEST_F(demo_client_test, send_datas_of_multiple_packages_containing_key_sequence
   demo_client dc("127.0.0.1", 9901);
   dc.connect();
   EXPECT_TRUE(dc.is_connected());
-  dc.key_sequence(true);
+  config::same_type(false);
+  config::key_sequence(false);
+  config::same_timestamp(false);
+  config::key_sequence(true);
 
   data_group_type ds{
     make_demo_data<int32_t>(1000, 9000, 1648363193268),
@@ -780,8 +819,11 @@ TEST_F(demo_client_test, send_datas_of_same_timestamp_and_key_sequence)
   demo_client dc("127.0.0.1", 9901);
   dc.connect();
   EXPECT_TRUE(dc.is_connected());
-  dc.same_timestamp(true);
-  dc.key_sequence(true);
+  config::same_type(false);
+  config::key_sequence(false);
+  config::same_timestamp(false);
+  config::same_timestamp(true);
+  config::key_sequence(true);
 
   data_group_type ds{
     make_demo_data<int32_t>(1000, 9000, 1648363193268),
@@ -830,8 +872,11 @@ TEST_F(demo_client_test, send_datas_of_same_timestamp_and_same_type)
   demo_client dc("127.0.0.1", 9901);
   dc.connect();
   EXPECT_TRUE(dc.is_connected());
-  dc.same_timestamp(true);
-  dc.same_type(true);
+  config::same_type(false);
+  config::key_sequence(false);
+  config::same_timestamp(false);
+  config::same_timestamp(true);
+  config::same_type(true);
 
   data_group_type ds{
     make_demo_data<int32_t>(1000, 9000, 1648363193268),
@@ -880,8 +925,11 @@ TEST_F(demo_client_test, send_datas_of_key_sequence_and_same_type)
   demo_client dc("127.0.0.1", 9901);
   dc.connect();
   EXPECT_TRUE(dc.is_connected());
-  dc.key_sequence(true);
-  dc.same_type(true);
+  config::same_type(false);
+  config::key_sequence(false);
+  config::same_timestamp(false);
+  config::key_sequence(true);
+  config::same_type(true);
 
   data_group_type ds{
     make_demo_data<int32_t>(1000, 9000, 1648363193268),
@@ -930,9 +978,9 @@ TEST_F(demo_client_test, send_datas_of_all_attribute)
   demo_client dc("127.0.0.1", 9901);
   dc.connect();
   EXPECT_TRUE(dc.is_connected());
-  dc.key_sequence(true);
-  dc.same_type(true);
-  dc.same_timestamp(true);
+  config::same_type(true);
+  config::key_sequence(true);
+  config::same_timestamp(true);
 
   data_group_type ds{
     make_demo_data<int32_t>(1000, 9000, 1648363193268),
@@ -979,9 +1027,9 @@ TEST_F(demo_client_test, send_datas_of_all_attribute_multiple_packages)
   demo_client dc("127.0.0.1", 9901);
   dc.connect();
   EXPECT_TRUE(dc.is_connected());
-  dc.key_sequence(true);
-  dc.same_type(true);
-  dc.same_timestamp(true);
+  config::same_type(true);
+  config::key_sequence(true);
+  config::same_timestamp(true);
 
   data_group_type ds{
     make_demo_data<int32_t>(1000, 9000, 1648363193268),

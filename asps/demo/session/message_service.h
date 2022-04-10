@@ -30,10 +30,7 @@ public:
 };
 
 message_serialization_service::pointer_type
-make_message_serialization_service(const data_group_type& group,
-                                   bool same_type,
-                                   bool key_sequence,
-                                   bool same_timestamp);
+make_message_serialization_service(const data_group_type& group);
 message_serialization_service::pointer_type
 make_message_serialization_service();
 

@@ -11,5 +11,6 @@
 #include <asps/demo/message/keepalive.h>
 #include <asps/demo/message/demo_message.h>
 #include <asps/demo/api/demo_client.h>
+#include <asps/demo/utility/config.h>
 
 #endif // ASPS_DEMO_DEMO_H

@@ -25,6 +25,9 @@ TEST(demo_message_test, serialize_float64_type)
     make_demo_data<double>(1234, 913456.230887143, 1647761782000)
   };
   demo_message msg(p);
+  config::same_type(false);
+  config::key_sequence(false);
+  config::same_timestamp(false);
 
   const std::vector<uint8_t>& buffer = msg.serialize();
   const uint8_t expect_buffer[] = {
@@ -54,6 +57,9 @@ TEST(demo_message_test, serialize_float32_type)
     make_demo_data<float>(1234, -98.12, 1647761782000)
   };
   demo_message msg(p);
+  config::same_type(false);
+  config::key_sequence(false);
+  config::same_timestamp(false);
 
   const std::vector<uint8_t>& buffer = msg.serialize();
   const uint8_t expect_buffer[] = {
@@ -83,6 +89,9 @@ TEST(demo_message_test, serialize_int64_type)
     make_demo_data<int64_t>(1234, -1154789657886957455, 1647761782000)
   };
   demo_message msg(p);
+  config::same_type(false);
+  config::key_sequence(false);
+  config::same_timestamp(false);
 
   const std::vector<uint8_t>& buffer = msg.serialize();
   const uint8_t expect_buffer[] = {
@@ -111,6 +120,9 @@ TEST(demo_message_test, serialize_uint32_type)
     make_demo_data<uint32_t>(1234, 9876, 1647761782000)
   };
   demo_message msg(p);
+  config::same_type(false);
+  config::key_sequence(false);
+  config::same_timestamp(false);
 
   const std::vector<uint8_t>& buffer = msg.serialize();
   const uint8_t expect_buffer[] = {
@@ -139,6 +151,9 @@ TEST(demo_message_test, serialize_int16_type)
     make_demo_data<int16_t>(1234, 9876, 1647761782000)
   };
   demo_message msg(p);
+  config::same_type(false);
+  config::key_sequence(false);
+  config::same_timestamp(false);
 
   const std::vector<uint8_t>& buffer = msg.serialize();
   const uint8_t expect_buffer[] = {
@@ -167,6 +182,9 @@ TEST(demo_message_test, serialize_int8_type)
     make_demo_data<int8_t>(1234, -32, 1648001566463)
   };
   demo_message msg(p);
+  config::same_type(false);
+  config::key_sequence(false);
+  config::same_timestamp(false);
 
   const std::vector<uint8_t>& buffer = msg.serialize();
   const uint8_t expect_buffer[] = {
@@ -196,6 +214,9 @@ TEST(demo_message_test, serialize_bool_type)
     make_demo_data<bool>(1234, true, 1648001566463)
   };
   demo_message msg(p);
+  config::same_type(false);
+  config::key_sequence(false);
+  config::same_timestamp(false);
 
   const std::vector<uint8_t>& buffer = msg.serialize();
   const uint8_t expect_buffer[] = {
@@ -226,6 +247,9 @@ TEST(demo_message_test, serialize_multi_int8_type)
     make_demo_data<int8_t>(1113, 13, 1648001566463)
   };
   demo_message msg(vs);
+  config::same_type(false);
+  config::key_sequence(false);
+  config::same_timestamp(false);
 
   const std::vector<uint8_t>& buffer = msg.serialize();
   const uint8_t expect_buffer[] = {
@@ -267,6 +291,9 @@ TEST(demo_message_test, serialize_multi_types)
     make_demo_data<uint32_t>(1113, 13, 1648001566463)
   };
   demo_message msg(vs);
+  config::same_type(false);
+  config::key_sequence(false);
+  config::same_timestamp(false);
 
   const std::vector<uint8_t>& buffer = msg.serialize();
   const uint8_t expect_buffer[] = {
@@ -309,7 +336,12 @@ TEST(demo_message_test, serialize_bool_type_compress_same_type_and_key_sequence)
     make_demo_data<bool>(1237, false, 1648001566463),
     make_demo_data<bool>(1238, true, 1648001566463),
   };
-  demo_message msg(p, true, true, false);
+  demo_message msg(p);
+  config::same_type(false);
+  config::key_sequence(false);
+  config::same_timestamp(false);
+  config::same_type(true);
+  config::key_sequence(true);
 
   const std::vector<uint8_t>& buffer = msg.serialize();
   const uint8_t expect_buffer[] = {
@@ -353,7 +385,12 @@ TEST(demo_message_test, serialize_bool_type_compress_same_type_and_same_timestam
     make_demo_data<bool>(1237, false, 1648001566463),
     make_demo_data<bool>(1238, true, 1648001566463),
   };
-  demo_message msg(p, true, false, true);
+  demo_message msg(p);
+  config::same_type(false);
+  config::key_sequence(false);
+  config::same_timestamp(false);
+  config::same_type(true);
+  config::same_timestamp(true);
 
   const std::vector<uint8_t>& buffer = msg.serialize();
   const uint8_t expect_buffer[] = {
@@ -397,7 +434,12 @@ TEST(demo_message_test, serialize_bool_type_compress_key_sequence_and_same_times
     make_demo_data<bool>(1237, false, 1648001566463),
     make_demo_data<bool>(1238, true, 1648001566463),
   };
-  demo_message msg(p, false, true, true);
+  demo_message msg(p);
+  config::same_type(false);
+  config::key_sequence(false);
+  config::same_timestamp(false);
+  config::key_sequence(true);
+  config::same_timestamp(true);
 
   const std::vector<uint8_t>& buffer = msg.serialize();
   const uint8_t expect_buffer[] = {
@@ -441,7 +483,10 @@ TEST(demo_message_test, serialize_bool_type_compress_all_attributes)
     make_demo_data<bool>(1237, false, 1648001566463),
     make_demo_data<bool>(1238, true, 1648001566463),
   };
-  demo_message msg(p, true, true, true);
+  demo_message msg(p);
+  config::same_type(true);
+  config::key_sequence(true);
+  config::same_timestamp(true);
 
   const std::vector<uint8_t>& buffer = msg.serialize();
   const uint8_t expect_buffer[] = {
@@ -481,7 +526,10 @@ TEST(demo_message_test, serialize_bool_type_compress_all_attributes_multiple_byt
     make_demo_data<bool>(1245, true, 1648001566463),
     make_demo_data<bool>(1246, true, 1648001566463)
   };
-  demo_message msg(p, true, true, true);
+  demo_message msg(p);
+  config::same_type(true);
+  config::key_sequence(true);
+  config::same_timestamp(true);
 
   const std::vector<uint8_t>& buffer = msg.serialize();
   const uint8_t expect_buffer[] = {

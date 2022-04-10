@@ -4,8 +4,8 @@
 //
 // Demo timer.
 
-#ifndef ASPS_DEMO_UTILITY_TIMER_SERVICE_H
-#define ASPS_DEMO_UTILITY_TIMER_SERVICE_H
+#ifndef ASPS_DEMO_UTILITY_TIMER_H
+#define ASPS_DEMO_UTILITY_TIMER_H
 
 #include <asps/demo/session/timer_service.h>
 
@@ -28,4 +28,4 @@ public:
 } // demo
 } // asps
 
-#endif // ASPS_DEMO_UTILITY_TIMER_SERVICE_H
+#endif // ASPS_DEMO_UTILITY_TIMER_H

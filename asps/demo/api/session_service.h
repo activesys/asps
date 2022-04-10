@@ -43,9 +43,6 @@ public:
   virtual buffer_type& serialize_datas(const data_group_type& group) = 0;
   virtual buffer_type& serialize_keepalive() = 0;
   virtual bool receive(const uint8_t* buffer) = 0;
-  virtual void same_type(bool flag) = 0;
-  virtual void key_sequence(bool flag) = 0;
-  virtual void same_timestamp(bool flag) = 0;
 
 public:
   virtual void register_observer(observer* o) {os_.push_back(o);}

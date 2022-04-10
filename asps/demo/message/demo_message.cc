@@ -8,20 +8,15 @@
 #include <map>
 #include <asps/demo/message/demo_message.h>
 #include <asps/demo/message/keepalive.h>
+#include <asps/demo/utility/config.h>
 
 namespace asps {
 namespace demo {
 
 message_serialization_service::pointer_type
-make_message_serialization_service(const data_group_type& group,
-                                   bool same_type,
-                                   bool key_sequence,
-                                   bool same_timestamp)
+make_message_serialization_service(const data_group_type& group)
 {
-  return std::make_shared<demo_message>(group,
-                                        same_type,
-                                        key_sequence,
-                                        same_timestamp);
+  return std::make_shared<demo_message>(group);
 }
 message_serialization_service::pointer_type
 make_message_serialization_service()
@@ -70,7 +65,7 @@ void demo_message::group()
 
 void demo_message::group_according_to_same_type()
 {
-  if (same_type_) {
+  if (config::same_type()) {
     data_groups_type temp_groups(std::move(datas_));
 
     for (auto& temp_group : temp_groups) {
@@ -88,7 +83,7 @@ void demo_message::group_according_to_same_type()
 
 void demo_message::group_according_to_key_sequence()
 {
-  if (key_sequence_) {
+  if (config::key_sequence()) {
     compare comp;
     for (auto& group : datas_) {
       std::sort(group.begin(), group.end(), comp);
@@ -118,7 +113,7 @@ void demo_message::group_according_to_key_sequence()
 
 void demo_message::group_according_to_same_timestamp()
 {
-  if (same_timestamp_) {
+  if (config::same_timestamp()) {
     data_groups_type temp_groups(std::move(datas_));
 
     for (auto& temp_group : temp_groups) {
@@ -153,13 +148,13 @@ std::size_t demo_message::serialization_mutable_length(data_group_type& group)
 {
   std::size_t length = 0;
 
-  if (same_type_) {
+  if (config::same_type()) {
     length += mutable_type_field_length;
   }
-  if (key_sequence_) {
+  if (config::key_sequence()) {
     length += mutable_key_field_length;
   }
-  if (same_timestamp_) {
+  if (config::same_timestamp()) {
     length += mutable_timestamp_field_length;
   }
 
@@ -175,19 +170,19 @@ std::size_t demo_message::serialization_datas_length(data_group_type& group)
    * contains data of type bool, bit compression is required.
    */
   if (group.front()->type() == demo_data::boolean_type &&
-      same_type_ &&
-      key_sequence_ &&
-      same_timestamp_) {
+      config::same_type() &&
+      config::key_sequence() &&
+      config::same_timestamp()) {
     length = (group.size() + 7) / 8;
   } else {
     for (auto& data : group) {
-      if (!same_type_) {
+      if (!config::same_type()) {
         length += data_type_field_length;
       }
-      if (!key_sequence_) {
+      if (!config::key_sequence()) {
         length += data_key_field_length;
       }
-      if (!same_timestamp_) {
+      if (!config::same_timestamp()) {
         length += data_timestamp_field_length;
       }
       length += data->size();
@@ -233,13 +228,13 @@ void demo_message::serialize_header_attribute(data_group_type& group,
                                               uint8_t*& pos)
 {
   *pos = attr_none;
-  if (same_type_) {
+  if (config::same_type()) {
     *pos |= attr_same_type;
   }
-  if (key_sequence_) {
+  if (config::key_sequence()) {
     *pos |= attr_key_sequence;
   }
-  if (same_timestamp_) {
+  if (config::same_timestamp()) {
     *pos |= attr_same_timestamp;
   }
   pos += header_attribute_field_length;
@@ -257,7 +252,7 @@ void demo_message::serialize_mutable(data_group_type& group,
 void demo_message::serialize_mutable_type(data_group_type& group,
                                           uint8_t*& pos)
 {
-  if (same_type_) {
+  if (config::same_type()) {
     *pos = group.front()->type();
     pos += mutable_type_field_length;
   }
@@ -266,7 +261,7 @@ void demo_message::serialize_mutable_type(data_group_type& group,
 void demo_message::serialize_mutable_key(data_group_type& group,
                                          uint8_t*& pos)
 {
-  if (key_sequence_) {
+  if (config::key_sequence()) {
     *reinterpret_cast<uint32_t*>(pos) = htonl(group.front()->key());
     pos += mutable_key_field_length;
   }
@@ -275,7 +270,7 @@ void demo_message::serialize_mutable_key(data_group_type& group,
 void demo_message::serialize_mutable_timestamp(data_group_type& group,
                                                uint8_t*& pos)
 {
-  if (same_timestamp_) {
+  if (config::same_timestamp()) {
     *reinterpret_cast<uint64_t*>(pos) = htonll(group.front()->timestamp());
     pos += mutable_timestamp_field_length;
   }
@@ -290,9 +285,9 @@ void demo_message::serialize_datas(data_group_type& group,
    * contains data of type bool, bit compression is required.
    */
   if (group.front()->type() == demo_data::boolean_type &&
-      same_type_ &&
-      key_sequence_ &&
-      same_timestamp_) {
+      config::same_type() &&
+      config::key_sequence() &&
+      config::same_timestamp()) {
     std::size_t byte_count = (group.size() + 7) / 8;
     for (std::size_t i = 0; i < group.size(); ++i) {
       uint8_t value;
@@ -318,7 +313,7 @@ void demo_message::serialize_one_data(demo_data::pointer_type& data,
 void demo_message::serialize_data_type(demo_data::pointer_type& data,
                                        uint8_t*& pos)
 {
-  if (!same_type_) {
+  if (!config::same_type()) {
     *pos = data->type();
     pos += data_type_field_length;
   }
@@ -327,7 +322,7 @@ void demo_message::serialize_data_type(demo_data::pointer_type& data,
 void demo_message::serialize_data_key(demo_data::pointer_type& data,
                                       uint8_t*& pos)
 {
-  if (!key_sequence_) {
+  if (!config::key_sequence()) {
     *reinterpret_cast<uint32_t*>(pos) = htonl(data->key());
     pos += data_key_field_length;
   }
@@ -336,7 +331,7 @@ void demo_message::serialize_data_key(demo_data::pointer_type& data,
 void demo_message::serialize_data_timestamp(demo_data::pointer_type& data,
                                             uint8_t*& pos)
 {
-  if (!same_timestamp_) {
+  if (!config::same_timestamp()) {
     *reinterpret_cast<uint64_t*>(pos) = htonll(data->timestamp());
     pos += data_timestamp_field_length;
   }

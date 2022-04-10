@@ -27,6 +27,7 @@ set(ASPS_DEMO_SOURCES
   session/demo_session.cc
   message/demo_message.cc
   utility/timer.cc
+  utility/config.cc
 )
 
 ##################################

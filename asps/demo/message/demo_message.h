@@ -57,15 +57,9 @@ class demo_message : public message_serialization_service
   };
 
 public:
-  demo_message(const data_group_type& group,
-               bool same_type = false,
-               bool key_sequence = false,
-               bool same_timestamp = false)
+  demo_message(const data_group_type& group)
     : message_serialization_service(),
-      datas_{group},
-      same_type_(same_type),
-      key_sequence_(key_sequence),
-      same_timestamp_(same_timestamp)
+      datas_{group}
   {}
 
 public:
@@ -102,9 +96,6 @@ private:
    void serialize_data_value(demo_data::pointer_type& data, uint8_t*& pos);
 
 protected:
-  bool same_type_;
-  bool key_sequence_;
-  bool same_timestamp_;
   data_groups_type datas_;
   buffer_type buffer_;
 };

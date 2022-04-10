@@ -38,19 +38,35 @@ void demo_client::close()
   session_.reset();
 }
 
-void demo_client::same_type(bool flag)
+bool demo_client::send(const data_group_type& group)
 {
-  session_->same_type(flag);
+  if (is_connected()) {
+    const std::vector<uint8_t>& buf = session_->serialize_datas(group);
+    boost::system::error_code ec;
+  
+    socket_.write_some(buffer(buf), ec);
+    return !ec;
+  } else {
+    return false;
+  }
 }
 
-void demo_client::key_sequence(bool flag)
+bool demo_client::receive(const uint8_t* buffer)
 {
-  session_->key_sequence(flag);
+  return session_->receive(buffer);
 }
 
-void demo_client::same_timestamp(bool flag)
+void demo_client::update_positive_keepalive()
 {
-  session_->same_timestamp(flag);
+  const std::vector<uint8_t>& buf = session_->serialize_keepalive();
+  boost::system::error_code ec;
+
+  socket_.write_some(buffer(buf), ec);
+}
+
+void demo_client::update_missing_positive_keepalive_ack()
+{
+  close();
 }
 
 } // demo
