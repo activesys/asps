@@ -8,7 +8,7 @@
 #include <map>
 #include <asps/demo/message/demo_message.h>
 #include <asps/demo/message/keepalive.h>
-#include <asps/demo/utility/config.h>
+#include <asps/demo/config/config.h>
 
 namespace asps {
 namespace demo {

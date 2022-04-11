@@ -4,8 +4,8 @@
 //
 // Demo config.
 
-#ifndef ASPS_DEMO_UTILITY_CONFIG_H
-#define ASPS_DEMO_UTILITY_CONFIG_H
+#ifndef ASPS_DEMO_CONFIG_CONFIG_H
+#define ASPS_DEMO_CONFIG_CONFIG_H
 
 #include <cstdint>
 
@@ -17,19 +17,18 @@ class config
   enum default_value {
     default_t1 = 30,
     default_t2 = 20,
-    default_positive_keepalive_ack = 0xff,
+    default_pack = 0xff,
     default_same_type = false,
     default_key_sequence = false,
     default_same_timestamp = false
   };
 
 public:
-  static int32_t t1();
-  static void t1(int32_t t);
-  static int32_t t2();
-  static void t2(int32_t t);
-  static uint8_t positive_keepalive_ack();
-  static void positive_keepalive_ack(uint8_t ack);
+  static uint32_t t1();
+  static uint32_t t2();
+  static bool t1_t2(uint32_t t1, uint32_t t2);
+  static uint8_t pack();
+  static void pack(uint8_t ack);
   static bool same_type();
   static void same_type(bool b);
   static bool key_sequence();
@@ -38,9 +37,9 @@ public:
   static void same_timestamp(bool b);
 
 private:
-  static int32_t t1_;
-  static int32_t t2_;
-  static uint8_t positive_keepalive_ack_;
+  static uint32_t t1_;
+  static uint32_t t2_;
+  static uint8_t pack_;
   static bool same_type_;
   static bool key_sequence_;
   static bool same_timestamp_;
@@ -49,4 +48,4 @@ private:
 } // demo
 } // asps
 
-#endif // ASPS_DEMO_UTILITY_CONFIG_H
+#endif // ASPS_DEMO_CONFIG_CONFIG_H

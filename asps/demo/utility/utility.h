@@ -2,12 +2,20 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file. See the AUTHORS file for names of contributors.
 //
-// Demo Data.
+// Demo utility.
 
-#include <asps/demo/semantic/demo_data.h>
+#ifndef ASPS_DEMO_UTILITY_UTILITY_H
+#define ASPS_DEMO_UTILITY_UTILITY_H
+
+#include <cstdint>
 
 namespace asps {
 namespace demo {
 
+// host sequence to network sequence for 64bits integer.
+uint64_t htonll(uint64_t value);
+
 } // demo
 } // asps
+
+#endif // ASPS_DEMO_UTILITY_UTILITY_H

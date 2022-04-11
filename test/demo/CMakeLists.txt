@@ -12,6 +12,7 @@ set(ASPS_DEMO_TEST_SOURCES
   api/demo_client_test.cc
   message/demo_message_test.cc
   message/keepalive_test.cc
+  config/config_test.cc
 )
 
 ##################################

@@ -12,11 +12,10 @@
 #include <vector>
 #include <arpa/inet.h>
 
+#include <asps/demo/utility/utility.h>
+
 namespace asps {
 namespace demo {
-
-// host sequence to network sequence for 64bits integer.
-uint64_t htonll(uint64_t value);
 
 // Demo Data
 class demo_data

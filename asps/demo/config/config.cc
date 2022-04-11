@@ -4,43 +4,47 @@
 //
 // Demo config.
 
-#include <asps/demo/utility/config.h>
+#include <asps/demo/config/config.h>
 
 namespace asps {
 namespace demo {
 
-int32_t config::t1_ = config::default_t1;
-int32_t config::t2_ = config::default_t2;
-uint8_t config::positive_keepalive_ack_ = config::default_positive_keepalive_ack;
+uint32_t config::t1_ = config::default_t1;
+uint32_t config::t2_ = config::default_t2;
+uint8_t config::pack_ = config::default_pack;
 bool config::same_type_ = config::default_same_type;
 bool config::key_sequence_ = config::default_key_sequence;
 bool config::same_timestamp_ = config::default_same_timestamp;
 
-int32_t config::t1()
+uint32_t config::t1()
 {
   return config::t1_;
 }
-void config::t1(int32_t t)
-{
-  config::t1_ = t;
-}
 
-int32_t config::t2()
+uint32_t config::t2()
 {
   return config::t2_;
 }
-void config::t2(int32_t t)
+
+bool config::t1_t2(uint32_t t1, uint32_t t2)
 {
-  config::t2_ = t;
+  if (t1 > t2) {
+    t1_ = t1;
+    t2_ = t2;
+    return true;
+  } else {
+    return false;
+  }
 }
 
-uint8_t config::positive_keepalive_ack()
+uint8_t config::pack()
 {
-  return config::positive_keepalive_ack_;
+  return config::pack_;
 }
-void config::positive_keepalive_ack(uint8_t ack)
+
+void config::pack(uint8_t ack)
 {
-  config::positive_keepalive_ack_ = ack;
+  config::pack_ = ack;
 }
 
 bool config::same_type()

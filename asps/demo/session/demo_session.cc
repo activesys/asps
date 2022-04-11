@@ -6,7 +6,7 @@
 
 #include <memory>
 #include <asps/demo/session/demo_session.h>
-#include <asps/demo/utility/config.h>
+#include <asps/demo/config/config.h>
 
 namespace asps {
 namespace demo {
@@ -42,7 +42,7 @@ bool demo_session::receive(const uint8_t* buffer)
 {
   t2_->stop();
   return make_message_unserialization_service(
-          config::positive_keepalive_ack())->unserialize(buffer);
+          config::pack())->unserialize(buffer);
 }
 
 void demo_session::t1_timeout()
