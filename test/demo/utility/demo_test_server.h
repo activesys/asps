@@ -71,6 +71,11 @@ private:
       return expect_length_ - bytes;
     }
 
+    // for KEEP and KACK
+    if (expect_length_ == 4 && bytes == 4) {
+      return 0;
+    }
+
     // The header of demo protocol has a fixed length of 16 bytes
     if (bytes < 13) {
       return 13 - bytes;

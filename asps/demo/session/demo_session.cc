@@ -13,6 +13,7 @@ namespace demo {
 
 demo_session::demo_session()
   : session_service(),
+    pkeep_seq_(make_sequence_service(true)),
     t1_(make_timer_service())
 {
   t1_->start(std::chrono::seconds(config::t1()),
@@ -24,38 +25,52 @@ demo_session::~demo_session()
   t1_->stop();
 }
 
-demo_session::buffer_type&
-demo_session::serialize_datas(const data_group_type& group)
+bool demo_session::send(const data_group_type& group)
 {
-  buffer_ = make_message_serialization_service(group)->serialize();
-  return buffer_;
-}
+  sequence_service::pointer_type seq = make_sequence_service(group);
+  const buffer_type& buffer = seq->request();
 
-demo_session::buffer_type&
-demo_session::serialize_keepalive()
-{
-  buffer_ = make_message_serialization_service()->serialize();
-  return buffer_;
+  notify_send(buffer);
+
+  return true;
 }
 
 bool demo_session::receive(const uint8_t* buffer)
 {
-  t2_->stop();
-  return make_message_unserialization_service(
-          config::pack())->unserialize(buffer);
+  sequence_type type = get_sequence_type(buffer);
+
+  if (type == belong_to_positive_keepalive_sequence) {
+
+    return pkeep_seq_->response(buffer);
+
+  } else if (type == belong_to_negative_keepalive_sequence) {
+
+    sequence_service::pointer_type seq = make_sequence_service(false);
+    if (!seq->response(buffer)) {
+      return false;
+    }
+
+    const buffer_type& buf = seq->request();
+    notify_send(buf);
+
+    return true;
+
+  } else {
+
+    return false;
+
+  }
 }
 
 void demo_session::t1_timeout()
 {
-  notify_positive_keepalive();
-  t2_ = make_timer_service();
-  t2_->start(std::chrono::seconds(config::t2()),
-             std::bind(&demo_session::t2_timeout, this));
+  const buffer_type& buf = pkeep_seq_->request();
+  notify_send(buf);
 }
 
-void demo_session::t2_timeout()
+void demo_session::update_event()
 {
-  notify_missing_positive_keepalive_ack();
+  notify_event();
 }
 
 session_service::pointer_type make_session_service()

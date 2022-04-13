@@ -12,6 +12,7 @@ namespace demo {
 uint32_t config::t1_ = config::default_t1;
 uint32_t config::t2_ = config::default_t2;
 uint8_t config::pack_ = config::default_pack;
+uint8_t config::nkeep_ = config::default_nkeep;
 bool config::same_type_ = config::default_same_type;
 bool config::key_sequence_ = config::default_key_sequence;
 bool config::same_timestamp_ = config::default_same_timestamp;
@@ -42,9 +43,20 @@ uint8_t config::pack()
   return config::pack_;
 }
 
-void config::pack(uint8_t ack)
+uint8_t config::nkeep()
 {
-  config::pack_ = ack;
+  return config::nkeep_;
+}
+
+bool config::pack_nkeep(uint8_t pack, uint8_t nkeep)
+{
+  if (pack != nkeep) {
+    config::pack_ = pack;
+    config::nkeep_ = nkeep;
+    return true;
+  } else {
+    return false;
+  }
 }
 
 bool config::same_type()

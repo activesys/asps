@@ -35,8 +35,8 @@ public:
 
   bool send(const data_group_type& group);
   bool receive(const uint8_t* buffer);
-  void update_positive_keepalive();
-  void update_missing_positive_keepalive_ack();
+  void update_send(const buffer_type& buffer) override;
+  void update_event() override;
 
 private:
   io_context context_;

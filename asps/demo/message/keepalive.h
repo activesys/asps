@@ -11,7 +11,8 @@
 #include <cstring>
 #include <vector>
 
-#include <asps/demo/session/message_service.h>
+#include <asps/demo/config/config.h>
+#include <asps/demo/sequence/message_service.h>
 
 namespace asps {
 namespace demo {
@@ -31,7 +32,9 @@ public:
     uint8_t* pos = buffer_.data();
 
     // flag field is "KEEP"
-    memcpy(reinterpret_cast<char*>(pos), "KEEP", flag_field_length);
+    memcpy(pos,
+           POSITIVE_KEEPALIVE_MESSAGE_FLAG,
+           flag_field_length);
     pos += flag_field_length;
 
     return buffer_;
@@ -48,19 +51,50 @@ class positive_keepalive_ack : public message_unserialization_service
   };
 
 public:
-  explicit positive_keepalive_ack(uint8_t flag)
-    : message_unserialization_service(),
-      flag_(flag)
-  {}
+  bool unserialize(const uint8_t* buffer) override
+  {
+    return buffer != nullptr && *buffer == config::pack();
+  }
+};
+
+class negative_keepalive : public message_unserialization_service
+{
+  enum flag_length {
+    flag_field_length = 1
+  };
 
 public:
   bool unserialize(const uint8_t* buffer) override
   {
-    return buffer != nullptr && *buffer == flag_;
+    return buffer != nullptr && *buffer == config::nkeep();
+  }
+};
+
+class negative_keepalive_ack : public message_serialization_service
+{
+  enum flag_length {
+    flag_field_length = 4
+  };
+
+  typedef std::vector<uint8_t> buffer_type;
+
+public:
+  const buffer_type& serialize() override
+  {
+    buffer_.resize(flag_field_length);
+    uint8_t* pos = buffer_.data();
+
+    // flag field is "KACK"
+    memcpy(pos,
+           NEGATIVE_KEEPALIVE_ACK_MESSAGE_FLAG,
+           flag_field_length);
+    pos += flag_field_length;
+
+    return buffer_;
   }
 
 private:
-  uint8_t flag_;
+  buffer_type buffer_;
 };
 
 } // demo

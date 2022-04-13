@@ -553,5 +553,35 @@ TEST(demo_message_test, serialize_bool_type_compress_all_attributes_multiple_byt
   }
 }
 
+TEST(get_message_type_test, get_message_type)
+{
+  config::pack_nkeep(0xff, 0x00);
+  uint8_t buffer[] = {
+    0x44, 0x45, 0x4d, 0x4f, 0x56, 0x31, 0x30, 0x30
+  };
+  EXPECT_EQ(get_message_type(buffer), data_message);
+
+  buffer[0] = 0x4b;
+  buffer[1] = 0x45;
+  buffer[2] = 0x45;
+  buffer[3] = 0x50;
+  EXPECT_EQ(get_message_type(buffer), positive_keepalive_message);
+
+  buffer[0] = 0x4b;
+  buffer[1] = 0x41;
+  buffer[2] = 0x43;
+  buffer[3] = 0x4b;
+  EXPECT_EQ(get_message_type(buffer), negative_keepalive_ack_message);
+
+  buffer[0] = 0xff;
+  EXPECT_EQ(get_message_type(buffer), positive_keepalive_ack_message);
+
+  buffer[0] = 0x00;
+  EXPECT_EQ(get_message_type(buffer), negative_keepalive_message);
+
+  buffer[0] = 0xaa;
+  EXPECT_EQ(get_message_type(buffer), invalid_message);
+}
+
 } // demo_test
 } // asps_test

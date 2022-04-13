@@ -41,11 +41,7 @@ void demo_client::close()
 bool demo_client::send(const data_group_type& group)
 {
   if (is_connected()) {
-    const std::vector<uint8_t>& buf = session_->serialize_datas(group);
-    boost::system::error_code ec;
-  
-    socket_.write_some(buffer(buf), ec);
-    return !ec;
+    return session_->send(group);
   } else {
     return false;
   }
@@ -56,15 +52,13 @@ bool demo_client::receive(const uint8_t* buffer)
   return session_->receive(buffer);
 }
 
-void demo_client::update_positive_keepalive()
+void demo_client::update_send(const buffer_type& buf)
 {
-  const std::vector<uint8_t>& buf = session_->serialize_keepalive();
-  boost::system::error_code ec;
-
-  socket_.write_some(buffer(buf), ec);
+    boost::system::error_code ec;
+    socket_.write_some(buffer(buf), ec);
 }
 
-void demo_client::update_missing_positive_keepalive_ack()
+void demo_client::update_event()
 {
   close();
 }

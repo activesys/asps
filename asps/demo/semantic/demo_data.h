@@ -105,6 +105,8 @@ MAKE_DEMO_DATA_SPECILICATION(double, float64_type, double)
 // Demo data group
 typedef std::vector<demo_data::pointer_type> data_group_type;
 
+typedef std::vector<uint8_t> buffer_type;
+
 } // demo
 } // asps
 

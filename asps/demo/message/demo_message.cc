@@ -13,24 +13,67 @@
 namespace asps {
 namespace demo {
 
+message_type get_message_type(const uint8_t* buffer)
+{
+  if (buffer == nullptr) {
+    return invalid_message;
+  }
+
+  if (memcmp(buffer,
+             DATA_MESSAGE_FLAG,
+             sizeof(DATA_MESSAGE_FLAG)) == 0) {
+    return data_message;
+  }
+
+  if (memcmp(buffer,
+             POSITIVE_KEEPALIVE_MESSAGE_FLAG,
+             sizeof(POSITIVE_KEEPALIVE_MESSAGE_FLAG)) == 0) {
+    return positive_keepalive_message;
+  }
+
+  if (*buffer == config::pack()) {
+    return positive_keepalive_ack_message;
+  }
+
+  if (*buffer == config::nkeep()) {
+    return negative_keepalive_message;
+  }
+
+  if (memcmp(buffer,
+             NEGATIVE_KEEPALIVE_ACK_MESSAGE_FLAG,
+             sizeof(NEGATIVE_KEEPALIVE_ACK_MESSAGE_FLAG)) == 0) {
+    return negative_keepalive_ack_message;
+  }
+
+  return invalid_message;
+}
+
 message_serialization_service::pointer_type
 make_message_serialization_service(const data_group_type& group)
 {
   return std::make_shared<demo_message>(group);
 }
 message_serialization_service::pointer_type
-make_message_serialization_service()
+make_message_serialization_service(bool positive)
 {
-  return std::make_shared<positive_keepalive>();
+  if (positive) {
+    return std::make_shared<positive_keepalive>();
+  } else {
+    return std::make_shared<negative_keepalive_ack>();
+  }
 }
 
 message_unserialization_service::pointer_type
-make_message_unserialization_service(uint8_t flag)
+make_message_unserialization_service(bool positive)
 {
-  return std::make_shared<positive_keepalive_ack>(flag);
+  if (positive) {
+    return std::make_shared<positive_keepalive_ack>();
+  } else {
+    return std::make_shared<negative_keepalive>();
+  }
 }
 
-const demo_message::buffer_type& demo_message::serialize()
+const buffer_type& demo_message::serialize()
 {
   group();
 
@@ -206,7 +249,9 @@ void demo_message::serialize_header_flag(data_group_type& group,
                                          uint8_t*& pos)
 {
   // flag field is "DEMOV100"
-  memcpy(reinterpret_cast<char*>(pos), "DEMOV100", header_flag_field_length);
+  memcpy(pos,
+         DATA_MESSAGE_FLAG,
+         header_flag_field_length);
   pos += header_flag_field_length;
 }
 

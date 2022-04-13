@@ -22,8 +22,8 @@ public:
   virtual ~observer() {}
 
 public:
-  virtual void update_positive_keepalive() = 0;
-  virtual void update_missing_positive_keepalive_ack() = 0;
+  virtual void update_send(const buffer_type& buffer) = 0;
+  virtual void update_event() = 0;
 };
 
 /*
@@ -33,29 +33,27 @@ class session_service
 {
 public:
   typedef std::shared_ptr<session_service> pointer_type;
-  typedef std::vector<uint8_t> buffer_type;
 
 public:
   session_service() = default;
   virtual ~session_service() {}
 
 public:
-  virtual buffer_type& serialize_datas(const data_group_type& group) = 0;
-  virtual buffer_type& serialize_keepalive() = 0;
   virtual bool receive(const uint8_t* buffer) = 0;
+  virtual bool send(const data_group_type& group) = 0;
 
 public:
   virtual void register_observer(observer* o) {os_.push_back(o);}
-  virtual void notify_positive_keepalive()
+  virtual void notify_send(const buffer_type& buffer)
   {
     for (auto o : os_) {
-      o->update_positive_keepalive();
+      o->update_send(buffer);
     }
   }
-  virtual void notify_missing_positive_keepalive_ack()
+  virtual void notify_event()
   {
     for (auto o : os_) {
-      o->update_missing_positive_keepalive_ack();
+      o->update_event();
     }
   }
 

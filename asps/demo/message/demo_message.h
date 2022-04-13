@@ -13,7 +13,7 @@
 #include <vector>
 #include <memory>
 #include <arpa/inet.h>
-#include <asps/demo/session/message_service.h>
+#include <asps/demo/sequence/message_service.h>
 
 namespace asps {
 namespace demo {

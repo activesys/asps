@@ -1113,19 +1113,28 @@ TEST_F(demo_client_test, send_datas_of_all_attribute_multiple_packages)
   }
 }
 
-TEST_F(demo_client_test, receive_positive_keepalive_ack)
+TEST_F(demo_client_test, receive_negative_keepalive)
 {
-  server_.expect_length(SIZE_MAX);
+  config::pack_nkeep(0xff, 0x00);
+  server_.expect_length(4);
   server_.start();
   demo_client dc("127.0.0.1", 9901);
   dc.connect();
   EXPECT_TRUE(dc.is_connected());
-  uint8_t expect_buffer_ack[] = {0xff};
+  uint8_t expect_buffer_ack[] = {0x00};
   EXPECT_TRUE(dc.receive(expect_buffer_ack));
-  expect_buffer_ack[0] = 0x3a;
-  EXPECT_FALSE(dc.receive(expect_buffer_ack));
   dc.close();
   server_.wait();
+
+  const std::vector<uint8_t>& buffer = server_.message();
+  const uint8_t expect_buffer[] = {
+    0x4b, 0x41, 0x43, 0x4b // kack flag
+  };
+  // check length
+  EXPECT_EQ(buffer.size(), 4);
+  for (std::size_t i = 0; i < buffer.size(); ++i) {
+    EXPECT_EQ(buffer[i], expect_buffer[i]);
+  }
 }
 
 } // demo_test

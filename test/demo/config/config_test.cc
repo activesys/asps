@@ -25,11 +25,17 @@ TEST(config_test, t1_t2)
   EXPECT_EQ(config::t2(), 78);
 }
 
-TEST(config_test, pack)
+TEST(config_test, pack_nkeep)
 {
+  config::pack_nkeep(0xff, 0x00);
   EXPECT_EQ(config::pack(), 0xff);
-  config::pack(0x6a);
+  EXPECT_EQ(config::nkeep(), 0x00);
+  EXPECT_TRUE(config::pack_nkeep(0x6a, 0xcd));
   EXPECT_EQ(config::pack(), 0x6a);
+  EXPECT_EQ(config::nkeep(), 0xcd);
+  EXPECT_FALSE(config::pack_nkeep(0xaa, 0xaa));
+  EXPECT_EQ(config::pack(), 0x6a);
+  EXPECT_EQ(config::nkeep(), 0xcd);
 }
 
 TEST(config_test, compress_attributes)

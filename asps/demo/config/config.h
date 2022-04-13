@@ -18,6 +18,7 @@ class config
     default_t1 = 30,
     default_t2 = 20,
     default_pack = 0xff,
+    default_nkeep = 0x00,
     default_same_type = false,
     default_key_sequence = false,
     default_same_timestamp = false
@@ -28,7 +29,8 @@ public:
   static uint32_t t2();
   static bool t1_t2(uint32_t t1, uint32_t t2);
   static uint8_t pack();
-  static void pack(uint8_t ack);
+  static uint8_t nkeep();
+  static bool pack_nkeep(uint8_t pack, uint8_t nkeep);
   static bool same_type();
   static void same_type(bool b);
   static bool key_sequence();
@@ -40,6 +42,7 @@ private:
   static uint32_t t1_;
   static uint32_t t2_;
   static uint8_t pack_;
+  static uint8_t nkeep_;
   static bool same_type_;
   static bool key_sequence_;
   static bool same_timestamp_;

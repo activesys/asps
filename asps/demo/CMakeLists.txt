@@ -29,6 +29,8 @@ set(ASPS_DEMO_SOURCES
   utility/timer.cc
   utility/utility.cc
   config/config.cc
+  sequence/sequence.cc
+  sequence/state.cc
 )
 
 ##################################

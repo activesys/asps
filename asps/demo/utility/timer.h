@@ -17,7 +17,7 @@ class timer : public timer_service
 public:
   void start(const std::chrono::seconds& seconds, callback_type callback) override
   {
-    callback();
+    //callback();
   }
 
   void stop() override

@@ -13,6 +13,7 @@ set(ASPS_DEMO_TEST_SOURCES
   message/demo_message_test.cc
   message/keepalive_test.cc
   config/config_test.cc
+  sequence/sequence_test.cc
 )
 
 ##################################
