@@ -10,25 +10,20 @@
 namespace asps {
 namespace demo {
 
-sequence_type get_sequence_type(const uint8_t* buffer)
+sequence_type get_sequence_type(const buffer_type& buffer)
 {
   message_type type = get_message_type(buffer);
 
-  if (type == data_message) {
-    return belong_to_data_sequence;
-  }
-
-  if (type == positive_keepalive_message ||
-      type == positive_keepalive_ack_message) {
+  /*
+   * For the client, only Pack and nkeep are valid data
+   */
+  if (type == positive_keepalive_ack_message) {
     return belong_to_positive_keepalive_sequence;
-  }
-
-  if (type == negative_keepalive_message ||
-      type == negative_keepalive_ack_message) {
+  } else if (type == negative_keepalive_message) {
     return belong_to_negative_keepalive_sequence;
+  } else {
+    return belong_to_invalid_sequence;
   }
-
-  return belong_to_invalid_sequence;
 }
 
 sequence_service::pointer_type
@@ -47,6 +42,12 @@ make_sequence_service(bool positive)
   }
 }
 
+sequence_service::pointer_type
+make_invalid_sequence()
+{
+  return std::make_shared<invalid_sequence>();
+}
+
 data_sequence::data_sequence(const data_group_type& group)
 {
   message_ = make_message_serialization_service(group);
@@ -57,7 +58,7 @@ const buffer_type& data_sequence::request()
   return message_->serialize();
 }
 
-bool data_sequence::response(const uint8_t* buffer)
+bool data_sequence::response(buffer_type& buffer)
 {
   return false;
 }
@@ -65,15 +66,16 @@ bool data_sequence::response(const uint8_t* buffer)
 positive_keepalive_sequence::positive_keepalive_sequence()
   : keepalive_(make_message_serialization_service(true)),
     ack_(make_message_unserialization_service(config::pack())),
-    t2_(make_timer_service()),
+    t2_(make_timer_service(config::t2(),
+                           std::bind(&positive_keepalive_sequence::t2_timeout,
+                                     this))),
     state_(none_state::instance())
 {
 }
 
 void positive_keepalive_sequence::t2_start()
 {
-  t2_->start(std::chrono::seconds(config::t2()),
-             std::bind(&positive_keepalive_sequence::t2_timeout, this));
+  t2_->start();
 }
 
 void positive_keepalive_sequence::t2_stop()
@@ -86,7 +88,7 @@ const buffer_type& positive_keepalive_sequence::serialize()
   return keepalive_->serialize();
 }
 
-bool positive_keepalive_sequence::unserialize(const uint8_t* buffer)
+bool positive_keepalive_sequence::unserialize(buffer_type& buffer)
 {
   return ack_->unserialize(buffer);
 }
@@ -101,7 +103,7 @@ void positive_keepalive_sequence::change_state(state* s)
   state_ = s;
 }
 
-bool positive_keepalive_sequence::response(const uint8_t* buffer)
+bool positive_keepalive_sequence::response(buffer_type& buffer)
 {
   return state_->response(this, buffer);
 }
@@ -122,9 +124,24 @@ const buffer_type& negative_keepalive_sequence::request()
   return ack_->serialize();
 }
 
-bool negative_keepalive_sequence::response(const uint8_t* buffer)
+bool negative_keepalive_sequence::response(buffer_type& buffer)
 {
   return keepalive_->unserialize(buffer);
+}
+
+invalid_sequence::invalid_sequence()
+{
+  message_ = make_invalid_message();
+}
+
+const buffer_type& invalid_sequence::request()
+{
+  return empty_buffer_;
+}
+
+bool invalid_sequence::response(buffer_type& buffer)
+{
+  return message_->unserialize(buffer);
 }
 
 } // demo

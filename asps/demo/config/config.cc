@@ -9,6 +9,7 @@
 namespace asps {
 namespace demo {
 
+uint32_t config::t0_ = config::default_t0;
 uint32_t config::t1_ = config::default_t1;
 uint32_t config::t2_ = config::default_t2;
 uint8_t config::pack_ = config::default_pack;
@@ -16,6 +17,19 @@ uint8_t config::nkeep_ = config::default_nkeep;
 bool config::same_type_ = config::default_same_type;
 bool config::key_sequence_ = config::default_key_sequence;
 bool config::same_timestamp_ = config::default_same_timestamp;
+std::size_t config::read_buffer_size_ = config::default_read_buffer_size;
+uint16_t config::port_ = 9990;
+std::string config::ip_("127.0.0.1");
+
+uint32_t config::t0()
+{
+  return config::t0_;
+}
+
+void config::t0(uint32_t t)
+{
+  config::t0_ = t;
+}
 
 uint32_t config::t1()
 {
@@ -84,6 +98,30 @@ bool config::same_timestamp()
 void config::same_timestamp(bool b)
 {
   config::same_timestamp_ = b;
+}
+
+uint16_t config::port()
+{
+  return config::port_;
+}
+const std::string& config::ip()
+{
+  return config::ip_;
+}
+void config::address(const std::string& ip, uint16_t port)
+{
+  config::ip_ = ip;
+  config::port_ = port;
+}
+
+std::size_t config::read_buffer_size()
+{
+  return config::read_buffer_size_;
+}
+
+void config::read_buffer_size(std::size_t size)
+{
+  config::read_buffer_size_ = size;
 }
 
 } // demo

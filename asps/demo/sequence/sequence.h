@@ -8,7 +8,7 @@
 #define ASPS_DEMO_SEQUENCE_SEQUENCE_H
 
 #include <asps/demo/semantic/demo_data.h>
-#include <asps/demo/session/timer_service.h>
+#include <asps/demo/utility/timer_service.h>
 #include <asps/demo/session/sequence_service.h>
 #include <asps/demo/sequence/message_service.h>
 #include <asps/demo/sequence/state.h>
@@ -24,7 +24,7 @@ public:
 
 public:
   const buffer_type& request() override;
-  bool response(const uint8_t* buffer) override;
+  bool response(buffer_type& buffer) override;
 
 private:
   message_serialization_service::pointer_type message_;
@@ -38,18 +38,17 @@ public:
 
 public:
   const buffer_type& request() override;
-  bool response(const uint8_t* buffer) override;
+  bool response(buffer_type& buffer) override;
 
 public:
   const buffer_type& serialize();
-  bool unserialize(const uint8_t* buffer);
+  bool unserialize(buffer_type& buffer);
   void t2_timeout();
   void t2_start();
   void t2_stop();
   void change_state(state* s);
 
 private:
-  friend class state;
   state* state_;
 
 private:
@@ -66,11 +65,26 @@ public:
 
 public:
   const buffer_type& request() override;
-  bool response(const uint8_t* buffer) override;
+  bool response(buffer_type& buffer) override;
 
 private:
   message_unserialization_service::pointer_type keepalive_;
   message_serialization_service::pointer_type ack_;
+};
+
+class invalid_sequence : public sequence_service
+{
+public:
+  invalid_sequence();
+  virtual ~invalid_sequence() {}
+
+public:
+  const buffer_type& request() override;
+  bool response(buffer_type& buffer) override;
+
+private:
+  buffer_type empty_buffer_;
+  message_unserialization_service::pointer_type message_;
 };
 
 } // demo

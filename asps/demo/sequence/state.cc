@@ -20,15 +20,14 @@ const buffer_type& none_state::request(positive_keepalive_sequence* seq)
 }
 
 bool none_state::response(positive_keepalive_sequence* seq,
-                          const uint8_t* buffer)
+                          buffer_type& buffer)
 {
-  return false;
+  return seq->unserialize(buffer);
 }
 
 void none_state::timeout(positive_keepalive_sequence* seq)
 {
 }
-
 
 state* keepalive_sent_state::instance_ = nullptr;
 
@@ -38,7 +37,7 @@ const buffer_type& keepalive_sent_state::request(positive_keepalive_sequence* se
 }
 
 bool keepalive_sent_state::response(positive_keepalive_sequence* seq,
-                                    const uint8_t* buffer)
+                                    buffer_type& buffer)
 {
   seq->change_state(none_state::instance());
   seq->t2_stop();

@@ -33,7 +33,7 @@ TEST(positive_keepalive_ack, unserialize)
 {
   config::pack_nkeep(0x8c, 0x00);
   positive_keepalive_ack pkaa;
-  uint8_t expect_buffer[] = {
+  std::vector<uint8_t> expect_buffer{
     0x8c // ack flag
   };
 
@@ -46,7 +46,7 @@ TEST(negative_keepalive, unserialize)
 {
   config::pack_nkeep(0xff, 0x6b);
   negative_keepalive nka;
-  uint8_t expect_buffer[] = {
+  std::vector<uint8_t> expect_buffer{
     0x6b // ack flag
   };
 

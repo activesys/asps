@@ -8,6 +8,7 @@
 #define ASPS_DEMO_CONFIG_CONFIG_H
 
 #include <cstdint>
+#include <string>
 
 namespace asps {
 namespace demo {
@@ -15,16 +16,20 @@ namespace demo {
 class config
 {
   enum default_value {
+    default_t0 = 30,
     default_t1 = 30,
     default_t2 = 20,
     default_pack = 0xff,
     default_nkeep = 0x00,
     default_same_type = false,
     default_key_sequence = false,
-    default_same_timestamp = false
+    default_same_timestamp = false,
+    default_read_buffer_size = 65536
   };
 
 public:
+  static uint32_t t0();
+  static void t0(uint32_t t);
   static uint32_t t1();
   static uint32_t t2();
   static bool t1_t2(uint32_t t1, uint32_t t2);
@@ -37,8 +42,14 @@ public:
   static void key_sequence(bool b);
   static bool same_timestamp();
   static void same_timestamp(bool b);
+  static uint16_t port();
+  static const std::string& ip();
+  static void address(const std::string& ip, uint16_t port);
+  static std::size_t read_buffer_size();
+  static void read_buffer_size(std::size_t size);
 
 private:
+  static uint32_t t0_;
   static uint32_t t1_;
   static uint32_t t2_;
   static uint8_t pack_;
@@ -46,6 +57,9 @@ private:
   static bool same_type_;
   static bool key_sequence_;
   static bool same_timestamp_;
+  static std::string ip_;
+  static uint16_t port_;
+  static std::size_t read_buffer_size_;
 };
 
 } // demo

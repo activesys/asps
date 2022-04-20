@@ -14,10 +14,11 @@ namespace demo {
 demo_session::demo_session()
   : session_service(),
     pkeep_seq_(make_sequence_service(true)),
-    t1_(make_timer_service())
+    t1_(make_timer_service(config::t1(),
+                           std::bind(&demo_session::t1_timeout, this)))
 {
-  t1_->start(std::chrono::seconds(config::t1()),
-             std::bind(&demo_session::t1_timeout, this));
+  t1_->start();
+  pkeep_seq_->register_observer(this);
 }
 
 demo_session::~demo_session()
@@ -35,7 +36,12 @@ bool demo_session::send(const data_group_type& group)
   return true;
 }
 
-bool demo_session::receive(const uint8_t* buffer)
+void demo_session::receive(buffer_type& buffer)
+{
+  while (receive_one_package(buffer));
+}
+
+bool demo_session::receive_one_package(buffer_type& buffer)
 {
   sequence_type type = get_sequence_type(buffer);
 
@@ -57,7 +63,8 @@ bool demo_session::receive(const uint8_t* buffer)
 
   } else {
 
-    return false;
+    sequence_service::pointer_type seq = make_invalid_sequence();
+    return seq->response(buffer);
 
   }
 }

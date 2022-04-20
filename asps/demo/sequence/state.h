@@ -22,7 +22,7 @@ public:
 public:
   virtual const buffer_type& request(positive_keepalive_sequence* seq) = 0;
   virtual bool response(positive_keepalive_sequence* seq,
-                        const uint8_t* buffer) = 0;
+                        buffer_type& buffer) = 0;
   virtual void timeout(positive_keepalive_sequence* seq) = 0;
 };
 
@@ -34,7 +34,7 @@ private:
 public:
   virtual const buffer_type& request(positive_keepalive_sequence* seq) override;
   virtual bool response(positive_keepalive_sequence* seq,
-                        const uint8_t* buffer) override;
+                        buffer_type& buffer) override;
   virtual void timeout(positive_keepalive_sequence* seq) override;
 
 public:
@@ -59,7 +59,7 @@ private:
 public:
   virtual const buffer_type& request(positive_keepalive_sequence* seq) override;
   virtual bool response(positive_keepalive_sequence* seq,
-                        const uint8_t* buffer) override;
+                        buffer_type& buffer) override;
   virtual void timeout(positive_keepalive_sequence* seq) override;
 
 public:

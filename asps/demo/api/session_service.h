@@ -39,7 +39,7 @@ public:
   virtual ~session_service() {}
 
 public:
-  virtual bool receive(const uint8_t* buffer) = 0;
+  virtual void receive(buffer_type& buffer) = 0;
   virtual bool send(const data_group_type& group) = 0;
 
 public:

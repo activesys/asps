@@ -13,35 +13,40 @@
 namespace asps {
 namespace demo {
 
-message_type get_message_type(const uint8_t* buffer)
+message_type get_message_type(const buffer_type& buffer)
 {
-  if (buffer == nullptr) {
+  std::size_t length = 0;
+
+  if (buffer.empty()) {
     return invalid_message;
   }
 
-  if (memcmp(buffer,
+  length = std::min(sizeof(DATA_MESSAGE_FLAG), buffer.size());
+  if (memcmp(buffer.data(),
              DATA_MESSAGE_FLAG,
-             sizeof(DATA_MESSAGE_FLAG)) == 0) {
+             length) == 0) {
     return data_message;
   }
 
-  if (memcmp(buffer,
+  length = std::min(sizeof(POSITIVE_KEEPALIVE_MESSAGE_FLAG), buffer.size());
+  if (memcmp(buffer.data(),
              POSITIVE_KEEPALIVE_MESSAGE_FLAG,
-             sizeof(POSITIVE_KEEPALIVE_MESSAGE_FLAG)) == 0) {
+             length) == 0) {
     return positive_keepalive_message;
   }
 
-  if (*buffer == config::pack()) {
+  if (buffer[0] == config::pack()) {
     return positive_keepalive_ack_message;
   }
 
-  if (*buffer == config::nkeep()) {
+  if (buffer[0] == config::nkeep()) {
     return negative_keepalive_message;
   }
 
-  if (memcmp(buffer,
+  length = std::min(sizeof(NEGATIVE_KEEPALIVE_ACK_MESSAGE_FLAG), buffer.size());
+  if (memcmp(buffer.data(),
              NEGATIVE_KEEPALIVE_ACK_MESSAGE_FLAG,
-             sizeof(NEGATIVE_KEEPALIVE_ACK_MESSAGE_FLAG)) == 0) {
+             length) == 0) {
     return negative_keepalive_ack_message;
   }
 
@@ -71,6 +76,11 @@ make_message_unserialization_service(bool positive)
   } else {
     return std::make_shared<negative_keepalive>();
   }
+}
+message_unserialization_service::pointer_type
+make_invalid_message()
+{
+  return std::make_shared<invalid_unserialization_message>();
 }
 
 const buffer_type& demo_message::serialize()

@@ -28,6 +28,7 @@ set(ASPS_DEMO_SOURCES
   message/demo_message.cc
   utility/timer.cc
   utility/utility.cc
+  utility/transport.cc
   config/config.cc
   sequence/sequence.cc
   sequence/state.cc

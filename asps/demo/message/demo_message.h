@@ -95,9 +95,23 @@ private:
    void serialize_data_timestamp(demo_data::pointer_type& data, uint8_t*& pos);
    void serialize_data_value(demo_data::pointer_type& data, uint8_t*& pos);
 
-protected:
+private:
   data_groups_type datas_;
   buffer_type buffer_;
+};
+
+class invalid_unserialization_message : public message_unserialization_service
+{
+public:
+  bool unserialize(buffer_type& buffer) override
+  {
+    if (!buffer.empty()) {
+      buffer.erase(buffer.begin());
+      return true;
+    } else {
+      return false;
+    }
+  }
 };
 
 } // demo

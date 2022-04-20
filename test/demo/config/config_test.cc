@@ -13,8 +13,11 @@ namespace demo_test {
 
 using namespace asps::demo;
 
-TEST(config_test, t1_t2)
+TEST(config_test, t0_t1_t2)
 {
+  config::t0(80);
+  EXPECT_EQ(config::t0(), 80);
+  config::t1_t2(30, 20);
   EXPECT_EQ(config::t1(), 30);
   EXPECT_EQ(config::t2(), 20);
   EXPECT_TRUE(config::t1_t2(100, 78));
@@ -52,6 +55,13 @@ TEST(config_test, compress_attributes)
   EXPECT_FALSE(config::same_timestamp());
   config::same_timestamp(true);
   EXPECT_TRUE(config::same_timestamp());
+}
+
+TEST(config_test, address)
+{
+  config::address("192.168.1.13", 9876);
+  EXPECT_EQ(config::ip(), "192.168.1.13");
+  EXPECT_EQ(config::port(), 9876);
 }
 
 } // demo_test

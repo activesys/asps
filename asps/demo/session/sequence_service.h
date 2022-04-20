@@ -23,7 +23,7 @@ enum sequence_type
   belong_to_invalid_sequence
 };
 
-sequence_type get_sequence_type(const uint8_t* buffer);
+sequence_type get_sequence_type(const buffer_type& buffer);
 
 class sequence_observer
 {
@@ -45,7 +45,7 @@ public:
 
 public:
   virtual const buffer_type& request() = 0;
-  virtual bool response(const uint8_t* buffer) = 0;
+  virtual bool response(buffer_type& buffer) = 0;
 
 public:
   virtual void register_observer(sequence_observer* o) {sos_.push_back(o);}
@@ -64,6 +64,8 @@ sequence_service::pointer_type
 make_sequence_service(const data_group_type& type);
 sequence_service::pointer_type
 make_sequence_service(bool positive);
+sequence_service::pointer_type
+make_invalid_sequence();
 
 } // demo
 } // asps

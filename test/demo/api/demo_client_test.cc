@@ -8,6 +8,8 @@
 #include <list>
 #include <vector>
 #include <deque>
+#include <thread>
+#include <chrono>
 #include <gtest/gtest.h>
 #include <asps/demo/demo.h>
 #include <boost/asio.hpp>
@@ -31,43 +33,67 @@ protected:
 };
 
 // Test demo client
-TEST_F(demo_client_test, network_connect)
+TEST_F(demo_client_test, network_connect_success)
 {
-  server_.start(false);
-  // The Demo client needs to know the address and port of the server
-  demo_client dct("127.0.0.1", 9901);
-  EXPECT_TRUE(dct.connect());
-  EXPECT_TRUE(dct.is_connected());
-  dct.close();
-  EXPECT_FALSE(dct.is_connected());
+  class connect_success_client : public demo_client
+  {
+  public:
+    void on_connect(bool success) {EXPECT_TRUE(success);stop();}
+    void on_write(bool success, std::size_t bytes) {}
+  };
 
-  demo_client dcf("127.0.0.1", 9902);
-  EXPECT_FALSE(dcf.connect());
-  EXPECT_FALSE(dcf.is_connected());
+  server_.start(false);
+  config::address("127.0.0.1", 9901);
+  connect_success_client c;
+  c.run();
+  server_.wait();
+}
+
+TEST_F(demo_client_test, network_connect_fail)
+{
+  class connect_fail_client : public demo_client
+  {
+  public:
+    void on_connect(bool success) {EXPECT_FALSE(success);stop();}
+    void on_write(bool success, std::size_t bytes) {}
+  };
+
+  config::address("127.0.0.1", 9902);
+  connect_fail_client c;
   data_group_type p{
     make_demo_data<uint64_t>(1234, 1154789657886957455, 1647761782000)
   };
-  EXPECT_FALSE(dcf.send(p));
-
-  server_.wait();
+  EXPECT_FALSE(c.send(p));
+  c.run();
 }
 
 TEST_F(demo_client_test, send_data_of_uint64_type)
 {
-  server_.start();
+  class connect_success_client : public demo_client
+  {
+  public:
+    void on_connect(bool success) {
+      EXPECT_TRUE(success);
+      data_group_type p{
+        make_demo_data<uint64_t>(1234, 1154789657886957455, 1647761782000)
+      };
+      EXPECT_TRUE(send(p));
+    }
+    void on_write(bool success, std::size_t bytes)
+    {
+      EXPECT_TRUE(success);
+      EXPECT_EQ(bytes, 34);
+      stop();
+    }
+  };
 
-  demo_client dc("127.0.0.1", 9901);
-  dc.connect();
-  EXPECT_TRUE(dc.is_connected());
+  server_.start();
+  config::address("127.0.0.1", 9901);
+  connect_success_client c;
   config::same_type(false);
   config::key_sequence(false);
   config::same_timestamp(false);
-
-  data_group_type p{
-    make_demo_data<uint64_t>(1234, 1154789657886957455, 1647761782000)
-  };
-  EXPECT_TRUE(dc.send(p));
-  dc.close();
+  c.run();
   server_.wait();
 
   const std::vector<uint8_t>& buffer = server_.message();
@@ -84,7 +110,8 @@ TEST_F(demo_client_test, send_data_of_uint64_type)
     0x00, 0x00, 0x01, 0x7f, 0xa6, 0x41, 0x74, 0xf0, // data timestamp
     0x10, 0x06, 0xa3, 0x13, 0x54, 0xa5, 0x9f, 0x8f // data value
   };
-  // check length
+
+  // check
   EXPECT_EQ(buffer.size(), 34);
   for (std::size_t i = 0; i < buffer.size(); ++i) {
     EXPECT_EQ(buffer[i], expect_buffer[i]);
@@ -93,20 +120,31 @@ TEST_F(demo_client_test, send_data_of_uint64_type)
 
 TEST_F(demo_client_test, send_data_of_int32_type)
 {
-  server_.start();
+  class connect_success_client : public demo_client
+  {
+  public:
+    void on_connect(bool success) {
+      EXPECT_TRUE(success);
+      data_group_type p{
+        make_demo_data<int32_t>(1234, 9876, 1647761782000)
+      };
+      EXPECT_TRUE(send(p));
+    }
+    void on_write(bool success, std::size_t bytes)
+    {
+      EXPECT_TRUE(success);
+      EXPECT_EQ(bytes, 30);
+      stop();
+    }
+  };
 
-  demo_client dc("127.0.0.1", 9901);
-  dc.connect();
-  EXPECT_TRUE(dc.is_connected());
+  server_.start();
+  config::address("127.0.0.1", 9901);
+  connect_success_client c;
   config::same_type(false);
   config::key_sequence(false);
   config::same_timestamp(false);
-
-  data_group_type p{
-    make_demo_data<int32_t>(1234, 9876, 1647761782000)
-  };
-  EXPECT_TRUE(dc.send(p));
-  dc.close();
+  c.run();
   server_.wait();
 
   const std::vector<uint8_t>& buffer = server_.message();
@@ -123,7 +161,7 @@ TEST_F(demo_client_test, send_data_of_int32_type)
     0x00, 0x00, 0x01, 0x7f, 0xa6, 0x41, 0x74, 0xf0, // data timestamp
     0x00, 0x00, 0x26, 0x94 // data value
   };
-  // check length
+  // check
   EXPECT_EQ(buffer.size(), 30);
   for (std::size_t i = 0; i < buffer.size(); ++i) {
     EXPECT_EQ(buffer[i], expect_buffer[i]);
@@ -132,20 +170,31 @@ TEST_F(demo_client_test, send_data_of_int32_type)
 
 TEST_F(demo_client_test, send_data_of_uint16_type)
 {
-  server_.start();
+  class connect_success_client : public demo_client
+  {
+  public:
+    void on_connect(bool success) {
+      EXPECT_TRUE(success);
+      data_group_type p{
+        make_demo_data<uint16_t>(1234, 9876, 1647761782000)
+      };
+      EXPECT_TRUE(send(p));
+    }
+    void on_write(bool success, std::size_t bytes)
+    {
+      EXPECT_TRUE(success);
+      EXPECT_EQ(bytes, 28);
+      stop();
+    }
+  };
 
-  demo_client dc("127.0.0.1", 9901);
-  dc.connect();
-  EXPECT_TRUE(dc.is_connected());
+  server_.start();
+  config::address("127.0.0.1", 9901);
+  connect_success_client c;
   config::same_type(false);
   config::key_sequence(false);
   config::same_timestamp(false);
-
-  data_group_type p{
-    make_demo_data<uint16_t>(1234, 9876, 1647761782000)
-  };
-  EXPECT_TRUE(dc.send(p));
-  dc.close();
+  c.run();
   server_.wait();
 
   const std::vector<uint8_t>& buffer = server_.message();
@@ -162,7 +211,7 @@ TEST_F(demo_client_test, send_data_of_uint16_type)
     0x00, 0x00, 0x01, 0x7f, 0xa6, 0x41, 0x74, 0xf0, // data timestamp
     0x26, 0x94 // data value
   };
-  // check length
+  // check
   EXPECT_EQ(buffer.size(), 28);
   for (std::size_t i = 0; i < buffer.size(); ++i) {
     EXPECT_EQ(buffer[i], expect_buffer[i]);
@@ -171,20 +220,31 @@ TEST_F(demo_client_test, send_data_of_uint16_type)
 
 TEST_F(demo_client_test, send_data_of_uint8_type)
 {
-  server_.start();
+  class connect_success_client : public demo_client
+  {
+  public:
+    void on_connect(bool success) {
+      EXPECT_TRUE(success);
+      data_group_type p{
+        make_demo_data<uint8_t>(1234, 255, 1647761782000)
+      };
+      EXPECT_TRUE(send(p));
+    }
+    void on_write(bool success, std::size_t bytes)
+    {
+      EXPECT_TRUE(success);
+      EXPECT_EQ(bytes, 27);
+      stop();
+    }
+  };
 
-  demo_client dc("127.0.0.1", 9901);
-  dc.connect();
-  EXPECT_TRUE(dc.is_connected());
+  server_.start();
+  config::address("127.0.0.1", 9901);
+  connect_success_client c;
   config::same_type(false);
   config::key_sequence(false);
   config::same_timestamp(false);
-
-  data_group_type p{
-    make_demo_data<uint8_t>(1234, 255, 1647761782000)
-  };
-  EXPECT_TRUE(dc.send(p));
-  dc.close();
+  c.run();
   server_.wait();
 
   const std::vector<uint8_t>& buffer = server_.message();
@@ -201,7 +261,7 @@ TEST_F(demo_client_test, send_data_of_uint8_type)
     0x00, 0x00, 0x01, 0x7f, 0xa6, 0x41, 0x74, 0xf0, // data timestamp
     0xff // data value
   };
-  // check length
+  // check
   EXPECT_EQ(buffer.size(), 27);
   for (std::size_t i = 0; i < buffer.size(); ++i) {
     EXPECT_EQ(buffer[i], expect_buffer[i]);
@@ -210,20 +270,31 @@ TEST_F(demo_client_test, send_data_of_uint8_type)
 
 TEST_F(demo_client_test, send_data_of_bool_type)
 {
-  server_.start();
+  class connect_success_client : public demo_client
+  {
+  public:
+    void on_connect(bool success) {
+      EXPECT_TRUE(success);
+      data_group_type p{
+        make_demo_data<bool>(1234, false, 1647761782000)
+      };
+      EXPECT_TRUE(send(p));
+    }
+    void on_write(bool success, std::size_t bytes)
+    {
+      EXPECT_TRUE(success);
+      EXPECT_EQ(bytes, 27);
+      stop();
+    }
+  };
 
-  demo_client dc("127.0.0.1", 9901);
-  dc.connect();
-  EXPECT_TRUE(dc.is_connected());
+  server_.start();
+  config::address("127.0.0.1", 9901);
+  connect_success_client c;
   config::same_type(false);
   config::key_sequence(false);
   config::same_timestamp(false);
-
-  data_group_type p{
-    make_demo_data<bool>(1234, false, 1647761782000)
-  };
-  EXPECT_TRUE(dc.send(p));
-  dc.close();
+  c.run();
   server_.wait();
 
   const std::vector<uint8_t>& buffer = server_.message();
@@ -240,7 +311,7 @@ TEST_F(demo_client_test, send_data_of_bool_type)
     0x00, 0x00, 0x01, 0x7f, 0xa6, 0x41, 0x74, 0xf0, // data timestamp
     0x00 // data value
   };
-  // check length
+  // check
   EXPECT_EQ(buffer.size(), 27);
   for (std::size_t i = 0; i < buffer.size(); ++i) {
     EXPECT_EQ(buffer[i], expect_buffer[i]);
@@ -249,23 +320,34 @@ TEST_F(demo_client_test, send_data_of_bool_type)
 
 TEST_F(demo_client_test, send_datas_of_int32_type)
 {
-  server_.start();
+  class connect_success_client : public demo_client
+  {
+  public:
+    void on_connect(bool success) {
+      EXPECT_TRUE(success);
+      data_group_type p{
+        make_demo_data<int32_t>(1000, 9000, 1648363193268),
+        make_demo_data<int32_t>(1001, 9001, 1648363193268),
+        make_demo_data<int32_t>(1002, 9002, 1648363193268),
+        make_demo_data<int32_t>(1003, 9003, 1648363193268)
+      };
+      EXPECT_TRUE(send(p));
+    }
+    void on_write(bool success, std::size_t bytes)
+    {
+      EXPECT_TRUE(success);
+      EXPECT_EQ(bytes, 81);
+      stop();
+    }
+  };
 
-  demo_client dc("127.0.0.1", 9901);
-  dc.connect();
-  EXPECT_TRUE(dc.is_connected());
+  server_.start();
+  config::address("127.0.0.1", 9901);
+  connect_success_client c;
   config::same_type(false);
   config::key_sequence(false);
   config::same_timestamp(false);
-
-  data_group_type ds{
-    make_demo_data<int32_t>(1000, 9000, 1648363193268),
-    make_demo_data<int32_t>(1001, 9001, 1648363193268),
-    make_demo_data<int32_t>(1002, 9002, 1648363193268),
-    make_demo_data<int32_t>(1003, 9003, 1648363193268)
-  };
-  EXPECT_TRUE(dc.send(ds));
-  dc.close();
+  c.run();
   server_.wait();
 
   const std::vector<uint8_t>& buffer = server_.message();
@@ -297,7 +379,7 @@ TEST_F(demo_client_test, send_datas_of_int32_type)
     0x00, 0x00, 0x01, 0x7f, 0xca, 0x1a, 0x43, 0xb4, // data timestamp
     0x00, 0x00, 0x23, 0x2b // data value
   };
-  // check length
+  // check
   EXPECT_EQ(buffer.size(), 81);
   for (std::size_t i = 0; i < buffer.size(); ++i) {
     EXPECT_EQ(buffer[i], expect_buffer[i]);
@@ -306,23 +388,34 @@ TEST_F(demo_client_test, send_datas_of_int32_type)
 
 TEST_F(demo_client_test, send_datas_of_multiple_types)
 {
-  server_.start();
+  class connect_success_client : public demo_client
+  {
+  public:
+    void on_connect(bool success) {
+      EXPECT_TRUE(success);
+      data_group_type p{
+        make_demo_data<int32_t>(1000, 9000, 1648363193268),
+        make_demo_data<uint32_t>(1001, 9001, 1648363193268),
+        make_demo_data<int16_t>(1002, 9002, 1648363193268),
+        make_demo_data<uint16_t>(1003, 9003, 1648363193268)
+      };
+      EXPECT_TRUE(send(p));
+    }
+    void on_write(bool success, std::size_t bytes)
+    {
+      EXPECT_TRUE(success);
+      EXPECT_EQ(bytes, 77);
+      stop();
+    }
+  };
 
-  demo_client dc("127.0.0.1", 9901);
-  dc.connect();
-  EXPECT_TRUE(dc.is_connected());
+  server_.start();
+  config::address("127.0.0.1", 9901);
+  connect_success_client c;
   config::same_type(false);
   config::key_sequence(false);
   config::same_timestamp(false);
-
-  data_group_type ds{
-    make_demo_data<int32_t>(1000, 9000, 1648363193268),
-    make_demo_data<uint32_t>(1001, 9001, 1648363193268),
-    make_demo_data<int16_t>(1002, 9002, 1648363193268),
-    make_demo_data<uint16_t>(1003, 9003, 1648363193268)
-  };
-  EXPECT_TRUE(dc.send(ds));
-  dc.close();
+  c.run();
   server_.wait();
 
   const std::vector<uint8_t>& buffer = server_.message();
@@ -354,7 +447,7 @@ TEST_F(demo_client_test, send_datas_of_multiple_types)
     0x00, 0x00, 0x01, 0x7f, 0xca, 0x1a, 0x43, 0xb4, // data timestamp
     0x23, 0x2b // data value
   };
-  // check length
+  // check
   EXPECT_EQ(buffer.size(), 77);
   for (std::size_t i = 0; i < buffer.size(); ++i) {
     EXPECT_EQ(buffer[i], expect_buffer[i]);
@@ -363,24 +456,35 @@ TEST_F(demo_client_test, send_datas_of_multiple_types)
 
 TEST_F(demo_client_test, send_datas_of_same_type)
 {
-  server_.start();
+  class connect_success_client : public demo_client
+  {
+  public:
+    void on_connect(bool success) {
+      EXPECT_TRUE(success);
+      data_group_type p{
+        make_demo_data<int32_t>(1000, 9000, 1648363193268),
+        make_demo_data<int32_t>(1002, 9001, 1648363193268),
+        make_demo_data<int32_t>(1004, 9002, 1648363193268),
+        make_demo_data<int32_t>(1006, 9003, 1648363193268)
+      };
+      EXPECT_TRUE(send(p));
+    }
+    void on_write(bool success, std::size_t bytes)
+    {
+      EXPECT_TRUE(success);
+      EXPECT_EQ(bytes, 78);
+      stop();
+    }
+  };
 
-  demo_client dc("127.0.0.1", 9901);
-  dc.connect();
-  EXPECT_TRUE(dc.is_connected());
+  server_.start();
+  config::address("127.0.0.1", 9901);
+  connect_success_client c;
   config::same_type(false);
   config::key_sequence(false);
   config::same_timestamp(false);
   config::same_type(true);
-
-  data_group_type ds{
-    make_demo_data<int32_t>(1000, 9000, 1648363193268),
-    make_demo_data<int32_t>(1002, 9001, 1648363193268),
-    make_demo_data<int32_t>(1004, 9002, 1648363193268),
-    make_demo_data<int32_t>(1006, 9003, 1648363193268)
-  };
-  EXPECT_TRUE(dc.send(ds));
-  dc.close();
+  c.run();
   server_.wait();
 
   const std::vector<uint8_t>& buffer = server_.message();
@@ -409,7 +513,7 @@ TEST_F(demo_client_test, send_datas_of_same_type)
     0x00, 0x00, 0x01, 0x7f, 0xca, 0x1a, 0x43, 0xb4, // data timestamp
     0x00, 0x00, 0x23, 0x2b // data value
   };
-  // check length
+  // check
   EXPECT_EQ(buffer.size(), 78);
   for (std::size_t i = 0; i < buffer.size(); ++i) {
     EXPECT_EQ(buffer[i], expect_buffer[i]);
@@ -418,29 +522,40 @@ TEST_F(demo_client_test, send_datas_of_same_type)
 
 TEST_F(demo_client_test, send_datas_of_multiple_packages_containing_same_type)
 {
+  class connect_success_client : public demo_client
+  {
+  public:
+    void on_connect(bool success) {
+      EXPECT_TRUE(success);
+      data_group_type p{
+        make_demo_data<int32_t>(1000, 9000, 1648363193268),
+        make_demo_data<int32_t>(1002, 9001, 1648363193268),
+        make_demo_data<int32_t>(1004, 9002, 1648363193268),
+        make_demo_data<uint32_t>(1000, 9000, 1648363193268),
+        make_demo_data<uint32_t>(1002, 9001, 1648363193268),
+        make_demo_data<int32_t>(1006, 9003, 1648363193268),
+        make_demo_data<uint16_t>(1004, 9002, 1648363193268),
+        make_demo_data<uint32_t>(1006, 9003, 1648363193268)
+      };
+      EXPECT_TRUE(send(p));
+    }
+    void on_write(bool success, std::size_t bytes)
+    {
+      EXPECT_TRUE(success);
+      EXPECT_EQ(bytes, 168);
+      stop();
+    }
+  };
+
   server_.expect_length(168);
   server_.start();
-
-  demo_client dc("127.0.0.1", 9901);
-  dc.connect();
-  EXPECT_TRUE(dc.is_connected());
+  config::address("127.0.0.1", 9901);
+  connect_success_client c;
   config::same_type(false);
   config::key_sequence(false);
   config::same_timestamp(false);
   config::same_type(true);
-
-  data_group_type ds{
-    make_demo_data<int32_t>(1000, 9000, 1648363193268),
-    make_demo_data<int32_t>(1002, 9001, 1648363193268),
-    make_demo_data<int32_t>(1004, 9002, 1648363193268),
-    make_demo_data<uint32_t>(1000, 9000, 1648363193268),
-    make_demo_data<uint32_t>(1002, 9001, 1648363193268),
-    make_demo_data<int32_t>(1006, 9003, 1648363193268),
-    make_demo_data<uint16_t>(1004, 9002, 1648363193268),
-    make_demo_data<uint32_t>(1006, 9003, 1648363193268)
-  };
-  EXPECT_TRUE(dc.send(ds));
-  dc.close();
+  c.run();
   server_.wait();
 
   const std::vector<uint8_t>& buffer = server_.message();
@@ -502,7 +617,7 @@ TEST_F(demo_client_test, send_datas_of_multiple_packages_containing_same_type)
     0x00, 0x00, 0x01, 0x7f, 0xca, 0x1a, 0x43, 0xb4, // data timestamp
     0x00, 0x00, 0x23, 0x2b // data value
   };
-  // check length
+  // check
   EXPECT_EQ(buffer.size(), 168);
   for (std::size_t i = 0; i < buffer.size(); ++i) {
     EXPECT_EQ(buffer[i], expect_buffer[i]);
@@ -511,24 +626,35 @@ TEST_F(demo_client_test, send_datas_of_multiple_packages_containing_same_type)
 
 TEST_F(demo_client_test, send_datas_of_same_timestamp)
 {
-  server_.start();
+  class connect_success_client : public demo_client
+  {
+  public:
+    void on_connect(bool success) {
+      EXPECT_TRUE(success);
+      data_group_type p{
+        make_demo_data<int32_t>(1000, 9000, 1648363193268),
+        make_demo_data<uint32_t>(1002, 9001, 1648363193268),
+        make_demo_data<int16_t>(1004, 9002, 1648363193268),
+        make_demo_data<uint16_t>(1006, 9003, 1648363193268)
+      };
+      EXPECT_TRUE(send(p));
+    }
+    void on_write(bool success, std::size_t bytes)
+    {
+      EXPECT_TRUE(success);
+      EXPECT_EQ(bytes, 53);
+      stop();
+    }
+  };
 
-  demo_client dc("127.0.0.1", 9901);
-  dc.connect();
-  EXPECT_TRUE(dc.is_connected());
+  server_.start();
+  config::address("127.0.0.1", 9901);
+  connect_success_client c;
   config::same_type(false);
   config::key_sequence(false);
   config::same_timestamp(false);
   config::same_timestamp(true);
-
-  data_group_type ds{
-    make_demo_data<int32_t>(1000, 9000, 1648363193268),
-    make_demo_data<uint32_t>(1002, 9001, 1648363193268),
-    make_demo_data<int16_t>(1004, 9002, 1648363193268),
-    make_demo_data<uint16_t>(1006, 9003, 1648363193268)
-  };
-  EXPECT_TRUE(dc.send(ds));
-  dc.close();
+  c.run();
   server_.wait();
 
   const std::vector<uint8_t>& buffer = server_.message();
@@ -557,7 +683,7 @@ TEST_F(demo_client_test, send_datas_of_same_timestamp)
     0x00, 0x00, 0x03, 0xee, // data key
     0x23, 0x2b // data value
   };
-  // check length
+  // check
   EXPECT_EQ(buffer.size(), 53);
   for (std::size_t i = 0; i < buffer.size(); ++i) {
     EXPECT_EQ(buffer[i], expect_buffer[i]);
@@ -566,29 +692,40 @@ TEST_F(demo_client_test, send_datas_of_same_timestamp)
 
 TEST_F(demo_client_test, send_datas_of_multiple_packages_containing_same_timestamp)
 {
+  class connect_success_client : public demo_client
+  {
+  public:
+    void on_connect(bool success) {
+      EXPECT_TRUE(success);
+      data_group_type p{
+        make_demo_data<int32_t>(1000, 9000, 1648363193268),
+        make_demo_data<uint32_t>(1002, 9001, 1648363193268),
+        make_demo_data<int32_t>(1000, 9000, 1648363193270),
+        make_demo_data<uint32_t>(1002, 9001, 1648363193270),
+        make_demo_data<int16_t>(1004, 9002, 1648363193268),
+        make_demo_data<uint16_t>(1006, 9003, 1648363193268),
+        make_demo_data<int16_t>(1004, 9002, 1648363193270),
+        make_demo_data<uint16_t>(1006, 9003, 1648363193270)
+      };
+      EXPECT_TRUE(send(p));
+    }
+    void on_write(bool success, std::size_t bytes)
+    {
+      EXPECT_TRUE(success);
+      EXPECT_EQ(bytes, 106);
+      stop();
+    }
+  };
+
   server_.expect_length(106);
   server_.start();
-
-  demo_client dc("127.0.0.1", 9901);
-  dc.connect();
-  EXPECT_TRUE(dc.is_connected());
+  config::address("127.0.0.1", 9901);
+  connect_success_client c;
   config::same_type(false);
   config::key_sequence(false);
   config::same_timestamp(false);
   config::same_timestamp(true);
-
-  data_group_type ds{
-    make_demo_data<int32_t>(1000, 9000, 1648363193268),
-    make_demo_data<uint32_t>(1002, 9001, 1648363193268),
-    make_demo_data<int32_t>(1000, 9000, 1648363193270),
-    make_demo_data<uint32_t>(1002, 9001, 1648363193270),
-    make_demo_data<int16_t>(1004, 9002, 1648363193268),
-    make_demo_data<uint16_t>(1006, 9003, 1648363193268),
-    make_demo_data<int16_t>(1004, 9002, 1648363193270),
-    make_demo_data<uint16_t>(1006, 9003, 1648363193270)
-  };
-  EXPECT_TRUE(dc.send(ds));
-  dc.close();
+  c.run();
   server_.wait();
 
   const std::vector<uint8_t>& buffer = server_.message();
@@ -642,7 +779,7 @@ TEST_F(demo_client_test, send_datas_of_multiple_packages_containing_same_timesta
     0x00, 0x00, 0x03, 0xee, // data key
     0x23, 0x2b // data value
   };
-  // check length
+  // check
   EXPECT_EQ(buffer.size(), 106);
   for (std::size_t i = 0; i < buffer.size(); ++i) {
     EXPECT_EQ(buffer[i], expect_buffer[i]);
@@ -651,24 +788,35 @@ TEST_F(demo_client_test, send_datas_of_multiple_packages_containing_same_timesta
 
 TEST_F(demo_client_test, send_datas_of_key_sequence)
 {
-  server_.start();
+  class connect_success_client : public demo_client
+  {
+  public:
+    void on_connect(bool success) {
+      EXPECT_TRUE(success);
+      data_group_type p{
+        make_demo_data<int32_t>(1000, 9000, 1648363193268),
+        make_demo_data<uint32_t>(1001, 9001, 1648363193269),
+        make_demo_data<int16_t>(1002, 9002, 1648363193270),
+        make_demo_data<uint16_t>(1003, 9003, 1648363193271)
+      };
+      EXPECT_TRUE(send(p));
+    }
+    void on_write(bool success, std::size_t bytes)
+    {
+      EXPECT_TRUE(success);
+      EXPECT_EQ(bytes, 65);
+      stop();
+    }
+  };
 
-  demo_client dc("127.0.0.1", 9901);
-  dc.connect();
-  EXPECT_TRUE(dc.is_connected());
+  server_.start();
+  config::address("127.0.0.1", 9901);
+  connect_success_client c;
   config::same_type(false);
   config::key_sequence(false);
   config::same_timestamp(false);
   config::key_sequence(true);
-
-  data_group_type ds{
-    make_demo_data<int32_t>(1000, 9000, 1648363193268),
-    make_demo_data<uint32_t>(1001, 9001, 1648363193269),
-    make_demo_data<int16_t>(1002, 9002, 1648363193270),
-    make_demo_data<uint16_t>(1003, 9003, 1648363193271)
-  };
-  EXPECT_TRUE(dc.send(ds));
-  dc.close();
+  c.run();
   server_.wait();
 
   const std::vector<uint8_t>& buffer = server_.message();
@@ -697,7 +845,7 @@ TEST_F(demo_client_test, send_datas_of_key_sequence)
     0x00, 0x00, 0x01, 0x7f, 0xca, 0x1a, 0x43, 0xb7, // data timestamp
     0x23, 0x2b // data value
   };
-  // check length
+  // check
   EXPECT_EQ(buffer.size(), 65);
   for (std::size_t i = 0; i < buffer.size(); ++i) {
     EXPECT_EQ(buffer[i], expect_buffer[i]);
@@ -706,32 +854,43 @@ TEST_F(demo_client_test, send_datas_of_key_sequence)
 
 TEST_F(demo_client_test, send_datas_of_multiple_packages_containing_key_sequence)
 {
+  class connect_success_client : public demo_client
+  {
+  public:
+    void on_connect(bool success) {
+      EXPECT_TRUE(success);
+      data_group_type p{
+        make_demo_data<int32_t>(1000, 9000, 1648363193268),
+        make_demo_data<uint32_t>(1001, 9001, 1648363193269),
+        make_demo_data<int16_t>(1002, 9002, 1648363193270),
+        make_demo_data<uint16_t>(1003, 9003, 1648363193271),
+        make_demo_data<int32_t>(1000, 9000, 1648363193268),
+        make_demo_data<uint32_t>(1001, 9001, 1648363193269),
+        make_demo_data<int16_t>(1002, 9002, 1648363193270),
+        make_demo_data<uint16_t>(1003, 9003, 1648363193271),
+        make_demo_data<int16_t>(1004, 9002, 1648363193270),
+        make_demo_data<uint16_t>(999, 9003, 1648363193271),
+        make_demo_data<uint16_t>(9999, 9003, 1648363193271)
+      };
+      EXPECT_TRUE(send(p));
+    }
+    void on_write(bool success, std::size_t bytes)
+    {
+      EXPECT_TRUE(success);
+      EXPECT_EQ(bytes, 180);
+      stop();
+    }
+  };
+
   server_.expect_length(180);
   server_.start();
-
-  demo_client dc("127.0.0.1", 9901);
-  dc.connect();
-  EXPECT_TRUE(dc.is_connected());
+  config::address("127.0.0.1", 9901);
+  connect_success_client c;
   config::same_type(false);
   config::key_sequence(false);
   config::same_timestamp(false);
   config::key_sequence(true);
-
-  data_group_type ds{
-    make_demo_data<int32_t>(1000, 9000, 1648363193268),
-    make_demo_data<uint32_t>(1001, 9001, 1648363193269),
-    make_demo_data<int16_t>(1002, 9002, 1648363193270),
-    make_demo_data<uint16_t>(1003, 9003, 1648363193271),
-    make_demo_data<int32_t>(1000, 9000, 1648363193268),
-    make_demo_data<uint32_t>(1001, 9001, 1648363193269),
-    make_demo_data<int16_t>(1002, 9002, 1648363193270),
-    make_demo_data<uint16_t>(1003, 9003, 1648363193271),
-    make_demo_data<int16_t>(1004, 9002, 1648363193270),
-    make_demo_data<uint16_t>(999, 9003, 1648363193271),
-    make_demo_data<uint16_t>(9999, 9003, 1648363193271)
-  };
-  EXPECT_TRUE(dc.send(ds));
-  dc.close();
+  c.run();
   server_.wait();
 
   const std::vector<uint8_t>& buffer = server_.message();
@@ -805,7 +964,7 @@ TEST_F(demo_client_test, send_datas_of_multiple_packages_containing_key_sequence
     0x00, 0x00, 0x01, 0x7f, 0xca, 0x1a, 0x43, 0xb7, // data timestamp
     0x23, 0x2b // data value
   };
-  // check length
+  // check
   EXPECT_EQ(buffer.size(), 180);
   for (std::size_t i = 0; i < buffer.size(); ++i) {
     EXPECT_EQ(buffer[i], expect_buffer[i]);
@@ -814,25 +973,36 @@ TEST_F(demo_client_test, send_datas_of_multiple_packages_containing_key_sequence
 
 TEST_F(demo_client_test, send_datas_of_same_timestamp_and_key_sequence)
 {
-  server_.start();
+  class connect_success_client : public demo_client
+  {
+  public:
+    void on_connect(bool success) {
+      EXPECT_TRUE(success);
+      data_group_type p{
+        make_demo_data<int32_t>(1000, 9000, 1648363193268),
+        make_demo_data<uint32_t>(1001, 9001, 1648363193268),
+        make_demo_data<int16_t>(1002, 9002, 1648363193268),
+        make_demo_data<uint16_t>(1003, 9003, 1648363193268)
+      };
+      EXPECT_TRUE(send(p));
+    }
+    void on_write(bool success, std::size_t bytes)
+    {
+      EXPECT_TRUE(success);
+      EXPECT_EQ(bytes, 41);
+      stop();
+    }
+  };
 
-  demo_client dc("127.0.0.1", 9901);
-  dc.connect();
-  EXPECT_TRUE(dc.is_connected());
+  server_.start();
+  config::address("127.0.0.1", 9901);
+  connect_success_client c;
   config::same_type(false);
   config::key_sequence(false);
   config::same_timestamp(false);
   config::same_timestamp(true);
   config::key_sequence(true);
-
-  data_group_type ds{
-    make_demo_data<int32_t>(1000, 9000, 1648363193268),
-    make_demo_data<uint32_t>(1001, 9001, 1648363193268),
-    make_demo_data<int16_t>(1002, 9002, 1648363193268),
-    make_demo_data<uint16_t>(1003, 9003, 1648363193268)
-  };
-  EXPECT_TRUE(dc.send(ds));
-  dc.close();
+  c.run();
   server_.wait();
 
   const std::vector<uint8_t>& buffer = server_.message();
@@ -858,7 +1028,7 @@ TEST_F(demo_client_test, send_datas_of_same_timestamp_and_key_sequence)
     0x04, // data type
     0x23, 0x2b // data value
   };
-  // check length
+  // check
   EXPECT_EQ(buffer.size(), 41);
   for (std::size_t i = 0; i < buffer.size(); ++i) {
     EXPECT_EQ(buffer[i], expect_buffer[i]);
@@ -867,25 +1037,36 @@ TEST_F(demo_client_test, send_datas_of_same_timestamp_and_key_sequence)
 
 TEST_F(demo_client_test, send_datas_of_same_timestamp_and_same_type)
 {
-  server_.start();
+  class connect_success_client : public demo_client
+  {
+  public:
+    void on_connect(bool success) {
+      EXPECT_TRUE(success);
+      data_group_type p{
+        make_demo_data<int32_t>(1000, 9000, 1648363193268),
+        make_demo_data<int32_t>(1001, 9001, 1648363193268),
+        make_demo_data<int32_t>(1002, 9002, 1648363193268),
+        make_demo_data<int32_t>(1003, 9003, 1648363193268)
+      };
+      EXPECT_TRUE(send(p));
+    }
+    void on_write(bool success, std::size_t bytes)
+    {
+      EXPECT_TRUE(success);
+      EXPECT_EQ(bytes, 54);
+      stop();
+    }
+  };
 
-  demo_client dc("127.0.0.1", 9901);
-  dc.connect();
-  EXPECT_TRUE(dc.is_connected());
+  server_.start();
+  config::address("127.0.0.1", 9901);
+  connect_success_client c;
   config::same_type(false);
   config::key_sequence(false);
   config::same_timestamp(false);
   config::same_timestamp(true);
   config::same_type(true);
-
-  data_group_type ds{
-    make_demo_data<int32_t>(1000, 9000, 1648363193268),
-    make_demo_data<int32_t>(1001, 9001, 1648363193268),
-    make_demo_data<int32_t>(1002, 9002, 1648363193268),
-    make_demo_data<int32_t>(1003, 9003, 1648363193268)
-  };
-  EXPECT_TRUE(dc.send(ds));
-  dc.close();
+  c.run();
   server_.wait();
 
   const std::vector<uint8_t>& buffer = server_.message();
@@ -911,7 +1092,7 @@ TEST_F(demo_client_test, send_datas_of_same_timestamp_and_same_type)
     0x00, 0x00, 0x03, 0xeb, // data key
     0x00, 0x00, 0x23, 0x2b // data value
   };
-  // check length
+  // check
   EXPECT_EQ(buffer.size(), 54);
   for (std::size_t i = 0; i < buffer.size(); ++i) {
     EXPECT_EQ(buffer[i], expect_buffer[i]);
@@ -920,25 +1101,36 @@ TEST_F(demo_client_test, send_datas_of_same_timestamp_and_same_type)
 
 TEST_F(demo_client_test, send_datas_of_key_sequence_and_same_type)
 {
-  server_.start();
+  class connect_success_client : public demo_client
+  {
+  public:
+    void on_connect(bool success) {
+      EXPECT_TRUE(success);
+      data_group_type p{
+        make_demo_data<int32_t>(1000, 9000, 1648363193268),
+        make_demo_data<int32_t>(1001, 9001, 1648363193268),
+        make_demo_data<int32_t>(1002, 9002, 1648363193268),
+        make_demo_data<int32_t>(1003, 9003, 1648363193268)
+      };
+      EXPECT_TRUE(send(p));
+    }
+    void on_write(bool success, std::size_t bytes)
+    {
+      EXPECT_TRUE(success);
+      EXPECT_EQ(bytes, 66);
+      stop();
+    }
+  };
 
-  demo_client dc("127.0.0.1", 9901);
-  dc.connect();
-  EXPECT_TRUE(dc.is_connected());
+  server_.start();
+  config::address("127.0.0.1", 9901);
+  connect_success_client c;
   config::same_type(false);
   config::key_sequence(false);
   config::same_timestamp(false);
   config::key_sequence(true);
   config::same_type(true);
-
-  data_group_type ds{
-    make_demo_data<int32_t>(1000, 9000, 1648363193268),
-    make_demo_data<int32_t>(1001, 9001, 1648363193268),
-    make_demo_data<int32_t>(1002, 9002, 1648363193268),
-    make_demo_data<int32_t>(1003, 9003, 1648363193268)
-  };
-  EXPECT_TRUE(dc.send(ds));
-  dc.close();
+  c.run();
   server_.wait();
 
   const std::vector<uint8_t>& buffer = server_.message();
@@ -964,7 +1156,7 @@ TEST_F(demo_client_test, send_datas_of_key_sequence_and_same_type)
     0x00, 0x00, 0x01, 0x7f, 0xca, 0x1a, 0x43, 0xb4, // data timestamp
     0x00, 0x00, 0x23, 0x2b // data value
   };
-  // check length
+  // check
   EXPECT_EQ(buffer.size(), 66);
   for (std::size_t i = 0; i < buffer.size(); ++i) {
     EXPECT_EQ(buffer[i], expect_buffer[i]);
@@ -973,23 +1165,34 @@ TEST_F(demo_client_test, send_datas_of_key_sequence_and_same_type)
 
 TEST_F(demo_client_test, send_datas_of_all_attribute)
 {
-  server_.start();
+  class connect_success_client : public demo_client
+  {
+  public:
+    void on_connect(bool success) {
+      EXPECT_TRUE(success);
+      data_group_type p{
+        make_demo_data<int32_t>(1000, 9000, 1648363193268),
+        make_demo_data<int32_t>(1001, 9001, 1648363193268),
+        make_demo_data<int32_t>(1002, 9002, 1648363193268),
+        make_demo_data<int32_t>(1003, 9003, 1648363193268)
+      };
+      EXPECT_TRUE(send(p));
+    }
+    void on_write(bool success, std::size_t bytes)
+    {
+      EXPECT_TRUE(success);
+      EXPECT_EQ(bytes, 42);
+      stop();
+    }
+  };
 
-  demo_client dc("127.0.0.1", 9901);
-  dc.connect();
-  EXPECT_TRUE(dc.is_connected());
+  server_.start();
+  config::address("127.0.0.1", 9901);
+  connect_success_client c;
   config::same_type(true);
   config::key_sequence(true);
   config::same_timestamp(true);
-
-  data_group_type ds{
-    make_demo_data<int32_t>(1000, 9000, 1648363193268),
-    make_demo_data<int32_t>(1001, 9001, 1648363193268),
-    make_demo_data<int32_t>(1002, 9002, 1648363193268),
-    make_demo_data<int32_t>(1003, 9003, 1648363193268)
-  };
-  EXPECT_TRUE(dc.send(ds));
-  dc.close();
+  c.run();
   server_.wait();
 
   const std::vector<uint8_t>& buffer = server_.message();
@@ -1021,32 +1224,43 @@ TEST_F(demo_client_test, send_datas_of_all_attribute)
 
 TEST_F(demo_client_test, send_datas_of_all_attribute_multiple_packages)
 {
+  class connect_success_client : public demo_client
+  {
+  public:
+    void on_connect(bool success) {
+      EXPECT_TRUE(success);
+      data_group_type p{
+        make_demo_data<int32_t>(1000, 9000, 1648363193268),
+        make_demo_data<uint32_t>(1000, 9000, 1648363193270),
+        make_demo_data<int32_t>(1002, 9002, 1648363193268),
+        make_demo_data<int32_t>(1004, 9000, 1648363193270),
+        make_demo_data<uint32_t>(1002, 9002, 1648363193270),
+        make_demo_data<int32_t>(1006, 9002, 1648363193270),
+        make_demo_data<uint32_t>(1001, 9001, 1648363193270),
+        make_demo_data<int32_t>(1003, 9003, 1648363193268),
+        make_demo_data<uint32_t>(1003, 9003, 1648363193270),
+        make_demo_data<int32_t>(1005, 9001, 1648363193270),
+        make_demo_data<int32_t>(1001, 9001, 1648363193268),
+        make_demo_data<int32_t>(1007, 9003, 1648363193270)
+      };
+      EXPECT_TRUE(send(p));
+    }
+    void on_write(bool success, std::size_t bytes)
+    {
+      EXPECT_TRUE(success);
+      EXPECT_EQ(bytes, 126);
+      stop();
+    }
+  };
+
   server_.expect_length(126);
   server_.start();
-
-  demo_client dc("127.0.0.1", 9901);
-  dc.connect();
-  EXPECT_TRUE(dc.is_connected());
+  config::address("127.0.0.1", 9901);
+  connect_success_client c;
   config::same_type(true);
   config::key_sequence(true);
   config::same_timestamp(true);
-
-  data_group_type ds{
-    make_demo_data<int32_t>(1000, 9000, 1648363193268),
-    make_demo_data<uint32_t>(1000, 9000, 1648363193270),
-    make_demo_data<int32_t>(1002, 9002, 1648363193268),
-    make_demo_data<int32_t>(1004, 9000, 1648363193270),
-    make_demo_data<uint32_t>(1002, 9002, 1648363193270),
-    make_demo_data<int32_t>(1006, 9002, 1648363193270),
-    make_demo_data<uint32_t>(1001, 9001, 1648363193270),
-    make_demo_data<int32_t>(1003, 9003, 1648363193268),
-    make_demo_data<uint32_t>(1003, 9003, 1648363193270),
-    make_demo_data<int32_t>(1005, 9001, 1648363193270),
-    make_demo_data<int32_t>(1001, 9001, 1648363193268),
-    make_demo_data<int32_t>(1007, 9003, 1648363193270)
-  };
-  EXPECT_TRUE(dc.send(ds));
-  dc.close();
+  c.run();
   server_.wait();
 
   const std::vector<uint8_t>& buffer = server_.message();
@@ -1106,31 +1320,205 @@ TEST_F(demo_client_test, send_datas_of_all_attribute_multiple_packages)
     // data 4
     0x00, 0x00, 0x23, 0x2b // data value
   };
-  // check length
+  // check
   EXPECT_EQ(buffer.size(), 126);
   for (std::size_t i = 0; i < buffer.size(); ++i) {
     EXPECT_EQ(buffer[i], expect_buffer[i]);
   }
 }
 
-TEST_F(demo_client_test, receive_negative_keepalive)
+TEST_F(demo_client_test, send_positive_keepalive)
 {
+  class connect_success_client : public demo_client
+  {
+  public:
+    void on_connect(bool success) {
+      EXPECT_TRUE(success);
+      std::this_thread::sleep_for(std::chrono::seconds(config::t1()+1));
+    }
+    void on_write(bool success, std::size_t bytes)
+    {
+      EXPECT_TRUE(success);
+      EXPECT_EQ(bytes, 4);
+      stop();
+    }
+  };
+  config::t1_t2(2,1);
   config::pack_nkeep(0xff, 0x00);
+  config::address("127.0.0.1", 9901);
   server_.expect_length(4);
   server_.start();
-  demo_client dc("127.0.0.1", 9901);
-  dc.connect();
-  EXPECT_TRUE(dc.is_connected());
-  uint8_t expect_buffer_ack[] = {0x00};
-  EXPECT_TRUE(dc.receive(expect_buffer_ack));
-  dc.close();
+  connect_success_client c;
+  c.run();
   server_.wait();
 
   const std::vector<uint8_t>& buffer = server_.message();
   const uint8_t expect_buffer[] = {
-    0x4b, 0x41, 0x43, 0x4b // kack flag
+    0x4b, 0x45, 0x45, 0x50 // KEEP flag
   };
-  // check length
+  // check
+  EXPECT_EQ(buffer.size(), 4);
+  for (std::size_t i = 0; i < buffer.size(); ++i) {
+    EXPECT_EQ(buffer[i], expect_buffer[i]);
+  }
+}
+
+TEST_F(demo_client_test, t0_t1_t2)
+{
+  class connect_success_client : public demo_client
+  {
+  public:
+    connect_success_client()
+      : demo_client(),
+        reconnect_(false)
+    {}
+
+  public:
+    void on_connect(bool success) {
+      if (!reconnect_) {
+        EXPECT_TRUE(success);
+        std::this_thread::sleep_for(std::chrono::seconds(config::t1()+1));
+        reconnect_ = true;
+      } else {
+        EXPECT_TRUE(success);
+        stop();
+      }
+    }
+    void on_write(bool success, std::size_t bytes)
+    {
+      EXPECT_TRUE(success);
+      EXPECT_EQ(bytes, 4);
+    }
+
+  private:
+    bool reconnect_;
+  };
+  config::t0(3);
+  config::t1_t2(2,1);
+  config::pack_nkeep(0xff, 0x00);
+  config::address("127.0.0.1", 9901);
+  server_.expect_length(4);
+  server_.start();
+  connect_success_client c;
+  c.run();
+  server_.wait();
+
+  const std::vector<uint8_t>& buffer = server_.message();
+  const uint8_t expect_buffer[] = {
+    0x4b, 0x45, 0x45, 0x50 // KEEP flag
+  };
+  // check
+  EXPECT_EQ(buffer.size(), 4);
+  for (std::size_t i = 0; i < buffer.size(); ++i) {
+    EXPECT_EQ(buffer[i], expect_buffer[i]);
+  }
+}
+
+TEST_F(demo_client_test, call_t0_multiple_times)
+{
+  class connect_fail_client : public demo_client
+  {
+  public:
+    connect_fail_client()
+      : demo_client(),
+        reconnect_(false)
+    {}
+
+  public:
+    void on_connect(bool success) {
+      if (!reconnect_) {
+        EXPECT_FALSE(success);
+        reconnect_ = true;
+      } else {
+        EXPECT_FALSE(success);
+        stop();
+      }
+    }
+    void on_write(bool success, std::size_t bytes)
+    {}
+
+  private:
+    bool reconnect_;
+  };
+
+  config::t0(2);
+  config::address("127.0.0.1", 9902);
+  connect_fail_client c;
+  c.run();
+}
+
+TEST_F(demo_client_test, negative_keepalive)
+{
+  class connect_success_client : public demo_client
+  {
+  public:
+    void on_connect(bool success)
+    {
+      EXPECT_TRUE(success);
+    }
+    void on_write(bool success, std::size_t bytes)
+    {
+      EXPECT_TRUE(success);
+      EXPECT_EQ(bytes, 4);
+      stop();
+    }
+  };
+  config::t0(3);
+  config::t1_t2(2,1);
+  config::pack_nkeep(0xff, 0x00);
+  config::address("127.0.0.1", 9901);
+  std::vector<uint8_t> nkeep{config::nkeep()};
+  server_.write_data(nkeep);
+  server_.expect_length(4);
+  server_.start();
+  connect_success_client c;
+  c.run();
+  server_.wait();
+
+  const std::vector<uint8_t>& buffer = server_.message();
+  const uint8_t expect_buffer[] = {
+    0x4b, 0x41, 0x43, 0x4b // KACK flag
+  };
+  // check
+  EXPECT_EQ(buffer.size(), 4);
+  for (std::size_t i = 0; i < buffer.size(); ++i) {
+    EXPECT_EQ(buffer[i], expect_buffer[i]);
+  }
+}
+
+TEST_F(demo_client_test, pack_and_nkeep)
+{
+  class connect_success_client : public demo_client
+  {
+  public:
+    void on_connect(bool success)
+    {
+      EXPECT_TRUE(success);
+    }
+    void on_write(bool success, std::size_t bytes)
+    {
+      EXPECT_TRUE(success);
+      EXPECT_EQ(bytes, 4);
+      stop();
+    }
+  };
+  config::t0(3);
+  config::t1_t2(2,1);
+  config::pack_nkeep(0xff, 0x00);
+  config::address("127.0.0.1", 9901);
+  std::vector<uint8_t> datas{config::pack(), 'K', 'E', 'E', 'P', config::nkeep(), 'D', 'E', 'M', 'O'};
+  server_.write_data(datas);
+  server_.expect_length(4);
+  server_.start();
+  connect_success_client c;
+  c.run();
+  server_.wait();
+
+  const std::vector<uint8_t>& buffer = server_.message();
+  const uint8_t expect_buffer[] = {
+    0x4b, 0x41, 0x43, 0x4b // KACK flag
+  };
+  // check
   EXPECT_EQ(buffer.size(), 4);
   for (std::size_t i = 0; i < buffer.size(); ++i) {
     EXPECT_EQ(buffer[i], expect_buffer[i]);

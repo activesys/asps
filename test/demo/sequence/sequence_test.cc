@@ -55,7 +55,7 @@ TEST(data_sequence_test, request_and_response)
     EXPECT_EQ(buffer[i], expect_buffer[i]);
   }
 
-  const uint8_t receive_buffer[] = {0x00};
+  std::vector<uint8_t> receive_buffer{0x00};
   EXPECT_FALSE(ds->response(receive_buffer));
 }
 
@@ -75,9 +75,9 @@ TEST(positive_keepalive_sequence_test, request_and_response)
   const buffer_type& after_buffer = pks->request();
   EXPECT_TRUE(after_buffer.empty());
 
-  uint8_t receive_buffer[] = {0xff};
+  std::vector<uint8_t> receive_buffer{0xff, 0xff};
   EXPECT_TRUE(pks->response(receive_buffer));
-  EXPECT_FALSE(pks->response(receive_buffer));
+  EXPECT_TRUE(pks->response(receive_buffer));
 }
 
 TEST(negative_keepalive_sequence_test, request_and_response)
@@ -85,7 +85,7 @@ TEST(negative_keepalive_sequence_test, request_and_response)
   config::pack_nkeep(0xff, 0x00);
   sequence_service::pointer_type nks = make_sequence_service(false);
 
-  uint8_t receive_buffer[] = {0x00};
+  std::vector<uint8_t> receive_buffer{0x00};
   EXPECT_TRUE(nks->response(receive_buffer));
   receive_buffer[0] = 0x88;
   EXPECT_FALSE(nks->response(receive_buffer));
@@ -102,22 +102,22 @@ TEST(negative_keepalive_sequence_test, request_and_response)
 TEST(get_sequence_type_test, get_sequence_type)
 {
   config::pack_nkeep(0xff, 0x00);
-  uint8_t buffer[] = {
+  std::vector<uint8_t> buffer{
     0x44, 0x45, 0x4d, 0x4f, 0x56, 0x31, 0x30, 0x30
   };
-  EXPECT_EQ(get_sequence_type(buffer), belong_to_data_sequence);
+  EXPECT_EQ(get_sequence_type(buffer), belong_to_invalid_sequence);
 
   buffer[0] = 0x4b;
   buffer[1] = 0x45;
   buffer[2] = 0x45;
   buffer[3] = 0x50;
-  EXPECT_EQ(get_sequence_type(buffer), belong_to_positive_keepalive_sequence);
+  EXPECT_EQ(get_sequence_type(buffer), belong_to_invalid_sequence);
 
   buffer[0] = 0x4b;
   buffer[1] = 0x41;
   buffer[2] = 0x43;
   buffer[3] = 0x4b;
-  EXPECT_EQ(get_sequence_type(buffer), belong_to_negative_keepalive_sequence);
+  EXPECT_EQ(get_sequence_type(buffer), belong_to_invalid_sequence);
 
   buffer[0] = 0xff;
   EXPECT_EQ(get_sequence_type(buffer), belong_to_positive_keepalive_sequence);

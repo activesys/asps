@@ -8,9 +8,12 @@
 #define ASPS_DEMO_UTILITY_UTILITY_H
 
 #include <cstdint>
+#include <vector>
 
 namespace asps {
 namespace demo {
+
+typedef std::vector<uint8_t> buffer_type;
 
 // host sequence to network sequence for 64bits integer.
 uint64_t htonll(uint64_t value);

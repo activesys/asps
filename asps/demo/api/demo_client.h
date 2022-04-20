@@ -9,41 +9,56 @@
 
 #include <cstdint>
 #include <string>
-#include <boost/asio.hpp>
-
+#include <functional>
 #include <asps/demo/api/session_service.h>
 #include <asps/demo/semantic/demo_data.h>
+#include <asps/demo/api/transport_service.h>
+#include <asps/demo/utility/timer_service.h>
+#include <asps/demo/config/config.h>
 
 namespace asps {
 namespace demo {
 
-using namespace boost::asio;
-
 class demo_client : public observer
 {
 public:
-  demo_client(const std::string& host, uint16_t port)
-    : socket_(context_),
-      endpoint_(ip::address::from_string(host), port),
-      is_connected_(false)
-  {}
+  demo_client(transport_service::pointer_type transport = make_transport_service())
+    : transport_(transport),
+      t0_(make_timer_service(config::t0(),
+                             std::bind(&demo_client::t0_timeout, this)))
+  {
+    t0_->start();
+  }
+  virtual ~demo_client()
+  {
+    t0_->stop();
+  }
 
 public:
-  bool connect();
-  bool is_connected();
-  void close();
+  virtual void on_connect(bool success) = 0;
+  virtual void on_write(bool success, std::size_t bytes) = 0;
 
+public:
   bool send(const data_group_type& group);
-  bool receive(const uint8_t* buffer);
+  void close();
+  void run();
+  void stop();
+
+private:
+  void connect_handler(bool success);
+  void write_handler(bool success, std::size_t bytes);
+  void read_handler(bool success, const buffer_type& buffer, std::size_t bytes);
+  void t0_timeout();
+
+private:
   void update_send(const buffer_type& buffer) override;
   void update_event() override;
 
 private:
-  io_context context_;
-  ip::tcp::socket socket_;
-  ip::tcp::endpoint endpoint_;
-  bool is_connected_;
+  transport_service::pointer_type transport_;
   session_service::pointer_type session_;
+  timer_service::pointer_type t0_;
+  buffer_type read_buffer_;
 };
 
 } // demo

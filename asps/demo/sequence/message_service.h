@@ -38,7 +38,7 @@ static const uint8_t NEGATIVE_KEEPALIVE_ACK_MESSAGE_FLAG[] = {
   0x4b, 0x41, 0x43, 0x4b
 };
 
-message_type get_message_type(const uint8_t* buffer);
+message_type get_message_type(const buffer_type& buffer);
 
 class message_serialization_service
 {
@@ -67,11 +67,14 @@ public:
   virtual ~message_unserialization_service() {}
 
 public:
-  virtual bool unserialize(const uint8_t* buffer) = 0;
+  virtual bool unserialize(buffer_type& buffer) = 0;
 };
 
 message_unserialization_service::pointer_type
 make_message_unserialization_service(bool positive);
+
+message_unserialization_service::pointer_type
+make_invalid_message();
 
 } // demo
 } // asps

@@ -51,9 +51,13 @@ class positive_keepalive_ack : public message_unserialization_service
   };
 
 public:
-  bool unserialize(const uint8_t* buffer) override
+  bool unserialize(buffer_type& buffer) override
   {
-    return buffer != nullptr && *buffer == config::pack();
+    bool ret = !buffer.empty() && buffer[0] == config::pack();
+    if (ret) {
+      buffer.erase(buffer.begin());
+    }
+    return ret;
   }
 };
 
@@ -64,9 +68,13 @@ class negative_keepalive : public message_unserialization_service
   };
 
 public:
-  bool unserialize(const uint8_t* buffer) override
+  bool unserialize(buffer_type& buffer) override
   {
-    return buffer != nullptr && *buffer == config::nkeep();
+    bool ret = !buffer.empty() && buffer[0] == config::nkeep();
+    if (ret) {
+      buffer.erase(buffer.begin());
+    }
+    return ret;
   }
 };
 

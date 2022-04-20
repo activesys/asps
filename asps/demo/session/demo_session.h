@@ -11,7 +11,7 @@
 #include <vector>
 
 #include <asps/demo/session/sequence_service.h>
-#include <asps/demo/session/timer_service.h>
+#include <asps/demo/utility/timer_service.h>
 #include <asps/demo/api/session_service.h>
 
 namespace asps {
@@ -26,12 +26,15 @@ public:
 
 public:
   bool send(const data_group_type& group) override;
-  bool receive(const uint8_t* buffer) override;
+  void receive(buffer_type& buffer) override;
 
   void t1_timeout();
 
 public:
   void update_event() override;
+
+private:
+  bool receive_one_package(buffer_type& buffer);
 
 private:
   buffer_type buffer_;

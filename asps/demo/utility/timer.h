@@ -7,22 +7,39 @@
 #ifndef ASPS_DEMO_UTILITY_TIMER_H
 #define ASPS_DEMO_UTILITY_TIMER_H
 
-#include <asps/demo/session/timer_service.h>
+#include <memory>
+#include <boost/asio.hpp>
+#include <asps/demo/utility/timer_service.h>
 
 namespace asps {
 namespace demo {
 
+using namespace boost::asio;
+using namespace boost::system;
+
+extern std::shared_ptr<io_context> context;
+
 class timer : public timer_service
 {
 public:
-  void start(const std::chrono::seconds& seconds, callback_type callback) override
-  {
-    //callback();
-  }
+  timer(io_context& context,
+        uint32_t expiry,
+        timer_service::timeout_handler handler)
+    : timer_service(expiry, handler),
+      context_(context),
+      timer_(context)
+  {}
 
-  void stop() override
-  {
-  }
+public:
+  void start() override;
+  void stop() override;
+
+private:
+  void on_timeout(const error_code& ec);
+
+private:
+  io_context& context_;
+  steady_timer timer_;
 };
 
 } // demo

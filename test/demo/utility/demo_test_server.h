@@ -33,6 +33,7 @@ public:
 
 public:
   void expect_length(std::size_t length) {expect_length_ = length;}
+  void write_data(const std::vector<uint8_t>& buf) {write_buffer_ = buf;}
   void start(bool need_read_data = true)
   {
     need_read_data_ = need_read_data;
@@ -59,7 +60,17 @@ private:
                    std::bind(&demo_test_server::on_completion, this, _1, _2),
                    std::bind(&demo_test_server::on_read, this, _1, _2));
       }
+      // Write Data
+      if (write_buffer_.size()) {
+        async_write(*peer_,
+                    buffer(write_buffer_),
+                    std::bind(&demo_test_server::on_write, this, _1, _2));
+      }
     }
+  }
+  void on_write(const boost::system::error_code& ec, std::size_t bytes)
+  {
+    write_buffer_.clear();
   }
   std::size_t on_completion(const boost::system::error_code& ec, std::size_t bytes)
   {
@@ -112,6 +123,7 @@ private:
   ip::tcp::acceptor acceptor_;
   std::shared_ptr<ip::tcp::socket> peer_;
   std::vector<uint8_t> buffer_;
+  std::vector<uint8_t> write_buffer_;
   bool need_read_data_;
 };
 

@@ -556,7 +556,7 @@ TEST(demo_message_test, serialize_bool_type_compress_all_attributes_multiple_byt
 TEST(get_message_type_test, get_message_type)
 {
   config::pack_nkeep(0xff, 0x00);
-  uint8_t buffer[] = {
+  std::vector<uint8_t> buffer{
     0x44, 0x45, 0x4d, 0x4f, 0x56, 0x31, 0x30, 0x30
   };
   EXPECT_EQ(get_message_type(buffer), data_message);
