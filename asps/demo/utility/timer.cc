@@ -4,6 +4,7 @@
 //
 // Demo timer.
 
+#include <chrono>
 #include <functional>
 #include <asps/demo/utility/timer.h>
 
@@ -20,8 +21,10 @@ make_timer_service(uint32_t expiry, timer_service::timeout_handler timeout)
 
 void timer::start()
 {
-  timer_.expires_after(expiry_);
-  timer_.async_wait(std::bind(&timer::on_timeout, this, _1));
+  if (expiry_ > 0) {
+    timer_.expires_after(std::chrono::seconds(expiry_));
+    timer_.async_wait(std::bind(&timer::on_timeout, this, _1));
+  }
 }
 
 void timer::stop()

@@ -8,7 +8,6 @@
 #define ASPS_DEMO_UTILITY_TIMER_SERVICE_H
 
 #include <memory>
-#include <chrono>
 #include <functional>
 
 namespace asps {
@@ -22,7 +21,7 @@ public:
 
 public:
   timer_service(uint32_t expiry, timeout_handler handler)
-    : expiry_(std::chrono::seconds(expiry)),
+    : expiry_(expiry),
       handler_(handler)
   {}
   virtual ~timer_service() {}
@@ -32,7 +31,7 @@ public:
   virtual void stop() = 0;
 
 protected:
-  std::chrono::seconds expiry_;
+  uint32_t expiry_;
   timeout_handler handler_;
 };
 
