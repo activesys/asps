@@ -2,10 +2,10 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file. See the AUTHORS file for names of contributors.
 //
-// Demo Sequence.
+// Demo Client Sequence.
 
-#ifndef ASPS_DEMO_SEQUENCE_SEQUENCE_H
-#define ASPS_DEMO_SEQUENCE_SEQUENCE_H
+#ifndef ASPS_DEMO_SEQUENCE_CLIENT_SEQUENCE_H
+#define ASPS_DEMO_SEQUENCE_CLIENT_SEQUENCE_H
 
 #include <asps/demo/semantic/demo_data.h>
 #include <asps/demo/utility/timer_service.h>
@@ -16,25 +16,23 @@
 namespace asps {
 namespace demo {
 
-class data_sequence : public sequence_service
+// Client Data Sequence
+class client_data_sequence
+  : public client_data_sequence_service
 {
 public:
-  data_sequence(const data_group_type& group);
-  virtual ~data_sequence() {};
-
-public:
-  const buffer_type& request() override;
-  bool response(buffer_type& buffer) override;
+  const buffer_type& request(const data_group_type& group) override;
 
 private:
   message_serialization_service::pointer_type message_;
 };
 
-class positive_keepalive_sequence : public sequence_service
+// Client Positive Keepalive Sequence
+class client_positive_keepalive_sequence
+  : public client_positive_keepalive_sequence_service
 {
 public:
-  positive_keepalive_sequence();
-  virtual ~positive_keepalive_sequence() {}
+  client_positive_keepalive_sequence();
 
 public:
   const buffer_type& request() override;
@@ -57,11 +55,13 @@ private:
   timer_service::pointer_type t2_;
 };
 
-class negative_keepalive_sequence : public sequence_service
+// Client Negative Keepalive Sequence
+class client_negative_keepalive_sequence
+  : public client_negative_keepalive_sequence_service
 {
 public:
-  negative_keepalive_sequence();
-  virtual ~negative_keepalive_sequence() {}
+  client_negative_keepalive_sequence();
+  virtual ~client_negative_keepalive_sequence() {}
 
 public:
   const buffer_type& request() override;
@@ -72,22 +72,22 @@ private:
   message_serialization_service::pointer_type ack_;
 };
 
-class invalid_sequence : public sequence_service
+// Client Invalid Sequnece
+class client_invalid_sequence
+  : public client_invalid_sequence_service
 {
 public:
-  invalid_sequence();
-  virtual ~invalid_sequence() {}
+  client_invalid_sequence();
+  virtual ~client_invalid_sequence() {}
 
 public:
-  const buffer_type& request() override;
   bool response(buffer_type& buffer) override;
 
 private:
-  buffer_type empty_buffer_;
   message_unserialization_service::pointer_type message_;
 };
 
 } // demo
 } // asps
 
-#endif // ASPS_DEMO_SEQUENCE_SEQUENCE_H
+#endif // ASPS_DEMO_SEQUENCE_CLIENT_SEQUENCE_H

@@ -9,5 +9,11 @@
 namespace asps {
 namespace demo {
 
+bool operator==(const demo_data::pointer_type first,
+                const demo_data::pointer_type second)
+{
+  return *first == *second;
+}
+
 } // demo
 } // asps

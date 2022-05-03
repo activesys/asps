@@ -2,7 +2,7 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file. See the AUTHORS file for names of contributors.
 //
-// Unit test for demo message.
+// Unit test for client data.
 
 #include <cstdint>
 #include <vector>
@@ -19,12 +19,12 @@ namespace demo_test {
 
 using namespace asps::demo;
 
-TEST(demo_message_test, serialize_float64_type)
+TEST(client_data_test, serialize_float64_type)
 {
   data_group_type p{
     make_demo_data<double>(1234, 913456.230887143, 1647761782000)
   };
-  demo_message msg(p);
+  client_data msg(p);
   config::same_type(false);
   config::key_sequence(false);
   config::same_timestamp(false);
@@ -51,12 +51,12 @@ TEST(demo_message_test, serialize_float64_type)
   }
 }
 
-TEST(demo_message_test, serialize_float32_type)
+TEST(client_data_test, serialize_float32_type)
 {
   data_group_type p{
     make_demo_data<float>(1234, -98.12, 1647761782000)
   };
-  demo_message msg(p);
+  client_data msg(p);
   config::same_type(false);
   config::key_sequence(false);
   config::same_timestamp(false);
@@ -83,12 +83,12 @@ TEST(demo_message_test, serialize_float32_type)
   }
 }
 
-TEST(demo_message_test, serialize_int64_type)
+TEST(client_data_test, serialize_int64_type)
 {
   data_group_type p{
     make_demo_data<int64_t>(1234, -1154789657886957455, 1647761782000)
   };
-  demo_message msg(p);
+  client_data msg(p);
   config::same_type(false);
   config::key_sequence(false);
   config::same_timestamp(false);
@@ -114,12 +114,12 @@ TEST(demo_message_test, serialize_int64_type)
   }
 }
 
-TEST(demo_message_test, serialize_uint32_type)
+TEST(client_data_test, serialize_uint32_type)
 {
   data_group_type p{
     make_demo_data<uint32_t>(1234, 9876, 1647761782000)
   };
-  demo_message msg(p);
+  client_data msg(p);
   config::same_type(false);
   config::key_sequence(false);
   config::same_timestamp(false);
@@ -145,12 +145,12 @@ TEST(demo_message_test, serialize_uint32_type)
   }
 }
 
-TEST(demo_message_test, serialize_int16_type)
+TEST(client_data_test, serialize_int16_type)
 {
   data_group_type p{
     make_demo_data<int16_t>(1234, 9876, 1647761782000)
   };
-  demo_message msg(p);
+  client_data msg(p);
   config::same_type(false);
   config::key_sequence(false);
   config::same_timestamp(false);
@@ -176,12 +176,12 @@ TEST(demo_message_test, serialize_int16_type)
   }
 }
 
-TEST(demo_message_test, serialize_int8_type)
+TEST(client_data_test, serialize_int8_type)
 {
   data_group_type p{
     make_demo_data<int8_t>(1234, -32, 1648001566463)
   };
-  demo_message msg(p);
+  client_data msg(p);
   config::same_type(false);
   config::key_sequence(false);
   config::same_timestamp(false);
@@ -208,12 +208,12 @@ TEST(demo_message_test, serialize_int8_type)
   }
 }
 
-TEST(demo_message_test, serialize_bool_type)
+TEST(client_data_test, serialize_bool_type)
 {
   data_group_type p{
     make_demo_data<bool>(1234, true, 1648001566463)
   };
-  demo_message msg(p);
+  client_data msg(p);
   config::same_type(false);
   config::key_sequence(false);
   config::same_timestamp(false);
@@ -239,14 +239,14 @@ TEST(demo_message_test, serialize_bool_type)
   }
 }
 
-TEST(demo_message_test, serialize_multi_int8_type)
+TEST(client_data_test, serialize_multi_int8_type)
 {
   data_group_type vs{
     make_demo_data<int8_t>(1111, 11, 1648001566463),
     make_demo_data<int8_t>(1112, 12, 1648001566463),
     make_demo_data<int8_t>(1113, 13, 1648001566463)
   };
-  demo_message msg(vs);
+  client_data msg(vs);
   config::same_type(false);
   config::key_sequence(false);
   config::same_timestamp(false);
@@ -283,14 +283,14 @@ TEST(demo_message_test, serialize_multi_int8_type)
   }
 }
 
-TEST(demo_message_test, serialize_multi_types)
+TEST(client_data_test, serialize_multi_types)
 {
   data_group_type vs{
     make_demo_data<uint8_t>(1111, 11, 1648001566463),
     make_demo_data<int16_t>(1112, 12, 1648001566463),
     make_demo_data<uint32_t>(1113, 13, 1648001566463)
   };
-  demo_message msg(vs);
+  client_data msg(vs);
   config::same_type(false);
   config::key_sequence(false);
   config::same_timestamp(false);
@@ -327,7 +327,7 @@ TEST(demo_message_test, serialize_multi_types)
   }
 }
 
-TEST(demo_message_test, serialize_bool_type_compress_same_type_and_key_sequence)
+TEST(client_data_test, serialize_bool_type_compress_same_type_and_key_sequence)
 {
   data_group_type p{
     make_demo_data<bool>(1234, true, 1648001566463),
@@ -336,7 +336,7 @@ TEST(demo_message_test, serialize_bool_type_compress_same_type_and_key_sequence)
     make_demo_data<bool>(1237, false, 1648001566463),
     make_demo_data<bool>(1238, true, 1648001566463),
   };
-  demo_message msg(p);
+  client_data msg(p);
   config::same_type(false);
   config::key_sequence(false);
   config::same_timestamp(false);
@@ -376,7 +376,7 @@ TEST(demo_message_test, serialize_bool_type_compress_same_type_and_key_sequence)
   }
 }
 
-TEST(demo_message_test, serialize_bool_type_compress_same_type_and_same_timestampe)
+TEST(client_data_test, serialize_bool_type_compress_same_type_and_same_timestampe)
 {
   data_group_type p{
     make_demo_data<bool>(1234, true, 1648001566463),
@@ -385,7 +385,7 @@ TEST(demo_message_test, serialize_bool_type_compress_same_type_and_same_timestam
     make_demo_data<bool>(1237, false, 1648001566463),
     make_demo_data<bool>(1238, true, 1648001566463),
   };
-  demo_message msg(p);
+  client_data msg(p);
   config::same_type(false);
   config::key_sequence(false);
   config::same_timestamp(false);
@@ -425,7 +425,7 @@ TEST(demo_message_test, serialize_bool_type_compress_same_type_and_same_timestam
   }
 }
 
-TEST(demo_message_test, serialize_bool_type_compress_key_sequence_and_same_timestampe)
+TEST(client_data_test, serialize_bool_type_compress_key_sequence_and_same_timestampe)
 {
   data_group_type p{
     make_demo_data<bool>(1234, true, 1648001566463),
@@ -434,7 +434,7 @@ TEST(demo_message_test, serialize_bool_type_compress_key_sequence_and_same_times
     make_demo_data<bool>(1237, false, 1648001566463),
     make_demo_data<bool>(1238, true, 1648001566463),
   };
-  demo_message msg(p);
+  client_data msg(p);
   config::same_type(false);
   config::key_sequence(false);
   config::same_timestamp(false);
@@ -474,7 +474,7 @@ TEST(demo_message_test, serialize_bool_type_compress_key_sequence_and_same_times
   }
 }
 
-TEST(demo_message_test, serialize_bool_type_compress_all_attributes)
+TEST(client_data_test, serialize_bool_type_compress_all_attributes)
 {
   data_group_type p{
     make_demo_data<bool>(1234, true, 1648001566463),
@@ -483,7 +483,7 @@ TEST(demo_message_test, serialize_bool_type_compress_all_attributes)
     make_demo_data<bool>(1237, false, 1648001566463),
     make_demo_data<bool>(1238, true, 1648001566463),
   };
-  demo_message msg(p);
+  client_data msg(p);
   config::same_type(true);
   config::key_sequence(true);
   config::same_timestamp(true);
@@ -509,7 +509,7 @@ TEST(demo_message_test, serialize_bool_type_compress_all_attributes)
   }
 }
 
-TEST(demo_message_test, serialize_bool_type_compress_all_attributes_multiple_bytes)
+TEST(client_data_test, serialize_bool_type_compress_all_attributes_multiple_bytes)
 {
   data_group_type p{
     make_demo_data<bool>(1234, true, 1648001566463),
@@ -526,7 +526,7 @@ TEST(demo_message_test, serialize_bool_type_compress_all_attributes_multiple_byt
     make_demo_data<bool>(1245, true, 1648001566463),
     make_demo_data<bool>(1246, true, 1648001566463)
   };
-  demo_message msg(p);
+  client_data msg(p);
   config::same_type(true);
   config::key_sequence(true);
   config::same_timestamp(true);

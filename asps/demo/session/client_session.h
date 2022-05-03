@@ -2,10 +2,10 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file. See the AUTHORS file for names of contributors.
 //
-// Demo Session.
+// Demo Client Session.
 
-#ifndef ASPS_DEMO_SESSION_DEMO_SESSION_H
-#define ASPS_DEMO_SESSION_DEMO_SESSION_H
+#ifndef ASPS_DEMO_SESSION_CLIENT_SESSION_H
+#define ASPS_DEMO_SESSION_CLIENT_SESSION_H
 
 #include <cstdint>
 #include <vector>
@@ -17,12 +17,12 @@
 namespace asps {
 namespace demo {
 
-// Demo Session
-class demo_session : public session_service, public sequence_observer
+// Demo Client Session
+class client_session : public client_session_service, public event_observer
 {
 public:
-  demo_session();
-  ~demo_session();
+  client_session();
+  ~client_session();
 
 public:
   bool send(const data_group_type& group) override;
@@ -38,11 +38,12 @@ private:
 
 private:
   buffer_type buffer_;
-  sequence_service::pointer_type pkeep_seq_;
+  client_data_sequence_service::pointer_type data_sequence_;
+  client_positive_keepalive_sequence_service::pointer_type pkeep_sequence_;
   timer_service::pointer_type t1_;
 };
 
 } // demo
 } // asps
 
-#endif // ASPS_DEMO_SESSION_DEMO_SESSION_H
+#endif // ASPS_DEMO_SESSION_CLIENT_SESSION_H

@@ -23,14 +23,18 @@ configure_file(
 # Set sources for demo
 set(ASPS_DEMO_SOURCES
   api/demo_client.cc
+  api/demo_server.cc
   semantic/demo_data.cc
-  session/demo_session.cc
-  message/demo_message.cc
+  session/client_session.cc
+  session/server_session.cc
+  message/client_message.cc
+  message/server_message.cc
   utility/timer.cc
   utility/utility.cc
   utility/transport.cc
   config/config.cc
-  sequence/sequence.cc
+  sequence/client_sequence.cc
+  sequence/server_sequence.cc
   sequence/state.cc
 )
 

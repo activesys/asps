@@ -19,10 +19,11 @@
 namespace asps {
 namespace demo {
 
-class demo_client : public observer
+class demo_client : public client_observer
 {
 public:
-  demo_client(transport_service::pointer_type transport = make_transport_service())
+  demo_client(client_transport_service::pointer_type transport =
+                make_client_transport_service())
     : transport_(transport),
       t0_(make_timer_service(config::t0(),
                              std::bind(&demo_client::t0_timeout, this)))
@@ -55,8 +56,8 @@ private:
   void update_event() override;
 
 private:
-  transport_service::pointer_type transport_;
-  session_service::pointer_type session_;
+  client_transport_service::pointer_type transport_;
+  client_session_service::pointer_type session_;
   timer_service::pointer_type t0_;
   buffer_type read_buffer_;
 };

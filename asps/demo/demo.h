@@ -9,8 +9,10 @@
 
 #include <asps/demo/semantic/demo_data.h>
 #include <asps/demo/message/keepalive.h>
-#include <asps/demo/message/demo_message.h>
+#include <asps/demo/message/client_message.h>
+#include <asps/demo/message/server_message.h>
 #include <asps/demo/api/demo_client.h>
+#include <asps/demo/api/demo_server.h>
 #include <asps/demo/config/config.h>
 
 #endif // ASPS_DEMO_DEMO_H

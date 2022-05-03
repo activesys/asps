@@ -2,10 +2,10 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file. See the AUTHORS file for names of contributors.
 //
-// Demo Message.
+// Client Message.
 
-#ifndef ASPS_DEMO_MESSAGE_DEMO_MESSAGE_H
-#define ASPS_DEMO_MESSAGE_DEMO_MESSAGE_H
+#ifndef ASPS_DEMO_MESSAGE_CLIENT_MESSAGE_H
+#define ASPS_DEMO_MESSAGE_CLIENT_MESSAGE_H
 
 #include <cstdint>
 #include <cstring>
@@ -18,32 +18,9 @@
 namespace asps {
 namespace demo {
 
-// demo_message without compression
-class demo_message : public message_serialization_service
+// client_data without compression
+class client_data : public message_serialization_service
 {
-  enum header_field_length {
-    header_flag_field_length = 8,
-    header_length_field_length = 2,
-    header_count_field_length = 2,
-    header_attribute_field_length = 1
-  };
-  enum mutable_field_length {
-    mutable_type_field_length = 1,
-    mutable_key_field_length = 4,
-    mutable_timestamp_field_length = 8
-  };
-  enum data_field_length {
-    data_type_field_length = 1,
-    data_key_field_length = 4,
-    data_timestamp_field_length = 8
-  };
-  enum attribute {
-    attr_none = 0x00,
-    attr_same_type = 0x01,
-    attr_key_sequence = 0x02,
-    attr_same_timestamp = 0x04
-  };
-
   typedef std::list<data_group_type> data_groups_type;
 
   // for sort demo_data
@@ -57,7 +34,7 @@ class demo_message : public message_serialization_service
   };
 
 public:
-  demo_message(const data_group_type& group)
+  client_data(const data_group_type& group)
     : message_serialization_service(),
       datas_{group}
   {}
@@ -117,4 +94,4 @@ public:
 } // demo
 } // asps
 
-#endif // ASPS_DEMO_MESSAGE_DEMO_MESSAGE_H
+#endif // ASPS_DEMO_MESSAGE_CLIENT_MESSAGE_H

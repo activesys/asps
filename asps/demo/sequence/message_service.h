@@ -25,6 +25,29 @@ enum message_type
   invalid_message
 };
 
+enum header_field_length {
+  header_flag_field_length = 8,
+  header_length_field_length = 2,
+  header_count_field_length = 2,
+  header_attribute_field_length = 1
+};
+enum mutable_field_length {
+  mutable_type_field_length = 1,
+  mutable_key_field_length = 4,
+  mutable_timestamp_field_length = 8
+};
+enum data_field_length {
+  data_type_field_length = 1,
+  data_key_field_length = 4,
+  data_timestamp_field_length = 8
+};
+enum attribute {
+  attr_none = 0x00,
+  attr_same_type = 0x01,
+  attr_key_sequence = 0x02,
+  attr_same_timestamp = 0x04
+};
+
 static const uint8_t DATA_MESSAGE_FLAG[] = {
   // header flag 'DEMOV100'
   0x44, 0x45, 0x4d, 0x4f, 0x56, 0x31, 0x30, 0x30
@@ -67,11 +90,20 @@ public:
   virtual ~message_unserialization_service() {}
 
 public:
+  const data_group_type& datas()
+  {return datas_;}
+
+public:
   virtual bool unserialize(buffer_type& buffer) = 0;
+
+protected:
+  data_group_type datas_;
 };
 
 message_unserialization_service::pointer_type
 make_message_unserialization_service(bool positive);
+message_unserialization_service::pointer_type
+make_message_unserialization_service();
 
 message_unserialization_service::pointer_type
 make_invalid_message();

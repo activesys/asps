@@ -13,6 +13,7 @@
 #include <thread>
 #include <functional>
 #include <boost/asio.hpp>
+#include <asps/demo/utility/utility.h>
 
 namespace asps_test {
 namespace demo_test {

@@ -2,19 +2,19 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file. See the AUTHORS file for names of contributors.
 //
-// Unit test for sequence.
+// Unit test for client sequence.
 
 #include <cstdint>
 #include <gtest/gtest.h>
 #include <asps/demo/demo.h>
-#include <asps/demo/sequence/sequence.h>
+#include <asps/demo/sequence/client_sequence.h>
 
 namespace asps_test {
 namespace demo_test {
 
 using namespace asps::demo;
 
-TEST(data_sequence_test, request_and_response)
+TEST(client_data_sequence_test, request_and_response)
 {
     data_group_type p{
     make_demo_data<bool>(1234, true, 1648001566463),
@@ -31,13 +31,13 @@ TEST(data_sequence_test, request_and_response)
     make_demo_data<bool>(1245, true, 1648001566463),
     make_demo_data<bool>(1246, true, 1648001566463)
   };
-  sequence_service::pointer_type ds = make_sequence_service(p);
+  client_data_sequence_service::pointer_type ds = make_client_data_sequence();
   config::same_type(true);
   config::key_sequence(true);
   config::same_timestamp(true);
 
-  const buffer_type& buffer = ds->request();
-  const uint8_t expect_buffer[] = {
+  const buffer_type& buffer_p = ds->request(p);
+  const uint8_t expect_buffer_p[] = {
     // header
     0x44, 0x45, 0x4d, 0x4f, 0x56, 0x31, 0x30, 0x30, // header flag
     0x00, 0x1c, // header length
@@ -51,18 +51,53 @@ TEST(data_sequence_test, request_and_response)
     0xff,
     0x1f
   };
-  for (std::size_t i = 0; i < sizeof(expect_buffer); ++i) {
-    EXPECT_EQ(buffer[i], expect_buffer[i]);
+  for (std::size_t i = 0; i < sizeof(expect_buffer_p); ++i) {
+    EXPECT_EQ(buffer_p[i], expect_buffer_p[i]);
   }
 
-  std::vector<uint8_t> receive_buffer{0x00};
-  EXPECT_FALSE(ds->response(receive_buffer));
+  data_group_type vs{
+    make_demo_data<uint8_t>(1111, 11, 1648001566463),
+    make_demo_data<int16_t>(1112, 12, 1648001566463),
+    make_demo_data<uint32_t>(1113, 13, 1648001566463)
+  };
+  const uint8_t expect_buffer_vs[] = {
+    // header
+    0x44, 0x45, 0x4d, 0x4f, 0x56, 0x31, 0x30, 0x30, // header flag
+    0x00, 0x3b, // header length
+    0x00, 0x03, // header count
+    0x00, // header attr
+    // mutable
+    // data 1
+    0x02, // data type
+    0x00, 0x00, 0x04, 0x57, // data key
+    0x00, 0x00, 0x01, 0x7f, 0xb4, 0x8c, 0x46, 0xff, // data timestamp
+    0x0b,  // data value
+    // data 2
+    0x03, // data type
+    0x00, 0x00, 0x04, 0x58, // data key
+    0x00, 0x00, 0x01, 0x7f, 0xb4, 0x8c, 0x46, 0xff, // data timestamp
+    0x00, 0x0c,  // data value
+    // data 3
+    0x06, // data type
+    0x00, 0x00, 0x04, 0x59, // data key
+    0x00, 0x00, 0x01, 0x7f, 0xb4, 0x8c, 0x46, 0xff, // data timestamp
+    0x00, 0x00, 0x00, 0x0d  // data value
+  };
+
+  config::same_type(false);
+  config::key_sequence(false);
+  config::same_timestamp(false);
+  const buffer_type& buffer_vs = ds->request(vs);
+  for (std::size_t i = 0; i < sizeof(expect_buffer_vs); ++i) {
+    EXPECT_EQ(buffer_vs[i], expect_buffer_vs[i]);
+  }
 }
 
-TEST(positive_keepalive_sequence_test, request_and_response)
+TEST(client_positive_keepalive_sequence_test, request_and_response)
 {
   config::pack_nkeep(0xff, 0x00);
-  sequence_service::pointer_type pks = make_sequence_service(true);
+  client_positive_keepalive_sequence_service::pointer_type pks =
+    make_client_positive_keepalive_sequence();
 
   const buffer_type& before_buffer = pks->request();
   const uint8_t expect_buffer[] = {
@@ -80,10 +115,11 @@ TEST(positive_keepalive_sequence_test, request_and_response)
   EXPECT_TRUE(pks->response(receive_buffer));
 }
 
-TEST(negative_keepalive_sequence_test, request_and_response)
+TEST(client_negative_keepalive_sequence_test, request_and_response)
 {
   config::pack_nkeep(0xff, 0x00);
-  sequence_service::pointer_type nks = make_sequence_service(false);
+  client_negative_keepalive_sequence_service::pointer_type nks =
+    make_client_negative_keepalive_sequence();
 
   std::vector<uint8_t> receive_buffer{0x00};
   EXPECT_TRUE(nks->response(receive_buffer));

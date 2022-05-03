@@ -45,7 +45,7 @@ void demo_client::t0_timeout()
 void demo_client::connect_handler(bool success)
 {
   if (success) {
-    session_ = make_session_service();
+    session_ = make_client_session_service();
     session_->register_observer(this);
     t0_->stop();
     transport_->read(std::bind(&demo_client::read_handler, this, _1, _2, _3));

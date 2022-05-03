@@ -10,10 +10,14 @@ enable_testing()
 # Set sources for modbus
 set(ASPS_DEMO_TEST_SOURCES
   api/demo_client_test.cc
-  message/demo_message_test.cc
+  api/demo_server_test.cc
+  message/client_data_test.cc
   message/keepalive_test.cc
+  message/server_data_test.cc
   config/config_test.cc
-  sequence/sequence_test.cc
+  sequence/client_sequence_test.cc
+  sequence/server_sequence_test.cc
+  session/server_session_test.cc
 )
 
 ##################################

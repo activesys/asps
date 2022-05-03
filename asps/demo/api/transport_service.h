@@ -7,6 +7,7 @@
 #ifndef ASPS_DEMO_API_TRANSPORT_SERVICE_H
 #define ASPS_DEMO_API_TRANSPORT_SERVICE_H
 
+#include <string>
 #include <memory>
 #include <functional>
 #include <asps/demo/semantic/demo_data.h>
@@ -14,18 +15,19 @@
 namespace asps {
 namespace demo {
 
-class transport_service
+// Client Transport Service
+class client_transport_service
 {
 public:
-  typedef std::shared_ptr<transport_service> pointer_type;
+  typedef std::shared_ptr<client_transport_service> pointer_type;
 
   typedef std::function<void(bool)> connect_handler;
   typedef std::function<void(bool,std::size_t)> write_handler;
   typedef std::function<void(bool,const buffer_type&,std::size_t)> read_handler;
 
 public:
-  transport_service() = default;
-  virtual ~transport_service() {}
+  client_transport_service() = default;
+  virtual ~client_transport_service() {}
 
 public:
   virtual void read(const read_handler& handler) = 0;
@@ -36,7 +38,33 @@ public:
   virtual void stop() = 0;
 };
 
-transport_service::pointer_type make_transport_service();
+client_transport_service::pointer_type
+make_client_transport_service();
+
+// Server Transport Service
+class server_transport_service
+{
+public:
+  typedef std::shared_ptr<server_transport_service> pointer_type;
+
+  typedef std::function<void(bool)> accept_handler;
+  typedef std::function<void(bool,const buffer_type&,std::size_t)> read_handler;
+
+public:
+  server_transport_service() = default;
+  virtual ~server_transport_service() {}
+
+public:
+  virtual void accept(const accept_handler& handler) = 0;
+  virtual void read(const read_handler& handler) = 0;
+  virtual void run() = 0;
+  virtual void stop() = 0;
+};
+
+server_transport_service::pointer_type
+make_server_transport_service(const std::string& ip, uint16_t port);
+server_transport_service::pointer_type
+make_server_transport_service(uint16_t port);
 
 } // demo
 } // asps

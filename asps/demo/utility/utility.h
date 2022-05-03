@@ -17,6 +17,7 @@ typedef std::vector<uint8_t> buffer_type;
 
 // host sequence to network sequence for 64bits integer.
 uint64_t htonll(uint64_t value);
+uint64_t ntohll(uint64_t value);
 
 } // demo
 } // asps

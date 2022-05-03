@@ -13,17 +13,17 @@
 namespace asps {
 namespace demo {
 
-class positive_keepalive_sequence;
+class client_positive_keepalive_sequence;
 class state
 {
 public:
   virtual ~state() {}
 
 public:
-  virtual const buffer_type& request(positive_keepalive_sequence* seq) = 0;
-  virtual bool response(positive_keepalive_sequence* seq,
+  virtual const buffer_type& request(client_positive_keepalive_sequence* seq) = 0;
+  virtual bool response(client_positive_keepalive_sequence* seq,
                         buffer_type& buffer) = 0;
-  virtual void timeout(positive_keepalive_sequence* seq) = 0;
+  virtual void timeout(client_positive_keepalive_sequence* seq) = 0;
 };
 
 class none_state : public state
@@ -32,10 +32,10 @@ private:
   none_state() = default;
 
 public:
-  virtual const buffer_type& request(positive_keepalive_sequence* seq) override;
-  virtual bool response(positive_keepalive_sequence* seq,
+  virtual const buffer_type& request(client_positive_keepalive_sequence* seq) override;
+  virtual bool response(client_positive_keepalive_sequence* seq,
                         buffer_type& buffer) override;
-  virtual void timeout(positive_keepalive_sequence* seq) override;
+  virtual void timeout(client_positive_keepalive_sequence* seq) override;
 
 public:
   static state* instance()
@@ -57,10 +57,10 @@ private:
   keepalive_sent_state() = default;
 
 public:
-  virtual const buffer_type& request(positive_keepalive_sequence* seq) override;
-  virtual bool response(positive_keepalive_sequence* seq,
+  virtual const buffer_type& request(client_positive_keepalive_sequence* seq) override;
+  virtual bool response(client_positive_keepalive_sequence* seq,
                         buffer_type& buffer) override;
-  virtual void timeout(positive_keepalive_sequence* seq) override;
+  virtual void timeout(client_positive_keepalive_sequence* seq) override;
 
 public:
   static state* instance()

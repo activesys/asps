@@ -6,7 +6,7 @@
 
 #include <algorithm>
 #include <map>
-#include <asps/demo/message/demo_message.h>
+#include <asps/demo/message/client_message.h>
 #include <asps/demo/message/keepalive.h>
 #include <asps/demo/config/config.h>
 
@@ -56,7 +56,7 @@ message_type get_message_type(const buffer_type& buffer)
 message_serialization_service::pointer_type
 make_message_serialization_service(const data_group_type& group)
 {
-  return std::make_shared<demo_message>(group);
+  return std::make_shared<client_data>(group);
 }
 message_serialization_service::pointer_type
 make_message_serialization_service(bool positive)
@@ -83,7 +83,7 @@ make_invalid_message()
   return std::make_shared<invalid_unserialization_message>();
 }
 
-const buffer_type& demo_message::serialize()
+const buffer_type& client_data::serialize()
 {
   group();
 
@@ -103,7 +103,7 @@ const buffer_type& demo_message::serialize()
   return buffer_;
 }
 
-void demo_message::group()
+void client_data::group()
 {
   /*
    * The order is determined by the length of the compressed data.
@@ -116,7 +116,7 @@ void demo_message::group()
   group_according_to_same_type();
 }
 
-void demo_message::group_according_to_same_type()
+void client_data::group_according_to_same_type()
 {
   if (config::same_type()) {
     data_groups_type temp_groups(std::move(datas_));
@@ -134,7 +134,7 @@ void demo_message::group_according_to_same_type()
   }
 }
 
-void demo_message::group_according_to_key_sequence()
+void client_data::group_according_to_key_sequence()
 {
   if (config::key_sequence()) {
     compare comp;
@@ -164,7 +164,7 @@ void demo_message::group_according_to_key_sequence()
   }
 }
 
-void demo_message::group_according_to_same_timestamp()
+void client_data::group_according_to_same_timestamp()
 {
   if (config::same_timestamp()) {
     data_groups_type temp_groups(std::move(datas_));
@@ -182,14 +182,14 @@ void demo_message::group_according_to_same_timestamp()
   }
 }
 
-std::size_t demo_message::serialization_length(data_group_type& group)
+std::size_t client_data::serialization_length(data_group_type& group)
 {
   return serialization_header_length(group) +
          serialization_mutable_length(group) +
          serialization_datas_length(group);
 }
 
-std::size_t demo_message::serialization_header_length(data_group_type& group)
+std::size_t client_data::serialization_header_length(data_group_type& group)
 {
   return header_flag_field_length +
          header_length_field_length +
@@ -197,7 +197,7 @@ std::size_t demo_message::serialization_header_length(data_group_type& group)
          header_attribute_field_length;
 }
 
-std::size_t demo_message::serialization_mutable_length(data_group_type& group)
+std::size_t client_data::serialization_mutable_length(data_group_type& group)
 {
   std::size_t length = 0;
 
@@ -214,7 +214,7 @@ std::size_t demo_message::serialization_mutable_length(data_group_type& group)
   return length;
 }
 
-std::size_t demo_message::serialization_datas_length(data_group_type& group)
+std::size_t client_data::serialization_datas_length(data_group_type& group)
 {
   std::size_t length = 0;
 
@@ -246,7 +246,7 @@ std::size_t demo_message::serialization_datas_length(data_group_type& group)
 }
 
 // deocde header
-void demo_message::serialize_header(data_group_type& group,
+void client_data::serialize_header(data_group_type& group,
                                     uint8_t*& pos)
 {
   serialize_header_flag(group, pos);
@@ -255,7 +255,7 @@ void demo_message::serialize_header(data_group_type& group,
   serialize_header_attribute(group, pos);
 }
 
-void demo_message::serialize_header_flag(data_group_type& group,
+void client_data::serialize_header_flag(data_group_type& group,
                                          uint8_t*& pos)
 {
   // flag field is "DEMOV100"
@@ -265,21 +265,21 @@ void demo_message::serialize_header_flag(data_group_type& group,
   pos += header_flag_field_length;
 }
 
-void demo_message::serialize_header_length(data_group_type& group,
+void client_data::serialize_header_length(data_group_type& group,
                                            uint8_t*& pos)
 {
   *reinterpret_cast<uint16_t*>(pos) = htons(serialization_length(group));
   pos += header_length_field_length;
 }
 
-void demo_message::serialize_header_count(data_group_type& group,
+void client_data::serialize_header_count(data_group_type& group,
                                           uint8_t*& pos)
 {
   *reinterpret_cast<uint16_t*>(pos) = htons(group.size());
   pos += header_count_field_length;
 }
 
-void demo_message::serialize_header_attribute(data_group_type& group,
+void client_data::serialize_header_attribute(data_group_type& group,
                                               uint8_t*& pos)
 {
   *pos = attr_none;
@@ -296,7 +296,7 @@ void demo_message::serialize_header_attribute(data_group_type& group,
 }
 
 // decode mutable
-void demo_message::serialize_mutable(data_group_type& group,
+void client_data::serialize_mutable(data_group_type& group,
                                      uint8_t*& pos)
 {
   serialize_mutable_type(group, pos);
@@ -304,7 +304,7 @@ void demo_message::serialize_mutable(data_group_type& group,
   serialize_mutable_timestamp(group, pos);
 }
 
-void demo_message::serialize_mutable_type(data_group_type& group,
+void client_data::serialize_mutable_type(data_group_type& group,
                                           uint8_t*& pos)
 {
   if (config::same_type()) {
@@ -313,7 +313,7 @@ void demo_message::serialize_mutable_type(data_group_type& group,
   }
 }
 
-void demo_message::serialize_mutable_key(data_group_type& group,
+void client_data::serialize_mutable_key(data_group_type& group,
                                          uint8_t*& pos)
 {
   if (config::key_sequence()) {
@@ -322,7 +322,7 @@ void demo_message::serialize_mutable_key(data_group_type& group,
   }
 }
 
-void demo_message::serialize_mutable_timestamp(data_group_type& group,
+void client_data::serialize_mutable_timestamp(data_group_type& group,
                                                uint8_t*& pos)
 {
   if (config::same_timestamp()) {
@@ -332,7 +332,7 @@ void demo_message::serialize_mutable_timestamp(data_group_type& group,
 }
 
 // decode datas
-void demo_message::serialize_datas(data_group_type& group,
+void client_data::serialize_datas(data_group_type& group,
                                    uint8_t*& pos)
 {
   /*
@@ -346,7 +346,7 @@ void demo_message::serialize_datas(data_group_type& group,
     std::size_t byte_count = (group.size() + 7) / 8;
     for (std::size_t i = 0; i < group.size(); ++i) {
       uint8_t value;
-      group.at(i)->assign_network_sequence_value(&value);
+      group.at(i)->serialize_network_sequence_value(&value);
       pos[i/8] |= value << i % 8;
     }
   } else {
@@ -356,7 +356,7 @@ void demo_message::serialize_datas(data_group_type& group,
   }
 }
 
-void demo_message::serialize_one_data(demo_data::pointer_type& data,
+void client_data::serialize_one_data(demo_data::pointer_type& data,
                                       uint8_t*& pos)
 {
   serialize_data_type(data, pos);
@@ -365,7 +365,7 @@ void demo_message::serialize_one_data(demo_data::pointer_type& data,
   serialize_data_value(data, pos);
 }
 
-void demo_message::serialize_data_type(demo_data::pointer_type& data,
+void client_data::serialize_data_type(demo_data::pointer_type& data,
                                        uint8_t*& pos)
 {
   if (!config::same_type()) {
@@ -374,7 +374,7 @@ void demo_message::serialize_data_type(demo_data::pointer_type& data,
   }
 }
 
-void demo_message::serialize_data_key(demo_data::pointer_type& data,
+void client_data::serialize_data_key(demo_data::pointer_type& data,
                                       uint8_t*& pos)
 {
   if (!config::key_sequence()) {
@@ -383,7 +383,7 @@ void demo_message::serialize_data_key(demo_data::pointer_type& data,
   }
 }
 
-void demo_message::serialize_data_timestamp(demo_data::pointer_type& data,
+void client_data::serialize_data_timestamp(demo_data::pointer_type& data,
                                             uint8_t*& pos)
 {
   if (!config::same_timestamp()) {
@@ -392,10 +392,10 @@ void demo_message::serialize_data_timestamp(demo_data::pointer_type& data,
   }
 }
 
-void demo_message::serialize_data_value(demo_data::pointer_type& data,
+void client_data::serialize_data_value(demo_data::pointer_type& data,
                                         uint8_t*& pos)
 {
-  data->assign_network_sequence_value(pos);
+  data->serialize_network_sequence_value(pos);
   pos += data->size();
 }
 
