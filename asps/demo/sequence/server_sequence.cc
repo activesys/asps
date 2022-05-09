@@ -10,17 +10,11 @@ namespace asps {
 namespace demo {
 
 // Server Data Sequence
-server_data_sequence_service::pointer_type
-make_server_data_sequence()
-{
-  return std::make_shared<server_data_sequence>();
-}
-
 server_data_sequence::server_data_sequence()
-  : message_(make_message_unserialization_service())
+  : message_(make_server_data_message())
 {}
 
-bool server_data_sequence::response(buffer_type& buffer)
+bool server_data_sequence::receive_data(buffer_type& buffer)
 {
   if (message_->unserialize(buffer)) {
     notify_data(message_->datas());
@@ -28,6 +22,20 @@ bool server_data_sequence::response(buffer_type& buffer)
   } else {
     return false;
   }
+}
+
+// Server Positive Keepalive Sequence
+server_positive_keepalive_sequence::server_positive_keepalive_sequence()
+{
+  keepalive_ = make_server_positive_keepalive();
+  ack_ = make_server_positive_keepalive_ack();
+}
+
+// Server Negative Keepalive Sequence
+server_negative_keepalive_sequence::server_negative_keepalive_sequence()
+{
+  keepalive_ = make_server_negative_keepalive();
+  ack_ = make_server_negative_keepalive_ack();
 }
 
 } // demo

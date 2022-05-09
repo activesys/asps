@@ -18,7 +18,7 @@ std::shared_ptr<io_context> context = std::make_shared<io_context>();
 client_transport_service::pointer_type
 make_client_transport_service()
 {
-  return std::make_shared<client_transport>(*context);
+  return std::make_shared<client_transport>(context);
 }
 
 void client_transport::connect(const connect_handler& handler)
@@ -65,27 +65,25 @@ void client_transport::close()
 
 void client_transport::run()
 {
-  context_.run();
-  context_.restart();
-  context = std::make_shared<io_context>();
+  context_->run();
 }
 
 void client_transport::stop()
 {
-  context_.stop();
+  context_->stop();
 }
 
 // Server Transport
 server_transport_service::pointer_type
 make_server_transport_service(const std::string& ip, uint16_t port)
 {
-  return std::make_shared<server_transport>(*context, ip, port);
+  return std::make_shared<server_transport>(context, ip, port);
 }
 
 server_transport_service::pointer_type
 make_server_transport_service(uint16_t port)
 {
-  return std::make_shared<server_transport>(*context, port);
+  return std::make_shared<server_transport>(context, port);
 }
 
 void server_transport::accept(const accept_handler& handler)
@@ -101,16 +99,26 @@ void server_transport::read(const read_handler& handler)
                         std::bind(&server_transport::on_read, this, _1, _2));
 }
 
+void server_transport::write(const buffer_type& buf, const write_handler& handler)
+{
+  write_handler_ = handler;
+  peer_.async_write_some(buffer(buf),
+                         std::bind(&server_transport::on_write, this, _1, _2));
+}
+
 void server_transport::run()
 {
-  context_.run();
-  context_.restart();
-  context = std::make_shared<io_context>();
+  context_->run();
 }
 
 void server_transport::stop()
 {
-  context_.stop();
+  context_->stop();
+}
+
+void server_transport::close()
+{
+  peer_.close();
 }
 
 void server_transport::on_accept(const error_code& ec)
@@ -121,6 +129,11 @@ void server_transport::on_accept(const error_code& ec)
 void server_transport::on_read(const error_code& ec, std::size_t bytes)
 {
   read_handler_(!ec, read_buffer_, bytes);
+}
+
+void server_transport::on_write(const error_code& ec, std::size_t bytes)
+{
+  write_handler_(!ec, bytes);
 }
 
 } // demo

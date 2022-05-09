@@ -13,17 +13,17 @@
 namespace asps {
 namespace demo {
 
-class client_positive_keepalive_sequence;
+class active_sequence;
 class state
 {
 public:
   virtual ~state() {}
 
 public:
-  virtual const buffer_type& request(client_positive_keepalive_sequence* seq) = 0;
-  virtual bool response(client_positive_keepalive_sequence* seq,
+  virtual const buffer_type& request(active_sequence* seq) = 0;
+  virtual bool response(active_sequence* seq,
                         buffer_type& buffer) = 0;
-  virtual void timeout(client_positive_keepalive_sequence* seq) = 0;
+  virtual void timeout(active_sequence* seq) = 0;
 };
 
 class none_state : public state
@@ -32,10 +32,10 @@ private:
   none_state() = default;
 
 public:
-  virtual const buffer_type& request(client_positive_keepalive_sequence* seq) override;
-  virtual bool response(client_positive_keepalive_sequence* seq,
+  virtual const buffer_type& request(active_sequence* seq) override;
+  virtual bool response(active_sequence* seq,
                         buffer_type& buffer) override;
-  virtual void timeout(client_positive_keepalive_sequence* seq) override;
+  virtual void timeout(active_sequence* seq) override;
 
 public:
   static state* instance()
@@ -51,22 +51,22 @@ private:
   static state* instance_;
 };
 
-class keepalive_sent_state : public state
+class sent_state : public state
 {
 private:
-  keepalive_sent_state() = default;
+  sent_state() = default;
 
 public:
-  virtual const buffer_type& request(client_positive_keepalive_sequence* seq) override;
-  virtual bool response(client_positive_keepalive_sequence* seq,
+  virtual const buffer_type& request(active_sequence* seq) override;
+  virtual bool response(active_sequence* seq,
                         buffer_type& buffer) override;
-  virtual void timeout(client_positive_keepalive_sequence* seq) override;
+  virtual void timeout(active_sequence* seq) override;
 
 public:
   static state* instance()
   {
     if (instance_ == nullptr) {
-      instance_ = new keepalive_sent_state();
+      instance_ = new sent_state();
     }
 
     return instance_;

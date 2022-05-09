@@ -72,7 +72,9 @@ public:
   virtual ~server_observer() {}
 
 public:
+  virtual void update_send(const buffer_type& buffer) = 0;
   virtual void update_data(const data_group_type& datas) = 0;
+  virtual void update_event() = 0;
 };
 
 /*
@@ -96,6 +98,18 @@ public:
   {
     for (auto o : os_) {
       o->update_data(datas);
+    }
+  }
+  virtual void notify_send(const buffer_type& buffer)
+  {
+    for (auto o : os_) {
+      o->update_send(buffer);
+    }
+  }
+  virtual void notify_event()
+  {
+    for (auto o : os_) {
+      o->update_event();
     }
   }
 

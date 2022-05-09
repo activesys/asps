@@ -76,11 +76,6 @@ public:
   virtual const buffer_type& serialize() = 0;
 };
 
-message_serialization_service::pointer_type
-make_message_serialization_service(const data_group_type& group);
-message_serialization_service::pointer_type
-make_message_serialization_service(bool positive);
-
 class message_unserialization_service
 {
 public:
@@ -100,11 +95,27 @@ protected:
   data_group_type datas_;
 };
 
+// Make function for serialization and unserialization service
+message_serialization_service::pointer_type
+make_client_data_message(const data_group_type& group);
+message_serialization_service::pointer_type
+make_client_positive_keepalive();
+message_serialization_service::pointer_type
+make_client_negative_keepalive_ack();
 message_unserialization_service::pointer_type
-make_message_unserialization_service(bool positive);
+make_client_positive_keepalive_ack();
 message_unserialization_service::pointer_type
-make_message_unserialization_service();
-
+make_client_negative_keepalive();
+message_unserialization_service::pointer_type
+make_server_data_message();
+message_unserialization_service::pointer_type
+make_server_positive_keepalive();
+message_serialization_service::pointer_type
+make_server_positive_keepalive_ack();
+message_serialization_service::pointer_type
+make_server_negative_keepalive();
+message_unserialization_service::pointer_type
+make_server_negative_keepalive_ack();
 message_unserialization_service::pointer_type
 make_invalid_message();
 

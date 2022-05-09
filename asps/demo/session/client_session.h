@@ -18,7 +18,9 @@ namespace asps {
 namespace demo {
 
 // Demo Client Session
-class client_session : public client_session_service, public event_observer
+class client_session
+  : public client_session_service,
+    public event_observer
 {
 public:
   client_session();
@@ -28,18 +30,18 @@ public:
   bool send(const data_group_type& group) override;
   void receive(buffer_type& buffer) override;
 
-  void t1_timeout();
-
-public:
+private:
   void update_event() override;
 
 private:
   bool receive_one_package(buffer_type& buffer);
+  void t1_timeout();
 
 private:
   buffer_type buffer_;
-  client_data_sequence_service::pointer_type data_sequence_;
-  client_positive_keepalive_sequence_service::pointer_type pkeep_sequence_;
+  data_send_sequence_service::pointer_type data_sequence_;
+  active_sequence_service::pointer_type pkeep_sequence_;
+  garbage_collector_sequence_service::pointer_type gc_sequence_;
   timer_service::pointer_type t1_;
 };
 

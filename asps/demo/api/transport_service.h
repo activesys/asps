@@ -49,6 +49,7 @@ public:
 
   typedef std::function<void(bool)> accept_handler;
   typedef std::function<void(bool,const buffer_type&,std::size_t)> read_handler;
+  typedef std::function<void(bool,std::size_t)> write_handler;
 
 public:
   server_transport_service() = default;
@@ -57,8 +58,10 @@ public:
 public:
   virtual void accept(const accept_handler& handler) = 0;
   virtual void read(const read_handler& handler) = 0;
+  virtual void write(const buffer_type& buf, const write_handler& handler) = 0;
   virtual void run() = 0;
   virtual void stop() = 0;
+  virtual void close() = 0;
 };
 
 server_transport_service::pointer_type

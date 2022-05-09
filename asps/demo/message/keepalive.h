@@ -17,13 +17,13 @@
 namespace asps {
 namespace demo {
 
-class positive_keepalive : public message_serialization_service
+// Client keepalive and ack
+class client_positive_keepalive
+  : public message_serialization_service
 {
   enum flag_length {
     flag_field_length = 4
   };
-
-  typedef std::vector<uint8_t> buffer_type;
 
 public:
   const buffer_type& serialize() override
@@ -44,7 +44,8 @@ private:
   buffer_type buffer_;
 };
 
-class positive_keepalive_ack : public message_unserialization_service
+class client_positive_keepalive_ack
+  : public message_unserialization_service
 {
   enum flag_length {
     flag_field_length = 1
@@ -61,7 +62,8 @@ public:
   }
 };
 
-class negative_keepalive : public message_unserialization_service
+class client_negative_keepalive
+  : public message_unserialization_service
 {
   enum flag_length {
     flag_field_length = 1
@@ -78,13 +80,12 @@ public:
   }
 };
 
-class negative_keepalive_ack : public message_serialization_service
+class client_negative_keepalive_ack
+  : public message_serialization_service
 {
   enum flag_length {
     flag_field_length = 4
   };
-
-  typedef std::vector<uint8_t> buffer_type;
 
 public:
   const buffer_type& serialize() override
@@ -103,6 +104,89 @@ public:
 
 private:
   buffer_type buffer_;
+};
+
+// Server keepalive and ack
+class server_positive_keepalive
+  : public message_unserialization_service
+{
+  enum flag_length {
+    flag_field_length = 4
+  };
+
+public:
+  bool unserialize(buffer_type& buffer) override
+  {
+    bool ret = !buffer.empty() &&
+               memcmp(buffer.data(),
+                      POSITIVE_KEEPALIVE_MESSAGE_FLAG,
+                      flag_field_length) == 0;
+    if (ret) {
+      buffer.erase(buffer.begin(), buffer.begin() + flag_field_length);
+    }
+    return ret;
+  }
+};
+
+class server_positive_keepalive_ack
+  : public message_serialization_service
+{
+  enum flag_length {
+    flag_field_length = 1
+  };
+
+public:
+  const buffer_type& serialize() override
+  {
+    buffer_.resize(flag_field_length);
+    buffer_[0] = config::pack();
+
+    return buffer_;
+  }
+
+private:
+  buffer_type buffer_;
+};
+
+class server_negative_keepalive
+  : public message_serialization_service
+{
+  enum flag_length {
+    flag_field_length = 1
+  };
+
+public:
+  const buffer_type& serialize() override
+  {
+    buffer_.resize(flag_field_length);
+    buffer_[0] = config::nkeep();
+
+    return buffer_;
+  }
+
+private:
+  buffer_type buffer_;
+};
+
+class server_negative_keepalive_ack
+  : public message_unserialization_service
+{
+  enum flag_length {
+    flag_field_length = 4
+  };
+
+public:
+  bool unserialize(buffer_type& buffer) override
+  {
+    bool ret = !buffer.empty() &&
+               memcmp(buffer.data(),
+                      NEGATIVE_KEEPALIVE_ACK_MESSAGE_FLAG,
+                      flag_field_length) == 0;
+    if (ret) {
+      buffer.erase(buffer.begin(), buffer.begin() + flag_field_length);
+    }
+    return ret;
+  }
 };
 
 } // demo

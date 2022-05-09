@@ -23,10 +23,10 @@ extern std::shared_ptr<io_context> context;
 class client_transport : public client_transport_service
 {
 public:
-  client_transport(io_context& context)
+  client_transport(std::shared_ptr<io_context> context)
     : client_transport_service(),
       context_(context),
-      socket_(context)
+      socket_(*context_)
   {
     read_buffer_.resize(config::read_buffer_size());
   }
@@ -45,7 +45,7 @@ private:
   void on_read(const error_code& ec, std::size_t bytes);
 
 private:
-  io_context& context_;
+  std::shared_ptr<io_context> context_;
   ip::tcp::socket socket_;
   connect_handler connect_handler_;
   write_handler write_handler_;
@@ -57,17 +57,17 @@ private:
 class server_transport : public server_transport_service
 {
 public:
-  server_transport(io_context& context, const std::string& ip, uint16_t port)
+  server_transport(std::shared_ptr<io_context> context, const std::string& ip, uint16_t port)
     : context_(context),
-      acceptor_(context_, ip::tcp::endpoint(ip::address::from_string(ip), port)),
-      peer_(context_)
+      acceptor_(*context_, ip::tcp::endpoint(ip::address::from_string(ip), port)),
+      peer_(*context_)
   {
     read_buffer_.resize(config::read_buffer_size());
   }
-  server_transport(io_context& context, uint16_t port)
+  server_transport(std::shared_ptr<io_context> context, uint16_t port)
     : context_(context),
-      acceptor_(context_, ip::tcp::endpoint(ip::tcp::v4(), port)),
-      peer_(context_)
+      acceptor_(*context_, ip::tcp::endpoint(ip::tcp::v4(), port)),
+      peer_(*context_)
   {
     read_buffer_.resize(config::read_buffer_size());
   }
@@ -75,20 +75,24 @@ public:
 public:
   virtual void accept(const accept_handler& handler) override;
   virtual void read(const read_handler& handler) override;
+  virtual void write(const buffer_type& buf, const write_handler& handler) override;
   virtual void stop() override;
   virtual void run() override;
+  virtual void close() override;
 
 private:
   void on_accept(const error_code& ec);
   void on_read(const error_code& ec, std::size_t bytes);
+  void on_write(const error_code& ec, std::size_t bytes);
 
 private:
-  io_context& context_;
+  std::shared_ptr<io_context> context_;
   ip::tcp::acceptor acceptor_;
   ip::tcp::socket peer_;
   buffer_type read_buffer_;
   read_handler read_handler_;
   accept_handler accept_handler_;
+  write_handler write_handler_;
 };
 
 } // demo

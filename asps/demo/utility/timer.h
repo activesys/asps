@@ -22,12 +22,12 @@ extern std::shared_ptr<io_context> context;
 class timer : public timer_service
 {
 public:
-  timer(io_context& context,
+  timer(std::shared_ptr<io_context> context,
         uint32_t expiry,
         timer_service::timeout_handler handler)
     : timer_service(expiry, handler),
       context_(context),
-      timer_(context)
+      timer_(*context_)
   {}
 
 public:
@@ -38,7 +38,7 @@ private:
   void on_timeout(const error_code& ec);
 
 private:
-  io_context& context_;
+  std::shared_ptr<io_context> context_;
   steady_timer timer_;
 };
 

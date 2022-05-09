@@ -24,10 +24,14 @@ public:
 
 public:
   virtual void update_data(const data_group_type& datas) override;
+  virtual void update_send(const buffer_type& buffer) override;
+  virtual void update_event() override;
 
 public:
   virtual void on_accept() = 0;
   virtual void on_read(const data_group_type& datas) = 0;
+  virtual void on_write(std::size_t bytes) = 0;
+  virtual void on_read_raw(const buffer_type& buffer) = 0;
 
 public:
   void run();
@@ -36,6 +40,7 @@ public:
 private:
   void accept_handler(bool success);
   void read_handler(bool success, const buffer_type& buffer, std::size_t bytes);
+  void write_handler(bool success, std::size_t bytes);
 
 private:
   server_transport_service::pointer_type transport_;

@@ -16,7 +16,7 @@ using namespace std::placeholders;
 timer_service::pointer_type
 make_timer_service(uint32_t expiry, timer_service::timeout_handler timeout)
 {
-  return std::make_shared<timer>(*context, expiry, timeout);
+  return std::make_shared<timer>(context, expiry, timeout);
 }
 
 void timer::start()

@@ -90,10 +90,90 @@ TEST(server_data_sequence_test, receive_and_notify)
   seq.register_data_observer(&dot);
 
   EXPECT_EQ(buffer.size(), 93);
-  EXPECT_TRUE(seq.response(buffer));
+  EXPECT_TRUE(seq.receive_data(buffer));
   EXPECT_EQ(buffer.size(), 34);
-  EXPECT_TRUE(seq.response(buffer));
+  EXPECT_TRUE(seq.receive_data(buffer));
   EXPECT_EQ(buffer.size(), 0);
+}
+
+TEST(server_positive_keepalive_sequence_test, request_and_response)
+{
+  config::pack_nkeep(0xff, 0x00);
+  passive_sequence_service::pointer_type pks = make_passive_sequence(true);
+
+  std::vector<uint8_t> receive_buffer{0x4c, 0x45, 0x45, 0x50};
+  EXPECT_FALSE(pks->receive_request(receive_buffer));
+  EXPECT_EQ(receive_buffer.size(), 4);
+  receive_buffer[0] = 0x4b;
+  EXPECT_TRUE(pks->receive_request(receive_buffer));
+  EXPECT_EQ(receive_buffer.size(), 0);
+
+  const buffer_type& buffer = pks->send_response();
+  const uint8_t expect_buffer[] = {
+    0xff // kack flag
+  };
+  for (std::size_t i = 0; i < sizeof(expect_buffer); ++i) {
+    EXPECT_EQ(buffer[i], expect_buffer[i]);
+  }
+}
+
+TEST(server_negative_keepalive_sequence_test, request_and_response)
+{
+  config::pack_nkeep(0xff, 0x00);
+  active_sequence_service::pointer_type pks = make_active_sequence(true);
+
+  const buffer_type& before_buffer = pks->send_request();
+  const uint8_t expect_buffer[] = {
+    0x00
+  };
+  for (std::size_t i = 0; i < sizeof(expect_buffer); ++i) {
+    EXPECT_EQ(before_buffer[i], expect_buffer[i]);
+  }
+
+  const buffer_type& after_buffer = pks->send_request();
+  EXPECT_TRUE(after_buffer.empty());
+
+  std::vector<uint8_t> receive_buffer{
+    0x4b, 0x41, 0x43, 0x4b, 0x4b, 0x41, 0x43, 0x4b // kack flag // kack flag
+  };
+  EXPECT_TRUE(pks->receive_response(receive_buffer));
+  EXPECT_TRUE(pks->receive_response(receive_buffer));
+}
+
+TEST(get_server_sequence_type_test, get_sequence_type)
+{
+  config::pack_nkeep(0xff, 0x00);
+  std::vector<uint8_t> buffer{
+    // header flag 'DEMOV100'
+    0x44, 0x45, 0x4d, 0x4f, 0x56, 0x31, 0x30, 0x30
+  };
+  EXPECT_EQ(get_server_sequence_type(buffer), belong_to_data_sequence);
+
+  // positive keepalive flag 'KEEP'
+  buffer[0] = 0x4b;
+  buffer[1] = 0x45;
+  buffer[2] = 0x45;
+  buffer[3] = 0x50;
+  EXPECT_EQ(get_server_sequence_type(buffer), belong_to_positive_keepalive_sequence);
+
+  // negative keepalive ack flag 'KACK'
+  buffer[0] = 0x4b;
+  buffer[1] = 0x41;
+  buffer[2] = 0x43;
+  buffer[3] = 0x4b;
+  EXPECT_EQ(get_server_sequence_type(buffer), belong_to_negative_keepalive_sequence);
+
+  // positive keepalive ack
+  buffer[0] = 0xff;
+  EXPECT_EQ(get_server_sequence_type(buffer), belong_to_invalid_sequence);
+
+  // negative keepalive
+  buffer[0] = 0x00;
+  EXPECT_EQ(get_server_sequence_type(buffer), belong_to_invalid_sequence);
+
+  // invalid message
+  buffer[0] = 0xaa;
+  EXPECT_EQ(get_server_sequence_type(buffer), belong_to_invalid_sequence);
 }
 
 } // demo_test

@@ -14,6 +14,7 @@
 #include <asps/demo/demo.h>
 #include <boost/asio.hpp>
 
+#include <asps/demo/utility/transport.h>
 #include <test/demo/utility/demo_test_server.h>
 
 namespace asps_test {
@@ -27,7 +28,9 @@ class demo_client_test : public ::testing::Test
 protected:
   demo_client_test()
     : server_("127.0.0.1", 9901)
-  {}
+  {
+    context = std::make_shared<io_context>();
+  }
 
   demo_test_server server_;
 };

@@ -48,6 +48,8 @@ void demo_server::accept_handler(bool success)
 void demo_server::read_handler(bool success, const buffer_type& buffer, std::size_t bytes)
 {
   if (success) {
+    on_read_raw(buffer);
+
     std::size_t remain_size = read_buffer_.size();
     read_buffer_.resize(remain_size + bytes);
     std::copy(buffer.begin(),
@@ -59,9 +61,26 @@ void demo_server::read_handler(bool success, const buffer_type& buffer, std::siz
   transport_->read(std::bind(&demo_server::read_handler, this, _1, _2, _3));
 }
 
+void demo_server::write_handler(bool success, std::size_t bytes)
+{
+  if (success) {
+    on_write(bytes);
+  }
+}
+
 void demo_server::update_data(const data_group_type& datas)
 {
   on_read(datas);
+}
+
+void demo_server::update_send(const buffer_type& buffer)
+{
+  transport_->write(buffer, std::bind(&demo_server::write_handler, this, _1, _2));
+}
+
+void demo_server::update_event()
+{
+  transport_->close();
 }
 
 } // demo

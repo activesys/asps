@@ -54,29 +54,35 @@ message_type get_message_type(const buffer_type& buffer)
 }
 
 message_serialization_service::pointer_type
-make_message_serialization_service(const data_group_type& group)
+make_client_data_message(const data_group_type& group)
 {
   return std::make_shared<client_data>(group);
 }
+
 message_serialization_service::pointer_type
-make_message_serialization_service(bool positive)
+make_client_positive_keepalive()
 {
-  if (positive) {
-    return std::make_shared<positive_keepalive>();
-  } else {
-    return std::make_shared<negative_keepalive_ack>();
-  }
+  return std::make_shared<client_positive_keepalive>();
+}
+
+message_serialization_service::pointer_type
+make_client_negative_keepalive_ack()
+{
+  return std::make_shared<client_negative_keepalive_ack>();
 }
 
 message_unserialization_service::pointer_type
-make_message_unserialization_service(bool positive)
+make_client_positive_keepalive_ack()
 {
-  if (positive) {
-    return std::make_shared<positive_keepalive_ack>();
-  } else {
-    return std::make_shared<negative_keepalive>();
-  }
+  return std::make_shared<client_positive_keepalive_ack>();
 }
+
+message_unserialization_service::pointer_type
+make_client_negative_keepalive()
+{
+  return std::make_shared<client_negative_keepalive>();
+}
+
 message_unserialization_service::pointer_type
 make_invalid_message()
 {

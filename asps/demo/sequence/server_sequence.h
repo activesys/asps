@@ -9,24 +9,41 @@
 
 #include <asps/demo/utility/utility.h>
 #include <asps/demo/semantic/demo_data.h>
-#include <asps/demo/session/sequence_service.h>
-#include <asps/demo/message/server_message.h>
+#include <asps/demo/sequence/sequence.h>
 
 namespace asps {
 namespace demo {
 
 // Server Data Sequence
 class server_data_sequence
-  : public server_data_sequence_service
+  : public data_receive_sequence_service
 {
 public:
   server_data_sequence();
 
 public:
-  virtual bool response(buffer_type& buffer) override;
+  virtual bool receive_data(buffer_type& buffer) override;
 
 private:
   message_unserialization_service::pointer_type message_;
+};
+
+// Server Positive Keepalive Sequence
+class server_positive_keepalive_sequence
+  : public passive_sequence
+{
+public:
+  server_positive_keepalive_sequence();
+  virtual ~server_positive_keepalive_sequence() {}
+};
+
+// Server Negative Keepalive Sequence
+class server_negative_keepalive_sequence
+  : public active_sequence
+{
+public:
+  server_negative_keepalive_sequence();
+  virtual ~server_negative_keepalive_sequence() {}
 };
 
 } // demo

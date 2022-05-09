@@ -24,6 +24,10 @@ TEST(server_session_test, receive_data_and_notify)
     {}
 
   public:
+    virtual void update_event() override
+    {}
+    virtual void update_send(const buffer_type& buffer) override
+    {}
     virtual void update_data(const data_group_type& datas) override
     {
       if (count == 0) {
@@ -93,7 +97,46 @@ TEST(server_session_test, receive_data_and_notify)
 
   EXPECT_EQ(buffer.size(), 95);
   session.receive(buffer);
-  EXPECT_EQ(buffer.size(), 2);
+  EXPECT_EQ(buffer.size(),0);
+}
+
+TEST(server_session_test, receive_positive_keepalive_and_notify)
+{
+  class server_observer_test : public server_observer
+  {
+  public:
+    server_observer_test()
+      : count(0)
+    {}
+
+  public:
+    virtual void update_send(const buffer_type& buffer) override
+    {
+      EXPECT_EQ(buffer.size(), 1);
+      EXPECT_EQ(buffer[0], 0xff);
+    }
+    virtual void update_data(const data_group_type& datas) override
+    {}
+    virtual void update_event()
+    {}
+
+  private:
+    int count;
+  };
+
+  buffer_type buffer{
+    // positive keepalive flag 'KEEP'
+    0x4b, 0x45, 0x45, 0x50
+  };
+
+  config::pack_nkeep(0xff, 0x00);
+  server_session session;
+  server_observer_test sot;
+  session.register_observer(&sot);
+
+  EXPECT_EQ(buffer.size(), 4);
+  session.receive(buffer);
+  EXPECT_EQ(buffer.size(), 0);
 }
 
 } // demo_test

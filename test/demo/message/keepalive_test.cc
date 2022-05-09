@@ -13,9 +13,9 @@ namespace demo_test {
 
 using namespace asps::demo;
 
-TEST(positive_keepalive, serialize)
+TEST(client_positive_keepalive, serialize)
 {
-  positive_keepalive pka;
+  client_positive_keepalive pka;
 
   const std::vector<uint8_t>& buffer = pka.serialize();
   const uint8_t expect_buffer[] = {
@@ -29,10 +29,10 @@ TEST(positive_keepalive, serialize)
   }
 }
 
-TEST(positive_keepalive_ack, unserialize)
+TEST(client_positive_keepalive_ack, unserialize)
 {
   config::pack_nkeep(0x8c, 0x00);
-  positive_keepalive_ack pkaa;
+  client_positive_keepalive_ack pkaa;
   std::vector<uint8_t> expect_buffer{
     0x8c // ack flag
   };
@@ -42,10 +42,10 @@ TEST(positive_keepalive_ack, unserialize)
   EXPECT_FALSE(pkaa.unserialize(expect_buffer));
 }
 
-TEST(negative_keepalive, unserialize)
+TEST(client_negative_keepalive, unserialize)
 {
   config::pack_nkeep(0xff, 0x6b);
-  negative_keepalive nka;
+  client_negative_keepalive nka;
   std::vector<uint8_t> expect_buffer{
     0x6b // ack flag
   };
@@ -55,9 +55,9 @@ TEST(negative_keepalive, unserialize)
   EXPECT_FALSE(nka.unserialize(expect_buffer));
 }
 
-TEST(negative_keepalive_ack, serialize)
+TEST(client_negative_keepalive_ack, serialize)
 {
-  negative_keepalive_ack nkaa;
+  client_negative_keepalive_ack nkaa;
 
   const std::vector<uint8_t>& buffer = nkaa.serialize();
   const uint8_t expect_buffer[] = {
@@ -69,6 +69,63 @@ TEST(negative_keepalive_ack, serialize)
   for (std::size_t i = 0; i < buffer.size(); ++i) {
     EXPECT_EQ(buffer[i], expect_buffer[i]);
   }
+}
+
+TEST(server_positive_keepalive, unserialize)
+{
+  server_positive_keepalive pka;
+  std::vector<uint8_t> buffer{
+    0x4b, 0x45, 0x45, 0x50 // keep flag
+  };
+
+  EXPECT_TRUE(pka.unserialize(buffer));
+  EXPECT_TRUE(buffer.empty());
+}
+
+TEST(server_positive_keepalive_ack, serialize)
+{
+  config::pack_nkeep(0xff, 0x6b);
+  server_positive_keepalive_ack pkaa;
+
+  const std::vector<uint8_t>& buffer = pkaa.serialize();
+  const uint8_t expect_buffer[] = {
+    0xff // ack flag
+  };
+
+  // check length
+  EXPECT_EQ(buffer.size(), 1);
+  for (std::size_t i = 0; i < buffer.size(); ++i) {
+    EXPECT_EQ(buffer[i], expect_buffer[i]);
+  }
+}
+
+TEST(server_negative_keepalive, serialize)
+{
+  config::pack_nkeep(0x8c, 0x00);
+  server_negative_keepalive nka;
+
+  const std::vector<uint8_t>& buffer = nka.serialize();
+  const uint8_t expect_buffer[] = {
+    0x00
+  };
+
+  // check length
+  EXPECT_EQ(buffer.size(), 1);
+  for (std::size_t i = 0; i < buffer.size(); ++i) {
+    EXPECT_EQ(buffer[i], expect_buffer[i]);
+  }
+}
+
+TEST(server_negative_keepalive_ack, unserialize)
+{
+  server_negative_keepalive_ack nkaa;
+  std::vector<uint8_t> expect_buffer{
+    0x4c, 0x41, 0x43, 0x4b // kack flag
+  };
+
+  EXPECT_FALSE(nkaa.unserialize(expect_buffer));
+  expect_buffer[0] = 0x4b;
+  EXPECT_TRUE(nkaa.unserialize(expect_buffer));
 }
 
 } // demo_test

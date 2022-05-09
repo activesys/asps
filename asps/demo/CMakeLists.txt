@@ -36,6 +36,7 @@ set(ASPS_DEMO_SOURCES
   sequence/client_sequence.cc
   sequence/server_sequence.cc
   sequence/state.cc
+  sequence/sequence.cc
 )
 
 ##################################

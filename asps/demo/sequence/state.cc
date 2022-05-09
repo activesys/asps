@@ -12,39 +12,37 @@ namespace demo {
 
 state* none_state::instance_ = nullptr;
 
-const buffer_type& none_state::request(client_positive_keepalive_sequence* seq)
+const buffer_type& none_state::request(active_sequence* seq)
 {
-  seq->change_state(keepalive_sent_state::instance());
+  seq->change_state(sent_state::instance());
   seq->t2_start();
   return seq->serialize();
 }
 
-bool none_state::response(client_positive_keepalive_sequence* seq,
-                          buffer_type& buffer)
+bool none_state::response(active_sequence* seq, buffer_type& buffer)
 {
   return seq->unserialize(buffer);
 }
 
-void none_state::timeout(client_positive_keepalive_sequence* seq)
+void none_state::timeout(active_sequence* seq)
 {
 }
 
-state* keepalive_sent_state::instance_ = nullptr;
+state* sent_state::instance_ = nullptr;
 
-const buffer_type& keepalive_sent_state::request(client_positive_keepalive_sequence* seq)
+const buffer_type& sent_state::request(active_sequence* seq)
 {
   return empty_buffer_;
 }
 
-bool keepalive_sent_state::response(client_positive_keepalive_sequence* seq,
-                                    buffer_type& buffer)
+bool sent_state::response(active_sequence* seq, buffer_type& buffer)
 {
   seq->change_state(none_state::instance());
   seq->t2_stop();
   return seq->unserialize(buffer);
 }
 
-void keepalive_sent_state::timeout(client_positive_keepalive_sequence* seq)
+void sent_state::timeout(active_sequence* seq)
 {
   seq->change_state(none_state::instance());
   seq->t2_start();
