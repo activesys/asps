@@ -24,11 +24,13 @@ TEST(server_session_test, receive_data_and_notify)
     {}
 
   public:
-    virtual void update_event() override
+    virtual void update_event(server_session_service::pointer_type session) override
     {}
-    virtual void update_send(const buffer_type& buffer) override
+    virtual void update_send(server_session_service::pointer_type session,
+                             const buffer_type& buffer) override
     {}
-    virtual void update_data(const data_group_type& datas) override
+    virtual void update_data(server_session_service::pointer_type session,
+                             const data_group_type& datas) override
     {
       if (count == 0) {
         data_group_type expect_datas{
@@ -91,12 +93,12 @@ TEST(server_session_test, receive_data_and_notify)
     0xaa, 0xff
   };
 
-  server_session session;
+  server_session_service::pointer_type session = make_server_session_service();
   server_observer_test sot;
-  session.register_observer(&sot);
+  session->register_observer(&sot);
 
   EXPECT_EQ(buffer.size(), 95);
-  session.receive(buffer);
+  session->receive(buffer);
   EXPECT_EQ(buffer.size(),0);
 }
 
@@ -110,14 +112,16 @@ TEST(server_session_test, receive_positive_keepalive_and_notify)
     {}
 
   public:
-    virtual void update_send(const buffer_type& buffer) override
+    virtual void update_send(server_session_service::pointer_type session,
+                             const buffer_type& buffer) override
     {
       EXPECT_EQ(buffer.size(), 1);
       EXPECT_EQ(buffer[0], 0xff);
     }
-    virtual void update_data(const data_group_type& datas) override
+    virtual void update_data(server_session_service::pointer_type session,
+                             const data_group_type& datas) override
     {}
-    virtual void update_event()
+    virtual void update_event(server_session_service::pointer_type session)
     {}
 
   private:
@@ -130,12 +134,12 @@ TEST(server_session_test, receive_positive_keepalive_and_notify)
   };
 
   config::pack_nkeep(0xff, 0x00);
-  server_session session;
+  server_session_service::pointer_type session = make_server_session_service();
   server_observer_test sot;
-  session.register_observer(&sot);
+  session->register_observer(&sot);
 
   EXPECT_EQ(buffer.size(), 4);
-  session.receive(buffer);
+  session->receive(buffer);
   EXPECT_EQ(buffer.size(), 0);
 }
 

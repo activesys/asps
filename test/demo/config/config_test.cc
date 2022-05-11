@@ -57,12 +57,5 @@ TEST(config_test, compress_attributes)
   EXPECT_TRUE(config::same_timestamp());
 }
 
-TEST(config_test, address)
-{
-  config::address("192.168.1.13", 9876);
-  EXPECT_EQ(config::ip(), "192.168.1.13");
-  EXPECT_EQ(config::port(), 9876);
-}
-
 } // demo_test
 } // asps_test

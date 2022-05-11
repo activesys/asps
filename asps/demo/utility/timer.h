@@ -17,7 +17,7 @@ namespace demo {
 using namespace boost::asio;
 using namespace boost::system;
 
-extern std::shared_ptr<io_context> context;
+extern std::shared_ptr<io_context> g_context;
 
 class timer : public timer_service
 {

@@ -21,7 +21,6 @@ namespace demo_test {
 
 using namespace boost::asio;
 using namespace boost::system;
-using namespace std::placeholders;
 using namespace asps::demo;
 
 class demo_test_client
@@ -54,12 +53,12 @@ private:
   void do_connect()
   {
     ip::tcp::endpoint ep(ip::address::from_string(ip_), port_);
-    socket_.async_connect(ep, std::bind(&demo_test_client::on_connect, this, _1));
+    socket_.async_connect(ep, std::bind(&demo_test_client::on_connect, this, std::placeholders::_1));
   }
   void on_connect(const error_code& ec)
   {
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
     if (ec) {
-      std::this_thread::sleep_for(std::chrono::milliseconds(100));
       do_connect();
     } else if (expect_length_ > 0) {
       do_read();
@@ -70,7 +69,7 @@ private:
   void do_read()
   {
     read_buffer_.resize(expect_length_);
-    socket_.async_read_some(buffer(read_buffer_), std::bind(&demo_test_client::on_read, this, _1, _2));
+    socket_.async_read_some(buffer(read_buffer_), std::bind(&demo_test_client::on_read, this, std::placeholders::_1, std::placeholders::_2));
   }
   void on_read(const error_code& ec, std::size_t bytes)
   {
@@ -78,14 +77,16 @@ private:
   }
   void do_write()
   {
-    socket_.async_write_some(buffer(write_buffer_), std::bind(&demo_test_client::on_write, this, _1, _2));
+    socket_.async_write_some(buffer(write_buffer_), std::bind(&demo_test_client::on_write, this, std::placeholders::_1, std::placeholders::_2));
   }
   void on_write(const error_code& ec, std::size_t bytes)
   {
     writed_bytes_ += bytes;
+    /*
     if (writed_bytes_ >= write_buffer_.size()) {
       context_.stop();
     }
+    */
   }
   void client_handler()
   {

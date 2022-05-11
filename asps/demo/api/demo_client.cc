@@ -20,13 +20,15 @@ bool demo_client::send(const data_group_type& group)
 
 void demo_client::run()
 {
-  transport_->connect(std::bind(&demo_client::connect_handler, this, _1));
-  transport_->run();
+  connector_->connect(std::bind(&demo_client::connect_handler, this, _1, _2));
+  connector_->run();
 }
 
 void demo_client::close()
 {
-  transport_->close();
+  if (connection_) {
+    connection_->close();
+  }
   t0_->start();
 }
 
@@ -34,49 +36,56 @@ void demo_client::stop()
 {
   close();
   t0_->stop();
-  transport_->stop();
+  connector_->stop();
 }
 
 void demo_client::t0_timeout()
 {
-  transport_->connect(std::bind(&demo_client::connect_handler, this, _1));
+  connector_->connect(std::bind(&demo_client::connect_handler, this, _1, _2));
 }
 
-void demo_client::connect_handler(bool success)
+void demo_client::connect_handler(bool success, connection::pointer_type conn)
 {
   if (success) {
+    connection_ = conn;
     session_ = make_client_session_service();
     session_->register_observer(this);
     t0_->stop();
-    transport_->read(std::bind(&demo_client::read_handler, this, _1, _2, _3));
+
+    if (connection_) {
+      connection_->read(std::bind(&demo_client::read_handler, this, _1, _2, _3));
+    }
   }
   on_connect(success);
 }
 
-void demo_client::write_handler(bool success, std::size_t bytes)
+void demo_client::write_handler(connection::pointer_type conn,
+                                std::size_t bytes)
 {
-  on_write(success, bytes);
+  on_write(true, bytes);
 }
 
-void demo_client::read_handler(bool success,
+void demo_client::read_handler(connection::pointer_type conn,
                                const buffer_type& buffer,
                                std::size_t bytes)
 {
-  if (success) {
-    std::size_t remain_size = read_buffer_.size();
-    read_buffer_.resize(remain_size + bytes);
-    std::copy(buffer.begin(),
-              buffer.begin() + bytes,
-              read_buffer_.begin() + remain_size);
-    session_->receive(read_buffer_);
-  }
+  std::size_t remain_size = read_buffer_.size();
+  read_buffer_.resize(remain_size + bytes);
+  std::copy(buffer.begin(),
+            buffer.begin() + bytes,
+            read_buffer_.begin() + remain_size);
+  session_->receive(read_buffer_);
 
-  transport_->read(std::bind(&demo_client::read_handler, this, _1, _2, _3));
+  if (connection_) {
+    connection_->read(std::bind(&demo_client::read_handler, this, _1, _2, _3));
+  }
 }
 
 void demo_client::update_send(const buffer_type& buf)
 {
-  transport_->write(buf, std::bind(&demo_client::write_handler, this, _1, _2));
+  if (connection_) {
+    connection_->write(buf, std::bind(&demo_client::write_handler, this, _1, _2));
+  }
 }
 
 void demo_client::update_event()

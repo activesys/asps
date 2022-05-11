@@ -20,7 +20,7 @@ class demo_server_test : public ::testing::Test
 protected:
   demo_server_test()
   {
-    context = std::make_shared<io_context>();
+    g_context = std::make_shared<io_context>();
   }
 };
 

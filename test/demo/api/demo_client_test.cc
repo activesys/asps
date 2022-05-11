@@ -29,7 +29,7 @@ protected:
   demo_client_test()
     : server_("127.0.0.1", 9901)
   {
-    context = std::make_shared<io_context>();
+    g_context = std::make_shared<io_context>();
   }
 
   demo_test_server server_;
@@ -41,13 +41,17 @@ TEST_F(demo_client_test, network_connect_success)
   class connect_success_client : public demo_client
   {
   public:
+    connect_success_client(const std::string& ip, uint16_t port)
+      : demo_client(ip, port)
+    {}
+
+  public:
     void on_connect(bool success) {EXPECT_TRUE(success);stop();}
     void on_write(bool success, std::size_t bytes) {}
   };
 
   server_.start(false);
-  config::address("127.0.0.1", 9901);
-  connect_success_client c;
+  connect_success_client c("127.0.0.1", 9901);
   c.run();
   server_.wait();
 }
@@ -57,12 +61,15 @@ TEST_F(demo_client_test, network_connect_fail)
   class connect_fail_client : public demo_client
   {
   public:
+    connect_fail_client(const std::string& ip, uint16_t port)
+      : demo_client(ip, port)
+    {}
+  public:
     void on_connect(bool success) {EXPECT_FALSE(success);stop();}
     void on_write(bool success, std::size_t bytes) {}
   };
 
-  config::address("127.0.0.1", 9902);
-  connect_fail_client c;
+  connect_fail_client c("127.0.0.1", 9902);
   data_group_type p{
     make_demo_data<uint64_t>(1234, 1154789657886957455, 1647761782000)
   };
@@ -74,6 +81,10 @@ TEST_F(demo_client_test, send_data_of_uint64_type)
 {
   class connect_success_client : public demo_client
   {
+  public:
+    connect_success_client(const std::string& ip, uint16_t port)
+      : demo_client(ip, port)
+    {}
   public:
     void on_connect(bool success) {
       EXPECT_TRUE(success);
@@ -91,8 +102,7 @@ TEST_F(demo_client_test, send_data_of_uint64_type)
   };
 
   server_.start();
-  config::address("127.0.0.1", 9901);
-  connect_success_client c;
+  connect_success_client c("127.0.0.1", 9901);
   config::same_type(false);
   config::key_sequence(false);
   config::same_timestamp(false);
@@ -126,6 +136,10 @@ TEST_F(demo_client_test, send_data_of_int32_type)
   class connect_success_client : public demo_client
   {
   public:
+    connect_success_client(const std::string& ip, uint16_t port)
+      : demo_client(ip, port)
+    {}
+  public:
     void on_connect(bool success) {
       EXPECT_TRUE(success);
       data_group_type p{
@@ -142,8 +156,7 @@ TEST_F(demo_client_test, send_data_of_int32_type)
   };
 
   server_.start();
-  config::address("127.0.0.1", 9901);
-  connect_success_client c;
+  connect_success_client c("127.0.0.1", 9901);
   config::same_type(false);
   config::key_sequence(false);
   config::same_timestamp(false);
@@ -176,6 +189,10 @@ TEST_F(demo_client_test, send_data_of_uint16_type)
   class connect_success_client : public demo_client
   {
   public:
+    connect_success_client(const std::string& ip, uint16_t port)
+      : demo_client(ip, port)
+    {}
+  public:
     void on_connect(bool success) {
       EXPECT_TRUE(success);
       data_group_type p{
@@ -192,8 +209,7 @@ TEST_F(demo_client_test, send_data_of_uint16_type)
   };
 
   server_.start();
-  config::address("127.0.0.1", 9901);
-  connect_success_client c;
+  connect_success_client c("127.0.0.1", 9901);
   config::same_type(false);
   config::key_sequence(false);
   config::same_timestamp(false);
@@ -226,6 +242,10 @@ TEST_F(demo_client_test, send_data_of_uint8_type)
   class connect_success_client : public demo_client
   {
   public:
+    connect_success_client(const std::string& ip, uint16_t port)
+      : demo_client(ip, port)
+    {}
+  public:
     void on_connect(bool success) {
       EXPECT_TRUE(success);
       data_group_type p{
@@ -242,8 +262,7 @@ TEST_F(demo_client_test, send_data_of_uint8_type)
   };
 
   server_.start();
-  config::address("127.0.0.1", 9901);
-  connect_success_client c;
+  connect_success_client c("127.0.0.1", 9901);
   config::same_type(false);
   config::key_sequence(false);
   config::same_timestamp(false);
@@ -276,6 +295,10 @@ TEST_F(demo_client_test, send_data_of_bool_type)
   class connect_success_client : public demo_client
   {
   public:
+    connect_success_client(const std::string& ip, uint16_t port)
+      : demo_client(ip, port)
+    {}
+  public:
     void on_connect(bool success) {
       EXPECT_TRUE(success);
       data_group_type p{
@@ -292,8 +315,7 @@ TEST_F(demo_client_test, send_data_of_bool_type)
   };
 
   server_.start();
-  config::address("127.0.0.1", 9901);
-  connect_success_client c;
+  connect_success_client c("127.0.0.1", 9901);
   config::same_type(false);
   config::key_sequence(false);
   config::same_timestamp(false);
@@ -326,6 +348,10 @@ TEST_F(demo_client_test, send_datas_of_int32_type)
   class connect_success_client : public demo_client
   {
   public:
+    connect_success_client(const std::string& ip, uint16_t port)
+      : demo_client(ip, port)
+    {}
+  public:
     void on_connect(bool success) {
       EXPECT_TRUE(success);
       data_group_type p{
@@ -345,8 +371,7 @@ TEST_F(demo_client_test, send_datas_of_int32_type)
   };
 
   server_.start();
-  config::address("127.0.0.1", 9901);
-  connect_success_client c;
+  connect_success_client c("127.0.0.1", 9901);
   config::same_type(false);
   config::key_sequence(false);
   config::same_timestamp(false);
@@ -394,6 +419,10 @@ TEST_F(demo_client_test, send_datas_of_multiple_types)
   class connect_success_client : public demo_client
   {
   public:
+    connect_success_client(const std::string& ip, uint16_t port)
+      : demo_client(ip, port)
+    {}
+  public:
     void on_connect(bool success) {
       EXPECT_TRUE(success);
       data_group_type p{
@@ -413,8 +442,7 @@ TEST_F(demo_client_test, send_datas_of_multiple_types)
   };
 
   server_.start();
-  config::address("127.0.0.1", 9901);
-  connect_success_client c;
+  connect_success_client c("127.0.0.1", 9901);
   config::same_type(false);
   config::key_sequence(false);
   config::same_timestamp(false);
@@ -462,6 +490,10 @@ TEST_F(demo_client_test, send_datas_of_same_type)
   class connect_success_client : public demo_client
   {
   public:
+    connect_success_client(const std::string& ip, uint16_t port)
+      : demo_client(ip, port)
+    {}
+  public:
     void on_connect(bool success) {
       EXPECT_TRUE(success);
       data_group_type p{
@@ -481,8 +513,7 @@ TEST_F(demo_client_test, send_datas_of_same_type)
   };
 
   server_.start();
-  config::address("127.0.0.1", 9901);
-  connect_success_client c;
+  connect_success_client c("127.0.0.1", 9901);
   config::same_type(false);
   config::key_sequence(false);
   config::same_timestamp(false);
@@ -528,6 +559,10 @@ TEST_F(demo_client_test, send_datas_of_multiple_packages_containing_same_type)
   class connect_success_client : public demo_client
   {
   public:
+    connect_success_client(const std::string& ip, uint16_t port)
+      : demo_client(ip, port)
+    {}
+  public:
     void on_connect(bool success) {
       EXPECT_TRUE(success);
       data_group_type p{
@@ -552,8 +587,7 @@ TEST_F(demo_client_test, send_datas_of_multiple_packages_containing_same_type)
 
   server_.expect_length(168);
   server_.start();
-  config::address("127.0.0.1", 9901);
-  connect_success_client c;
+  connect_success_client c("127.0.0.1", 9901);
   config::same_type(false);
   config::key_sequence(false);
   config::same_timestamp(false);
@@ -632,6 +666,10 @@ TEST_F(demo_client_test, send_datas_of_same_timestamp)
   class connect_success_client : public demo_client
   {
   public:
+    connect_success_client(const std::string& ip, uint16_t port)
+      : demo_client(ip, port)
+    {}
+  public:
     void on_connect(bool success) {
       EXPECT_TRUE(success);
       data_group_type p{
@@ -651,8 +689,7 @@ TEST_F(demo_client_test, send_datas_of_same_timestamp)
   };
 
   server_.start();
-  config::address("127.0.0.1", 9901);
-  connect_success_client c;
+  connect_success_client c("127.0.0.1", 9901);
   config::same_type(false);
   config::key_sequence(false);
   config::same_timestamp(false);
@@ -698,6 +735,10 @@ TEST_F(demo_client_test, send_datas_of_multiple_packages_containing_same_timesta
   class connect_success_client : public demo_client
   {
   public:
+    connect_success_client(const std::string& ip, uint16_t port)
+      : demo_client(ip, port)
+    {}
+  public:
     void on_connect(bool success) {
       EXPECT_TRUE(success);
       data_group_type p{
@@ -722,8 +763,7 @@ TEST_F(demo_client_test, send_datas_of_multiple_packages_containing_same_timesta
 
   server_.expect_length(106);
   server_.start();
-  config::address("127.0.0.1", 9901);
-  connect_success_client c;
+  connect_success_client c("127.0.0.1", 9901);
   config::same_type(false);
   config::key_sequence(false);
   config::same_timestamp(false);
@@ -794,6 +834,10 @@ TEST_F(demo_client_test, send_datas_of_key_sequence)
   class connect_success_client : public demo_client
   {
   public:
+    connect_success_client(const std::string& ip, uint16_t port)
+      : demo_client(ip, port)
+    {}
+  public:
     void on_connect(bool success) {
       EXPECT_TRUE(success);
       data_group_type p{
@@ -813,8 +857,7 @@ TEST_F(demo_client_test, send_datas_of_key_sequence)
   };
 
   server_.start();
-  config::address("127.0.0.1", 9901);
-  connect_success_client c;
+  connect_success_client c("127.0.0.1", 9901);
   config::same_type(false);
   config::key_sequence(false);
   config::same_timestamp(false);
@@ -860,6 +903,10 @@ TEST_F(demo_client_test, send_datas_of_multiple_packages_containing_key_sequence
   class connect_success_client : public demo_client
   {
   public:
+    connect_success_client(const std::string& ip, uint16_t port)
+      : demo_client(ip, port)
+    {}
+  public:
     void on_connect(bool success) {
       EXPECT_TRUE(success);
       data_group_type p{
@@ -887,8 +934,7 @@ TEST_F(demo_client_test, send_datas_of_multiple_packages_containing_key_sequence
 
   server_.expect_length(180);
   server_.start();
-  config::address("127.0.0.1", 9901);
-  connect_success_client c;
+  connect_success_client c("127.0.0.1", 9901);
   config::same_type(false);
   config::key_sequence(false);
   config::same_timestamp(false);
@@ -979,6 +1025,10 @@ TEST_F(demo_client_test, send_datas_of_same_timestamp_and_key_sequence)
   class connect_success_client : public demo_client
   {
   public:
+    connect_success_client(const std::string& ip, uint16_t port)
+      : demo_client(ip, port)
+    {}
+  public:
     void on_connect(bool success) {
       EXPECT_TRUE(success);
       data_group_type p{
@@ -998,8 +1048,7 @@ TEST_F(demo_client_test, send_datas_of_same_timestamp_and_key_sequence)
   };
 
   server_.start();
-  config::address("127.0.0.1", 9901);
-  connect_success_client c;
+  connect_success_client c("127.0.0.1", 9901);
   config::same_type(false);
   config::key_sequence(false);
   config::same_timestamp(false);
@@ -1043,6 +1092,10 @@ TEST_F(demo_client_test, send_datas_of_same_timestamp_and_same_type)
   class connect_success_client : public demo_client
   {
   public:
+    connect_success_client(const std::string& ip, uint16_t port)
+      : demo_client(ip, port)
+    {}
+  public:
     void on_connect(bool success) {
       EXPECT_TRUE(success);
       data_group_type p{
@@ -1062,8 +1115,7 @@ TEST_F(demo_client_test, send_datas_of_same_timestamp_and_same_type)
   };
 
   server_.start();
-  config::address("127.0.0.1", 9901);
-  connect_success_client c;
+  connect_success_client c("127.0.0.1", 9901);
   config::same_type(false);
   config::key_sequence(false);
   config::same_timestamp(false);
@@ -1107,6 +1159,10 @@ TEST_F(demo_client_test, send_datas_of_key_sequence_and_same_type)
   class connect_success_client : public demo_client
   {
   public:
+    connect_success_client(const std::string& ip, uint16_t port)
+      : demo_client(ip, port)
+    {}
+  public:
     void on_connect(bool success) {
       EXPECT_TRUE(success);
       data_group_type p{
@@ -1126,8 +1182,7 @@ TEST_F(demo_client_test, send_datas_of_key_sequence_and_same_type)
   };
 
   server_.start();
-  config::address("127.0.0.1", 9901);
-  connect_success_client c;
+  connect_success_client c("127.0.0.1", 9901);
   config::same_type(false);
   config::key_sequence(false);
   config::same_timestamp(false);
@@ -1171,6 +1226,10 @@ TEST_F(demo_client_test, send_datas_of_all_attribute)
   class connect_success_client : public demo_client
   {
   public:
+    connect_success_client(const std::string& ip, uint16_t port)
+      : demo_client(ip, port)
+    {}
+  public:
     void on_connect(bool success) {
       EXPECT_TRUE(success);
       data_group_type p{
@@ -1190,8 +1249,7 @@ TEST_F(demo_client_test, send_datas_of_all_attribute)
   };
 
   server_.start();
-  config::address("127.0.0.1", 9901);
-  connect_success_client c;
+  connect_success_client c("127.0.0.1", 9901);
   config::same_type(true);
   config::key_sequence(true);
   config::same_timestamp(true);
@@ -1230,6 +1288,10 @@ TEST_F(demo_client_test, send_datas_of_all_attribute_multiple_packages)
   class connect_success_client : public demo_client
   {
   public:
+    connect_success_client(const std::string& ip, uint16_t port)
+      : demo_client(ip, port)
+    {}
+  public:
     void on_connect(bool success) {
       EXPECT_TRUE(success);
       data_group_type p{
@@ -1258,8 +1320,7 @@ TEST_F(demo_client_test, send_datas_of_all_attribute_multiple_packages)
 
   server_.expect_length(126);
   server_.start();
-  config::address("127.0.0.1", 9901);
-  connect_success_client c;
+  connect_success_client c("127.0.0.1", 9901);
   config::same_type(true);
   config::key_sequence(true);
   config::same_timestamp(true);
@@ -1335,6 +1396,10 @@ TEST_F(demo_client_test, send_positive_keepalive)
   class connect_success_client : public demo_client
   {
   public:
+    connect_success_client(const std::string& ip, uint16_t port)
+      : demo_client(ip, port)
+    {}
+  public:
     void on_connect(bool success) {
       EXPECT_TRUE(success);
       std::this_thread::sleep_for(std::chrono::seconds(config::t1()+1));
@@ -1348,10 +1413,9 @@ TEST_F(demo_client_test, send_positive_keepalive)
   };
   config::t1_t2(2,1);
   config::pack_nkeep(0xff, 0x00);
-  config::address("127.0.0.1", 9901);
   server_.expect_length(4);
   server_.start();
-  connect_success_client c;
+  connect_success_client c("127.0.0.1", 9901);
   c.run();
   server_.wait();
 
@@ -1371,8 +1435,8 @@ TEST_F(demo_client_test, t0_t1_t2)
   class connect_success_client : public demo_client
   {
   public:
-    connect_success_client()
-      : demo_client(),
+    connect_success_client(const std::string& ip, uint16_t port)
+      : demo_client(ip, port),
         reconnect_(false)
     {}
 
@@ -1399,10 +1463,9 @@ TEST_F(demo_client_test, t0_t1_t2)
   config::t0(3);
   config::t1_t2(2,1);
   config::pack_nkeep(0xff, 0x00);
-  config::address("127.0.0.1", 9901);
   server_.expect_length(4);
   server_.start();
-  connect_success_client c;
+  connect_success_client c("127.0.0.1", 9901);
   c.run();
   server_.wait();
 
@@ -1422,8 +1485,8 @@ TEST_F(demo_client_test, call_t0_multiple_times)
   class connect_fail_client : public demo_client
   {
   public:
-    connect_fail_client()
-      : demo_client(),
+    connect_fail_client(const std::string& ip, uint16_t port)
+      : demo_client(ip, port),
         reconnect_(false)
     {}
 
@@ -1445,8 +1508,7 @@ TEST_F(demo_client_test, call_t0_multiple_times)
   };
 
   config::t0(2);
-  config::address("127.0.0.1", 9902);
-  connect_fail_client c;
+  connect_fail_client c("127.0.0.1", 9902);
   c.run();
 }
 
@@ -1454,6 +1516,10 @@ TEST_F(demo_client_test, negative_keepalive)
 {
   class connect_success_client : public demo_client
   {
+  public:
+    connect_success_client(const std::string& ip, uint16_t port)
+      : demo_client(ip, port)
+    {}
   public:
     void on_connect(bool success)
     {
@@ -1469,12 +1535,11 @@ TEST_F(demo_client_test, negative_keepalive)
   config::t0(3);
   config::t1_t2(2,1);
   config::pack_nkeep(0xff, 0x00);
-  config::address("127.0.0.1", 9901);
   std::vector<uint8_t> nkeep{config::nkeep()};
   server_.write_data(nkeep);
   server_.expect_length(4);
   server_.start();
-  connect_success_client c;
+  connect_success_client c("127.0.0.1", 9901);
   c.run();
   server_.wait();
 
@@ -1494,6 +1559,10 @@ TEST_F(demo_client_test, pack_and_nkeep)
   class connect_success_client : public demo_client
   {
   public:
+    connect_success_client(const std::string& ip, uint16_t port)
+      : demo_client(ip, port)
+    {}
+  public:
     void on_connect(bool success)
     {
       EXPECT_TRUE(success);
@@ -1508,12 +1577,11 @@ TEST_F(demo_client_test, pack_and_nkeep)
   config::t0(3);
   config::t1_t2(2,1);
   config::pack_nkeep(0xff, 0x00);
-  config::address("127.0.0.1", 9901);
   std::vector<uint8_t> datas{config::pack(), 'K', 'E', 'E', 'P', config::nkeep(), 'D', 'E', 'M', 'O'};
   server_.write_data(datas);
   server_.expect_length(4);
   server_.start();
-  connect_success_client c;
+  connect_success_client c("127.0.0.1", 9901);
   c.run();
   server_.wait();
 

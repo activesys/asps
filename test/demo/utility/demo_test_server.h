@@ -19,7 +19,6 @@ namespace asps_test {
 namespace demo_test {
 
 using namespace boost::asio;
-using namespace std::placeholders;
 
 class demo_test_server
 {
@@ -58,14 +57,14 @@ private:
       if (need_read_data_) {
         async_read(*peer_,
                    buffer(buffer_),
-                   std::bind(&demo_test_server::on_completion, this, _1, _2),
-                   std::bind(&demo_test_server::on_read, this, _1, _2));
+                   std::bind(&demo_test_server::on_completion, this, std::placeholders::_1, std::placeholders::_2),
+                   std::bind(&demo_test_server::on_read, this, std::placeholders::_1, std::placeholders::_2));
       }
       // Write Data
       if (write_buffer_.size()) {
         async_write(*peer_,
                     buffer(write_buffer_),
-                    std::bind(&demo_test_server::on_write, this, _1, _2));
+                    std::bind(&demo_test_server::on_write, this, std::placeholders::_1, std::placeholders::_2));
       }
     }
   }
@@ -113,7 +112,7 @@ private:
   void server_handler()
   {
     peer_ = std::make_shared<ip::tcp::socket>(context_);
-    acceptor_.async_accept(*peer_, std::bind(&demo_test_server::on_accept, this, _1));
+    acceptor_.async_accept(*peer_, std::bind(&demo_test_server::on_accept, this, std::placeholders::_1));
     context_.run();
   }
 

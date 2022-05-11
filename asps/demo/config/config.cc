@@ -18,8 +18,6 @@ bool config::same_type_ = config::default_same_type;
 bool config::key_sequence_ = config::default_key_sequence;
 bool config::same_timestamp_ = config::default_same_timestamp;
 std::size_t config::read_buffer_size_ = config::default_read_buffer_size;
-uint16_t config::port_ = 9990;
-std::string config::ip_("127.0.0.1");
 
 uint32_t config::t0()
 {
@@ -98,20 +96,6 @@ bool config::same_timestamp()
 void config::same_timestamp(bool b)
 {
   config::same_timestamp_ = b;
-}
-
-uint16_t config::port()
-{
-  return config::port_;
-}
-const std::string& config::ip()
-{
-  return config::ip_;
-}
-void config::address(const std::string& ip, uint16_t port)
-{
-  config::ip_ = ip;
-  config::port_ = port;
 }
 
 std::size_t config::read_buffer_size()

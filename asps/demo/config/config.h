@@ -42,9 +42,6 @@ public:
   static void key_sequence(bool b);
   static bool same_timestamp();
   static void same_timestamp(bool b);
-  static uint16_t port();
-  static const std::string& ip();
-  static void address(const std::string& ip, uint16_t port);
   static std::size_t read_buffer_size();
   static void read_buffer_size(std::size_t size);
 
@@ -57,8 +54,6 @@ private:
   static bool same_type_;
   static bool key_sequence_;
   static bool same_timestamp_;
-  static std::string ip_;
-  static uint16_t port_;
   static std::size_t read_buffer_size_;
 };
 

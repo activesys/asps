@@ -66,21 +66,25 @@ client_session_service::pointer_type
 make_client_session_service();
 
 // Server Session Service
+class server_session_service;
 class server_observer
 {
 public:
   virtual ~server_observer() {}
 
 public:
-  virtual void update_send(const buffer_type& buffer) = 0;
-  virtual void update_data(const data_group_type& datas) = 0;
-  virtual void update_event() = 0;
+  virtual void update_send(std::shared_ptr<server_session_service> session,
+                           const buffer_type& buffer) = 0;
+  virtual void update_data(std::shared_ptr<server_session_service> session,
+                           const data_group_type& datas) = 0;
+  virtual void update_event(std::shared_ptr<server_session_service> session) = 0;
 };
 
 /*
  * Session service classe are also a subject
  */
 class server_session_service
+  : public std::enable_shared_from_this<server_session_service>
 {
 public:
   typedef std::shared_ptr<server_session_service> pointer_type;
@@ -97,19 +101,19 @@ public:
   virtual void notify_data(const data_group_type& datas)
   {
     for (auto o : os_) {
-      o->update_data(datas);
+      o->update_data(shared_from_this(), datas);
     }
   }
   virtual void notify_send(const buffer_type& buffer)
   {
     for (auto o : os_) {
-      o->update_send(buffer);
+      o->update_send(shared_from_this(), buffer);
     }
   }
   virtual void notify_event()
   {
     for (auto o : os_) {
-      o->update_event();
+      o->update_event(shared_from_this());
     }
   }
 

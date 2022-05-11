@@ -12,128 +12,138 @@ namespace demo {
 
 using namespace std::placeholders;
 
-std::shared_ptr<io_context> context = std::make_shared<io_context>();
+std::shared_ptr<io_context> g_context = std::make_shared<io_context>();
 
-// Client Transport
-client_transport_service::pointer_type
-make_client_transport_service()
+// Connection
+connection::pointer_type
+make_connection()
 {
-  return std::make_shared<client_transport>(context);
+  return std::make_shared<boost_connection>(g_context);
 }
 
-void client_transport::connect(const connect_handler& handler)
+void boost_connection::read(const read_handler& handler)
 {
-  connect_handler_ = handler;
-  ip::tcp::endpoint ep(ip::address::from_string(config::ip()), config::port());
-  socket_.async_connect(ep, std::bind(&client_transport::on_connect, this, _1));
+  read_handler_ = handler;
+  socket_.async_read_some(buffer(buffer_),
+                          std::bind(&boost_connection::on_read, this, _1, _2));
 }
 
-void client_transport::on_connect(const error_code& ec)
-{
-  connect_handler_(!ec);
-}
-
-void client_transport::write(const buffer_type& buf, const write_handler& handler)
+void boost_connection::write(const buffer_type& buf,
+                             const write_handler& handler)
 {
   write_handler_ = handler;
   socket_.async_write_some(buffer(buf),
-                           std::bind(&client_transport::on_write, this, _1, _2));
+                           std::bind(&boost_connection::on_write, this, _1, _2));
 }
 
-void client_transport::on_write(const error_code& ec, std::size_t bytes)
+void boost_connection::close()
 {
-  write_handler_(!ec, bytes);
+  socket_.close();
 }
 
-void client_transport::read(const read_handler& handler)
+void boost_connection::on_read(const error_code& ec, std::size_t bytes)
 {
-  read_handler_ = handler;
-  socket_.async_read_some(buffer(read_buffer_),
-                          std::bind(&client_transport::on_read, this, _1, _2));
+  if (!ec) {
+    read_handler_(shared_from_this(), buffer_, bytes);
+  }
+
+  socket_.async_read_some(buffer(buffer_),
+                          std::bind(&boost_connection::on_read, this, _1, _2));
 }
 
-void client_transport::on_read(const error_code& ec, std::size_t bytes)
+void boost_connection::on_write(const error_code& ec, std::size_t bytes)
 {
-  read_handler_(!ec, read_buffer_, bytes);
+  if (!ec) {
+    write_handler_(shared_from_this(), bytes);
+  }
 }
 
-void client_transport::close()
+// Connector
+connector::pointer_type
+make_connector(const std::string& ip, uint16_t port)
 {
-  error_code ec;
-  socket_.close(ec);
+  return std::make_shared<boost_connector>(g_context, ip, port);
 }
 
-void client_transport::run()
+void boost_connector::connect(const connect_handler& handler)
+{
+  connect_handler_ = handler;
+  do_connect();
+}
+
+void boost_connector::do_connect()
+{
+  boost_connection* conn = dynamic_cast<boost_connection*>(connection_.get());
+  if (conn != nullptr) {
+    ip::tcp::endpoint ep(ip::address::from_string(ip_), port_);
+    conn->socket().async_connect(ep,
+                                 std::bind(&boost_connector::on_connect,
+                                           this,
+                                           _1));
+  }
+}
+
+void boost_connector::on_connect(const error_code& ec)
+{
+  connect_handler_(!ec, connection_);
+}
+
+void boost_connector::run()
 {
   context_->run();
 }
 
-void client_transport::stop()
+void boost_connector::stop()
 {
   context_->stop();
 }
 
-// Server Transport
-server_transport_service::pointer_type
-make_server_transport_service(const std::string& ip, uint16_t port)
+// Acceptor
+acceptor::pointer_type
+make_acceptor(const std::string& ip, uint16_t port)
 {
-  return std::make_shared<server_transport>(context, ip, port);
+  return std::make_shared<boost_acceptor>(g_context, ip, port);
 }
 
-server_transport_service::pointer_type
-make_server_transport_service(uint16_t port)
+acceptor::pointer_type
+make_acceptor(uint16_t port)
 {
-  return std::make_shared<server_transport>(context, port);
+  return std::make_shared<boost_acceptor>(g_context, port);
 }
 
-void server_transport::accept(const accept_handler& handler)
+void boost_acceptor::accept(const accept_handler& handler)
 {
   accept_handler_ = handler;
-  acceptor_.async_accept(peer_, std::bind(&server_transport::on_accept, this, _1));
+  do_accept();
 }
 
-void server_transport::read(const read_handler& handler)
+void boost_acceptor::do_accept()
 {
-  read_handler_ = handler;
-  peer_.async_read_some(buffer(read_buffer_),
-                        std::bind(&server_transport::on_read, this, _1, _2));
+  connection_ = make_connection();
+  boost_connection* conn = dynamic_cast<boost_connection*>(connection_.get());
+  if (conn != nullptr) {
+    acceptor_.async_accept(conn->socket(),
+                           std::bind(&boost_acceptor::on_accept, this, _1));
+  }
 }
 
-void server_transport::write(const buffer_type& buf, const write_handler& handler)
+void boost_acceptor::on_accept(const error_code& ec)
 {
-  write_handler_ = handler;
-  peer_.async_write_some(buffer(buf),
-                         std::bind(&server_transport::on_write, this, _1, _2));
+  if (!ec) {
+    accept_handler_(connection_);
+  }
+
+  do_accept();
 }
 
-void server_transport::run()
+void boost_acceptor::run()
 {
   context_->run();
 }
 
-void server_transport::stop()
+void boost_acceptor::stop()
 {
   context_->stop();
-}
-
-void server_transport::close()
-{
-  peer_.close();
-}
-
-void server_transport::on_accept(const error_code& ec)
-{
-  accept_handler_(!ec);
-}
-
-void server_transport::on_read(const error_code& ec, std::size_t bytes)
-{
-  read_handler_(!ec, read_buffer_, bytes);
-}
-
-void server_transport::on_write(const error_code& ec, std::size_t bytes)
-{
-  write_handler_(!ec, bytes);
 }
 
 } // demo

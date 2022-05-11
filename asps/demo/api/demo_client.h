@@ -22,9 +22,15 @@ namespace demo {
 class demo_client : public client_observer
 {
 public:
-  demo_client(client_transport_service::pointer_type transport =
-                make_client_transport_service())
-    : transport_(transport),
+  demo_client(const std::string& ip, uint16_t port)
+    : connector_(make_connector(ip, port)),
+      t0_(make_timer_service(config::t0(),
+                             std::bind(&demo_client::t0_timeout, this)))
+  {
+    t0_->start();
+  }
+  demo_client(const connector::pointer_type conn)
+    : connector_(conn),
       t0_(make_timer_service(config::t0(),
                              std::bind(&demo_client::t0_timeout, this)))
   {
@@ -46,9 +52,12 @@ public:
   void stop();
 
 private:
-  void connect_handler(bool success);
-  void write_handler(bool success, std::size_t bytes);
-  void read_handler(bool success, const buffer_type& buffer, std::size_t bytes);
+  void connect_handler(bool success, connection::pointer_type conn);
+  void write_handler(connection::pointer_type conn,
+                     std::size_t bytes);
+  void read_handler(connection::pointer_type conn,
+                    const buffer_type& buffer,
+                    std::size_t bytes);
   void t0_timeout();
 
 private:
@@ -56,7 +65,8 @@ private:
   void update_event() override;
 
 private:
-  client_transport_service::pointer_type transport_;
+  connector::pointer_type connector_;
+  connection::pointer_type connection_;
   client_session_service::pointer_type session_;
   timer_service::pointer_type t0_;
   buffer_type read_buffer_;
