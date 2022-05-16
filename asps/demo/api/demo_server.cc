@@ -12,9 +12,13 @@ namespace demo {
 
 void demo_server::run()
 {
-  acceptor_->accept(std::bind(&demo_server::accept_handler,
-                              this,
-                              std::placeholders::_1));
+  acceptor_->set_handler(std::bind(&demo_server::accept_handler,
+                                   this,
+                                   std::placeholders::_1),
+                         std::bind(&demo_server::release_handler,
+                                   this,
+                                   std::placeholders::_1));
+  acceptor_->accept();
   acceptor_->run();
 }
 
@@ -23,71 +27,111 @@ void demo_server::stop()
   acceptor_->stop();
 }
 
-void demo_server::accept_handler(connection::pointer_type conn)
+void demo_server::accept_handler(connection_type conn)
 {
-  session_type session = make_server_session_service();
-  session->register_observer(this);
-  connection_container_.insert(bimap_type::value_type(conn, session));
+  if (conn) {
+    conn->set_handler(std::bind(&demo_server::read_handler,
+                                this,
+                                std::placeholders::_1,
+                                std::placeholders::_2,
+                                std::placeholders::_3),
+                      std::bind(&demo_server::write_handler,
+                                this,
+                                std::placeholders::_1,
+                                std::placeholders::_2),
+                      std::bind(&demo_server::close_handler,
+                                this,
+                                std::placeholders::_1));
 
-  on_accept();
-  conn->read(std::bind(&demo_server::read_handler,
-                       this,
-                       std::placeholders::_1,
-                       std::placeholders::_2,
-                       std::placeholders::_3));
+    session_type session = make_server_session_service();
+    session->register_observer(this);
+    connection_container_.insert(bimap_type::value_type(conn, session));
+
+    on_accept(conn);
+    conn->read();
+  }
 }
 
-void demo_server::read_handler(connection::pointer_type conn,
+void demo_server::read_handler(connection_type conn,
                                const buffer_type& buffer,
                                std::size_t bytes)
 {
-  bimap_type::left_const_iterator it = connection_container_.left.find(conn);
-  if (it != connection_container_.left.end()) {
-    on_read_raw(buffer);
+  session_type session = get_session(conn);
+  if (session) {
+    on_read_raw(conn, buffer, bytes);
 
     std::size_t remain_size = read_buffer_.size();
     read_buffer_.resize(remain_size + bytes);
     std::copy(buffer.begin(),
               buffer.begin() + bytes,
               read_buffer_.begin() + remain_size);
-    it->second->receive(read_buffer_);
+    session->receive(read_buffer_);
 
-    conn->read(std::bind(&demo_server::read_handler,
-                         this,
-                         std::placeholders::_1,
-                         std::placeholders::_2,
-                         std::placeholders::_3));
+    conn->read();
   }
 }
 
-void demo_server::write_handler(connection::pointer_type conn,
+void demo_server::write_handler(connection_type conn,
                                 std::size_t bytes)
 {
-  on_write(bytes);
+  on_write_raw(conn, write_buffer_, bytes);
+}
+
+void demo_server::close_handler(connection_type conn)
+{
+  release_connection(conn);
+}
+
+void demo_server::release_handler(connection_type conn)
+{
+  release_connection(conn);
+}
+
+void demo_server::release_connection(connection_type conn)
+{
+  if (get_session(conn)) {
+    on_close(conn);
+    connection_container_.left.erase(conn);
+  }
+}
+
+const demo_server::connection_type
+demo_server::get_connection(const session_type session)
+{
+  bimap_type::right_const_iterator it = connection_container_.right.find(session);
+  return it != connection_container_.right.end() ? it->second : nullptr;
+}
+
+const demo_server::session_type
+demo_server::get_session(const connection_type conn)
+{
+  bimap_type::left_const_iterator it = connection_container_.left.find(conn);
+  return it != connection_container_.left.end() ? it->second : nullptr;
 }
 
 void demo_server::update_data(session_type session, const data_group_type& datas)
 {
-  on_read(datas);
+  connection_type conn = get_connection(session);
+  if (conn) {
+    on_read(conn, datas);
+  }
 }
 
 void demo_server::update_send(session_type session, const buffer_type& buffer)
 {
-  bimap_type::right_const_iterator it = connection_container_.right.find(session);
-  if (it != connection_container_.right.end()) {
-    it->second->write(buffer, std::bind(&demo_server::write_handler,
-                                        this,
-                                        std::placeholders::_1,
-                                        std::placeholders::_2));
+  connection_type conn = get_connection(session);
+  if (conn) {
+    write_buffer_ = buffer;
+    conn->write(write_buffer_);
   }
 }
 
 void demo_server::update_event(session_type session)
 {
-  bimap_type::right_const_iterator it = connection_container_.right.find(session);
-  if (it != connection_container_.right.end()) {
-    it->second->close();
-    connection_container_.right.erase(session);
+  connection_type conn = get_connection(session);
+  if (conn) {
+    conn->close();
+    acceptor_->release(conn);
   }
 }
 

@@ -14,9 +14,11 @@ namespace demo {
 using namespace std::placeholders;
 
 timer_service::pointer_type
-make_timer_service(uint32_t expiry, timer_service::timeout_handler timeout)
+make_timer_service(uint32_t expiry,
+                   timer_service::timeout_handler timeout,
+                   bool repeat)
 {
-  return std::make_shared<timer>(g_context, expiry, timeout);
+  return std::make_shared<timer>(g_context, expiry, timeout, repeat);
 }
 
 void timer::start()
@@ -36,6 +38,10 @@ void timer::on_timeout(const error_code& ec)
 {
   if (!ec) {
     handler_();
+  }
+
+  if (repeat_ && ec != error::operation_aborted) {
+    start();
   }
 }
 

@@ -20,7 +20,8 @@ bool demo_client::send(const data_group_type& group)
 
 void demo_client::run()
 {
-  connector_->connect(std::bind(&demo_client::connect_handler, this, _1, _2));
+  connector_->set_handler(std::bind(&demo_client::connect_handler, this, _1, _2));
+  connector_->connect();
   connector_->run();
 }
 
@@ -41,23 +42,27 @@ void demo_client::stop()
 
 void demo_client::t0_timeout()
 {
-  connector_->connect(std::bind(&demo_client::connect_handler, this, _1, _2));
+  connector_->connect();
 }
 
 void demo_client::connect_handler(bool success, connection::pointer_type conn)
 {
-  if (success) {
+  if (success && conn) {
     connection_ = conn;
     session_ = make_client_session_service();
     session_->register_observer(this);
     t0_->stop();
 
-    if (connection_) {
-      connection_->read(std::bind(&demo_client::read_handler, this, _1, _2, _3));
-    }
+    connection_->set_handler(std::bind(&demo_client::read_handler, this, _1, _2, _3),
+                             std::bind(&demo_client::write_handler, this, _1, _2),
+                             std::bind(&demo_client::close_handler, this, _1));
+    connection_->read();
   }
   on_connect(success);
 }
+
+void demo_client::close_handler(connection::pointer_type conn)
+{}
 
 void demo_client::write_handler(connection::pointer_type conn,
                                 std::size_t bytes)
@@ -77,14 +82,14 @@ void demo_client::read_handler(connection::pointer_type conn,
   session_->receive(read_buffer_);
 
   if (connection_) {
-    connection_->read(std::bind(&demo_client::read_handler, this, _1, _2, _3));
+    connection_->read();
   }
 }
 
 void demo_client::update_send(const buffer_type& buf)
 {
   if (connection_) {
-    connection_->write(buf, std::bind(&demo_client::write_handler, this, _1, _2));
+    connection_->write(buf);
   }
 }
 

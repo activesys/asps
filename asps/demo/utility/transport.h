@@ -8,6 +8,7 @@
 #define ASPS_DEMO_UTILITY_TRANSPORT_H
 
 #include <memory>
+#include <string>
 #include <boost/asio.hpp>
 #include <asps/demo/config/config.h>
 #include <asps/demo/api/transport_service.h>
@@ -35,9 +36,14 @@ public:
   virtual ~boost_connection() {}
 
 public:
-  virtual void read(const read_handler& handler) override;
-  virtual void write(const buffer_type& buf, const write_handler& handler) override;
+  virtual void set_handler(const read_handler rhandler,
+                           const write_handler whandler,
+                           const close_handler chandler) override;
+  virtual void read() override;
+  virtual void write(const buffer_type& buf) override;
   virtual void close() override;
+  virtual std::string remote_address() override;
+  virtual uint16_t remote_port() override;
 
 public:
   ip::tcp::socket& socket()
@@ -55,6 +61,9 @@ private:
   buffer_type buffer_;
   read_handler read_handler_;
   write_handler write_handler_;
+  close_handler close_handler_;
+  std::string remote_ip_;
+  uint16_t remote_port_;
 };
 
 // Connector
@@ -72,7 +81,8 @@ public:
   virtual ~boost_connector() {}
 
 public:
-  virtual void connect(const connect_handler& handler) override;
+  virtual void set_handler(const connect_handler handler) override;
+  virtual void connect() override;
   virtual void run() override;
   virtual void stop() override;
 
@@ -109,19 +119,24 @@ public:
   virtual ~boost_acceptor() {}
 
 public:
-  virtual void accept(const accept_handler& handler) override;
+  virtual void set_handler(const accept_handler ahandler,
+                           const release_handler rhandler) override;
+  virtual void accept() override;
+  virtual void release(connection::pointer_type conn) override;
   virtual void run() override;
   virtual void stop() override;
 
 private:
   void do_accept();
   void on_accept(const error_code& ec);
+  void on_release(connection::pointer_type conn);
 
 private:
   std::shared_ptr<io_context> context_;
   ip::tcp::acceptor acceptor_;
   connection::pointer_type connection_;
   accept_handler accept_handler_;
+  release_handler release_handler_;
 };
 
 } // demo

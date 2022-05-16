@@ -6,7 +6,7 @@
 
 #include <iostream>
 #include <asps/modbus/modbus.h>
-#include <demos/modbus/boost_asio_transport_layer.h>
+#include <example/modbus/boost_asio_transport_layer.h>
 
 using namespace asps::modbus;
 using namespace asps_demos::modbus_demos;

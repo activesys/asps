@@ -24,8 +24,9 @@ class timer : public timer_service
 public:
   timer(std::shared_ptr<io_context> context,
         uint32_t expiry,
-        timer_service::timeout_handler handler)
-    : timer_service(expiry, handler),
+        timer_service::timeout_handler handler,
+        bool repeat)
+    : timer_service(expiry, handler, repeat),
       context_(context),
       timer_(*context_)
   {}

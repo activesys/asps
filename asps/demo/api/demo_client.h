@@ -58,6 +58,7 @@ private:
   void read_handler(connection::pointer_type conn,
                     const buffer_type& buffer,
                     std::size_t bytes);
+  void close_handler(connection::pointer_type conn);
   void t0_timeout();
 
 private:

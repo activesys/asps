@@ -91,7 +91,7 @@ demo_data::pointer_type make_demo_data(uint32_t k, T v, uint64_t t)
     virtual void get_value(void* v) const override                         \
     {*reinterpret_cast<TT*>(v) = value_;}                                  \
     virtual bool operator==(const demo_data& other) override               \
-    { TT v; other.get_value(&v);                                           \
+    {TT v; other.get_value(&v);                                            \
       return type_ == other.type() && key_ == other.key() &&               \
              timestamp_ == other.timestamp() && value_ == v;}              \
                                                                            \

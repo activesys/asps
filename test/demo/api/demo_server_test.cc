@@ -35,10 +35,15 @@ TEST_F(demo_server_test, receive_datas)
     {}
 
   public:
-    virtual void on_read_raw(const buffer_type& buffer) override {}
-    virtual void on_accept() override {}
-    virtual void on_write(std::size_t bytes) override {}
-    virtual void on_read(const data_group_type& datas) override
+    virtual void on_read_raw(const connection::pointer_type conn,
+                             const buffer_type& buffer,
+                             std::size_t bytes) override {}
+    virtual void on_accept(const connection::pointer_type conn) override {}
+    virtual void on_write_raw(const connection::pointer_type conn,
+                              const buffer_type& buffer,
+                              std::size_t bytes) override {}
+    virtual void on_read(const connection::pointer_type conn,
+                         const data_group_type& datas) override
     {
       data_group_type expect_datas{
         make_demo_data<int32_t>(1000, 9000, 1648363193268),
@@ -102,10 +107,15 @@ TEST_F(demo_server_test, receive_datas_with_compress_same_type)
     {}
 
   public:
-    virtual void on_accept() override {}
-    virtual void on_write(std::size_t bytes) override {}
-    virtual void on_read_raw(const buffer_type& buffer) override {}
-    virtual void on_read(const data_group_type& datas) override
+    virtual void on_accept(const connection::pointer_type conn) override {}
+    virtual void on_write_raw(const connection::pointer_type conn,
+                              const buffer_type& buffer,
+                              std::size_t bytes) override {}
+    virtual void on_read_raw(const connection::pointer_type conn,
+                             const buffer_type& buffer,
+                             std::size_t bytes) override {}
+    virtual void on_read(const connection::pointer_type conn,
+                         const data_group_type& datas) override
     {
       data_group_type expect_datas{
         make_demo_data<int32_t>(1000, 9000, 1648363193268),
@@ -166,10 +176,15 @@ TEST_F(demo_server_test, receive_datas_with_compress_same_timestamp)
     {}
 
   public:
-    virtual void on_accept() override {}
-    virtual void on_write(std::size_t bytes) override {}
-    virtual void on_read_raw(const buffer_type& buffer) override {}
-    virtual void on_read(const data_group_type& datas) override
+    virtual void on_accept(const connection::pointer_type conn) override {}
+    virtual void on_write_raw(const connection::pointer_type conn,
+                              const buffer_type& buffer,
+                              std::size_t bytes) override {}
+    virtual void on_read_raw(const connection::pointer_type conn,
+                             const buffer_type& buffer,
+                             std::size_t bytes) override {}
+    virtual void on_read(const connection::pointer_type conn,
+                         const data_group_type& datas) override
     {
       data_group_type expect_datas{
         make_demo_data<int32_t>(1000, 9000, 1648363193268),
@@ -230,10 +245,15 @@ TEST_F(demo_server_test, receive_datas_with_compress_key_sequence)
     {}
 
   public:
-    virtual void on_accept() override {}
-    virtual void on_write(std::size_t bytes) override {}
-    virtual void on_read_raw(const buffer_type& buffer) override {}
-    virtual void on_read(const data_group_type& datas) override
+    virtual void on_accept(const connection::pointer_type conn) override {}
+    virtual void on_write_raw(const connection::pointer_type conn,
+                              const buffer_type& buffer,
+                              std::size_t bytes) override {}
+    virtual void on_read_raw(const connection::pointer_type conn,
+                            const buffer_type& buffer,
+                            std::size_t bytes) override {}
+    virtual void on_read(const connection::pointer_type conn,
+                         const data_group_type& datas) override
     {
       data_group_type expect_datas{
         make_demo_data<int32_t>(1000, 9000, 1648363193268),
@@ -294,10 +314,15 @@ TEST_F(demo_server_test, receive_datas_with_compress_all_attribute)
     {}
 
   public:
-    virtual void on_accept() override {}
-    virtual void on_write(std::size_t bytes) override {}
-    virtual void on_read_raw(const buffer_type& buffer) override {}
-    virtual void on_read(const data_group_type& datas) override
+    virtual void on_accept(const connection::pointer_type conn) override {}
+    virtual void on_write_raw(const connection::pointer_type conn,
+                              const buffer_type& buffer,
+                              std::size_t bytes) override {}
+    virtual void on_read_raw(const connection::pointer_type conn,
+                             const buffer_type& buffer,
+                             std::size_t bytes) override {}
+    virtual void on_read(const connection::pointer_type conn,
+                        const data_group_type& datas) override
     {
       data_group_type expect_datas{
         make_demo_data<int32_t>(1000, 9000, 1648363193268),
@@ -353,10 +378,15 @@ TEST_F(demo_server_test, receive_datas_with_compress_multiple_packages)
     {}
 
   public:
-    virtual void on_accept() override {}
-    virtual void on_write(std::size_t bytes) override {}
-    virtual void on_read_raw(const buffer_type& buffer) override {}
-    virtual void on_read(const data_group_type& datas) override
+    virtual void on_accept(const connection::pointer_type conn) override {}
+    virtual void on_write_raw(const connection::pointer_type conn,
+                              const buffer_type& buffer,
+                              std::size_t bytes) override {}
+    virtual void on_read_raw(const connection::pointer_type conn,
+                             const buffer_type& buffer,
+                             std::size_t bytes) override {}
+    virtual void on_read(const connection::pointer_type conn,
+                         const data_group_type& datas) override
     {
       if (count_ == 0) {
         data_group_type expect_datas{
@@ -470,12 +500,17 @@ TEST_F(demo_server_test, server_positive_keepalive)
     {}
 
   public:
-    virtual void on_accept() override {}
-    virtual void on_read(const data_group_type& datas) override
+    virtual void on_accept(const connection::pointer_type conn) override {}
+    virtual void on_read(const connection::pointer_type conn,
+                        const data_group_type& datas) override
     {}
-    virtual void on_read_raw(const buffer_type& buffer) override
+    virtual void on_read_raw(const connection::pointer_type conn,
+                             const buffer_type& buffer,
+                             std::size_t bytes) override
     {}
-    virtual void on_write(std::size_t bytes) override
+    virtual void on_write_raw(const connection::pointer_type conn,
+                              const buffer_type& buffer,
+                              std::size_t bytes) override
     {
       EXPECT_EQ(bytes, 1);
       stop();
@@ -509,10 +544,13 @@ TEST_F(demo_server_test, server_negative_keepalive)
     {}
 
   public:
-    virtual void on_accept() override {}
-    virtual void on_read(const data_group_type& datas) override
+    virtual void on_accept(const connection::pointer_type conn) override {}
+    virtual void on_read(const connection::pointer_type conn,
+                         const data_group_type& datas) override
     {}
-    virtual void on_read_raw(const buffer_type& buffer) override
+    virtual void on_read_raw(const connection::pointer_type conn,
+                             const buffer_type& buffer,
+                             std::size_t bytes) override
     {
       buffer_type expect_buffer{
         // positive keepalive flag 'KACK'
@@ -524,7 +562,9 @@ TEST_F(demo_server_test, server_negative_keepalive)
       stop();
       client_.stop();
     }
-    virtual void on_write(std::size_t bytes) override
+    virtual void on_write_raw(const connection::pointer_type conn,
+                              const buffer_type& buffer,
+                              std::size_t bytes) override
     {
       EXPECT_EQ(bytes, 1);
     }

@@ -40,27 +40,41 @@ public:
   virtual void update_event(session_type session) override;
 
 public:
-  virtual void on_accept() = 0;
-  virtual void on_read(const data_group_type& datas) = 0;
-  virtual void on_write(std::size_t bytes) = 0;
-  virtual void on_read_raw(const buffer_type& buffer) = 0;
+  virtual void on_accept(const connection_type conn) {}
+  virtual void on_close(const connection_type conn) {}
+  virtual void on_read(const connection_type conn,
+                       const data_group_type& datas) {}
+  virtual void on_write_raw(const connection_type conn,
+                            const buffer_type& buffer,
+                            std::size_t bytes) {}
+  virtual void on_read_raw(const connection_type conn,
+                           const buffer_type& buffer,
+                           std::size_t bytes) {}
 
 public:
   void run();
   void stop();
 
 private:
-  void accept_handler(connection::pointer_type conn);
-  void read_handler(connection::pointer_type conn,
+  void accept_handler(connection_type conn);
+  void read_handler(connection_type conn,
                     const buffer_type& buffer,
                     std::size_t bytes);
-  void write_handler(connection::pointer_type conn,
+  void write_handler(connection_type conn,
                      std::size_t bytes);
+  void close_handler(connection_type conn);
+  void release_handler(connection_type conn);
+
+private:
+  void release_connection(connection_type conn);
+  const connection_type get_connection(const session_type session);
+  const session_type get_session(const connection_type conn);
 
 private:
   acceptor::pointer_type acceptor_;
   bimap_type connection_container_;
   buffer_type read_buffer_;
+  buffer_type write_buffer_;
 };
 
 } // demo

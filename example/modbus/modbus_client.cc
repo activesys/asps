@@ -10,8 +10,8 @@
 #include <fstream>
 #include <limits>
 #include <asps/modbus/modbus.h>
-#include <demos/modbus/boost_asio_transport_layer.h>
-#include <demos/modbus/options_parser.h>
+#include <example/modbus/boost_asio_transport_layer.h>
+#include <example/modbus/options_parser.h>
 
 using namespace asps::modbus;
 using namespace asps_demos::modbus_demos;

@@ -25,7 +25,8 @@ server_session::server_session()
     nkeep_sequence_(make_active_sequence(true)),
     gc_sequence_(make_garbage_collector_sequence()),
     t1_(make_timer_service(config::t1(),
-                           std::bind(&server_session::t1_timeout, this)))
+                           std::bind(&server_session::t1_timeout, this),
+                           true))
 {
   data_sequence_->register_data_observer(this);
   nkeep_sequence_->register_event_observer(this);

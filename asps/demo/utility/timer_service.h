@@ -20,9 +20,10 @@ public:
   typedef std::shared_ptr<timer_service> pointer_type;
 
 public:
-  timer_service(uint32_t expiry, timeout_handler handler)
+  timer_service(uint32_t expiry, timeout_handler handler, bool repeat)
     : expiry_(expiry),
-      handler_(handler)
+      handler_(handler),
+      repeat_(repeat)
   {}
   virtual ~timer_service() {}
 
@@ -33,11 +34,13 @@ public:
 protected:
   uint32_t expiry_;
   timeout_handler handler_;
+  bool repeat_;
 };
 
 timer_service::pointer_type
 make_timer_service(uint32_t expiry,
-                   timer_service::timeout_handler handler);
+                   timer_service::timeout_handler handler,
+                   bool repeat = false);
 
 } // demo
 } // asps

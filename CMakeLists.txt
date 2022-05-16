@@ -73,5 +73,5 @@ if (GTEST_FOUND AND GMOCK_FOUND)
 endif (GTEST_FOUND AND GMOCK_FOUND)
 
 ##################################
-# Build demos
-add_subdirectory(demos)
+# Build example
+add_subdirectory(example)

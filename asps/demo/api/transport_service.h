@@ -26,15 +26,21 @@ public:
                              std::size_t)> read_handler;
   typedef std::function<void(connection::pointer_type,
                              std::size_t)> write_handler;
+  typedef std::function<void(connection::pointer_type)> close_handler;
 
 public:
   connection() = default;
   virtual ~connection() {}
 
 public:
-  virtual void read(const read_handler& handler) = 0;
-  virtual void write(const buffer_type& buf, const write_handler& handler) = 0;
+  virtual void set_handler(const read_handler rhandler,
+                           const write_handler whandler,
+                           const close_handler chandler) = 0;
+  virtual void read() = 0;
+  virtual void write(const buffer_type& buf) = 0;
   virtual void close() = 0;
+  virtual std::string remote_address() = 0;
+  virtual uint16_t remote_port() = 0;
 };
 
 connection::pointer_type
@@ -56,7 +62,8 @@ public:
   virtual ~connector() {}
 
 public:
-  virtual void connect(const connect_handler& handler) = 0;
+  virtual void set_handler(const connect_handler handler) = 0;
+  virtual void connect() = 0;
   virtual void run() = 0;
   virtual void stop() = 0;
 
@@ -75,6 +82,7 @@ public:
   typedef std::shared_ptr<acceptor> pointer_type;
 
   typedef std::function<void(connection::pointer_type)> accept_handler;
+  typedef std::function<void(connection::pointer_type)> release_handler;
 
 public:
   acceptor(const std::string& ip, uint16_t port)
@@ -87,7 +95,10 @@ public:
   virtual ~acceptor() {}
 
 public:
-  virtual void accept(const accept_handler& handler) = 0;
+  virtual void set_handler(const accept_handler ahandler,
+                           const release_handler rhandler) = 0;
+  virtual void release(connection::pointer_type conn) = 0;
+  virtual void accept() = 0;
   virtual void run() = 0;
   virtual void stop() = 0;
 
