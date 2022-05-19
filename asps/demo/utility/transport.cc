@@ -38,8 +38,9 @@ void boost_connection::read()
 
 void boost_connection::write(const buffer_type& buf)
 {
-  socket_.async_write_some(buffer(buf),
-                           std::bind(&boost_connection::on_write, this, _1, _2));
+  async_write(socket_,
+              buffer(buf),
+              std::bind(&boost_connection::on_write, this, _1, _2));
 }
 
 void boost_connection::close()
@@ -124,8 +125,8 @@ void boost_connector::do_connect()
 
 void boost_connector::on_connect(const error_code& ec)
 {
-  if (connect_handler_) {
-    connect_handler_(!ec, connection_);
+  if (!ec && connect_handler_) {
+    connect_handler_(connection_);
   }
 }
 

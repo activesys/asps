@@ -24,14 +24,15 @@ make_timer_service(uint32_t expiry,
 void timer::start()
 {
   if (expiry_ > 0) {
-    timer_.expires_after(std::chrono::seconds(expiry_));
+    timer_.expires_after(std::chrono::milliseconds(expiry_));
     timer_.async_wait(std::bind(&timer::on_timeout, this, _1));
   }
 }
 
 void timer::stop()
 {
-  timer_.cancel();
+  error_code ec;
+  timer_.cancel(ec);
 }
 
 void timer::on_timeout(const error_code& ec)

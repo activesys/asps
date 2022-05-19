@@ -21,9 +21,9 @@ class config
     default_t2 = 20,
     default_pack = 0xff,
     default_nkeep = 0x00,
-    default_same_type = false,
-    default_key_sequence = false,
-    default_same_timestamp = false,
+    default_same_type = true,
+    default_key_sequence = true,
+    default_same_timestamp = true,
     default_read_buffer_size = 65536
   };
 

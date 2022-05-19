@@ -46,8 +46,8 @@ TEST_F(demo_client_test, network_connect_success)
     {}
 
   public:
-    void on_connect(bool success) {EXPECT_TRUE(success);stop();}
-    void on_write(bool success, std::size_t bytes) {}
+    void on_connect(const connection::pointer_type conn) override
+    {EXPECT_TRUE(conn);stop();}
   };
 
   server_.start(false);
@@ -56,6 +56,7 @@ TEST_F(demo_client_test, network_connect_success)
   server_.wait();
 }
 
+/*
 TEST_F(demo_client_test, network_connect_fail)
 {
   class connect_fail_client : public demo_client
@@ -66,7 +67,6 @@ TEST_F(demo_client_test, network_connect_fail)
     {}
   public:
     void on_connect(bool success) {EXPECT_FALSE(success);stop();}
-    void on_write(bool success, std::size_t bytes) {}
   };
 
   connect_fail_client c("127.0.0.1", 9902);
@@ -76,6 +76,7 @@ TEST_F(demo_client_test, network_connect_fail)
   EXPECT_FALSE(c.send(p));
   c.run();
 }
+*/
 
 TEST_F(demo_client_test, send_data_of_uint64_type)
 {
@@ -86,16 +87,18 @@ TEST_F(demo_client_test, send_data_of_uint64_type)
       : demo_client(ip, port)
     {}
   public:
-    void on_connect(bool success) {
-      EXPECT_TRUE(success);
+    void on_connect(const connection::pointer_type conn) override {
+      EXPECT_TRUE(conn);
       data_group_type p{
         make_demo_data<uint64_t>(1234, 1154789657886957455, 1647761782000)
       };
       EXPECT_TRUE(send(p));
     }
-    void on_write(bool success, std::size_t bytes)
+    void on_write_raw(const connection::pointer_type conn,
+                  const buffer_type& buffer,
+                  std::size_t bytes) override
     {
-      EXPECT_TRUE(success);
+      EXPECT_TRUE(conn);
       EXPECT_EQ(bytes, 34);
       stop();
     }
@@ -140,16 +143,18 @@ TEST_F(demo_client_test, send_data_of_int32_type)
       : demo_client(ip, port)
     {}
   public:
-    void on_connect(bool success) {
-      EXPECT_TRUE(success);
+    void on_connect(const connection::pointer_type conn) override {
+      EXPECT_TRUE(conn);
       data_group_type p{
         make_demo_data<int32_t>(1234, 9876, 1647761782000)
       };
       EXPECT_TRUE(send(p));
     }
-    void on_write(bool success, std::size_t bytes)
+    void on_write_raw(const connection::pointer_type conn,
+                  const buffer_type& buffer,
+                  std::size_t bytes) override
     {
-      EXPECT_TRUE(success);
+      EXPECT_TRUE(conn);
       EXPECT_EQ(bytes, 30);
       stop();
     }
@@ -193,16 +198,18 @@ TEST_F(demo_client_test, send_data_of_uint16_type)
       : demo_client(ip, port)
     {}
   public:
-    void on_connect(bool success) {
-      EXPECT_TRUE(success);
+    void on_connect(const connection::pointer_type conn) override {
+      EXPECT_TRUE(conn);
       data_group_type p{
         make_demo_data<uint16_t>(1234, 9876, 1647761782000)
       };
       EXPECT_TRUE(send(p));
     }
-    void on_write(bool success, std::size_t bytes)
+    void on_write_raw(const connection::pointer_type conn,
+                  const buffer_type& buffer,
+                  std::size_t bytes) override
     {
-      EXPECT_TRUE(success);
+      EXPECT_TRUE(conn);
       EXPECT_EQ(bytes, 28);
       stop();
     }
@@ -246,16 +253,18 @@ TEST_F(demo_client_test, send_data_of_uint8_type)
       : demo_client(ip, port)
     {}
   public:
-    void on_connect(bool success) {
-      EXPECT_TRUE(success);
+    void on_connect(const connection::pointer_type conn) override {
+      EXPECT_TRUE(conn);
       data_group_type p{
         make_demo_data<uint8_t>(1234, 255, 1647761782000)
       };
       EXPECT_TRUE(send(p));
     }
-    void on_write(bool success, std::size_t bytes)
+    void on_write_raw(const connection::pointer_type conn,
+                  const buffer_type& buffer,
+                  std::size_t bytes) override
     {
-      EXPECT_TRUE(success);
+      EXPECT_TRUE(conn);
       EXPECT_EQ(bytes, 27);
       stop();
     }
@@ -299,16 +308,18 @@ TEST_F(demo_client_test, send_data_of_bool_type)
       : demo_client(ip, port)
     {}
   public:
-    void on_connect(bool success) {
-      EXPECT_TRUE(success);
+    void on_connect(const connection::pointer_type conn) override {
+      EXPECT_TRUE(conn);
       data_group_type p{
         make_demo_data<bool>(1234, false, 1647761782000)
       };
       EXPECT_TRUE(send(p));
     }
-    void on_write(bool success, std::size_t bytes)
+    void on_write_raw(const connection::pointer_type conn,
+                  const buffer_type& buffer,
+                  std::size_t bytes) override
     {
-      EXPECT_TRUE(success);
+      EXPECT_TRUE(conn);
       EXPECT_EQ(bytes, 27);
       stop();
     }
@@ -352,8 +363,8 @@ TEST_F(demo_client_test, send_datas_of_int32_type)
       : demo_client(ip, port)
     {}
   public:
-    void on_connect(bool success) {
-      EXPECT_TRUE(success);
+    void on_connect(const connection::pointer_type conn) override {
+      EXPECT_TRUE(conn);
       data_group_type p{
         make_demo_data<int32_t>(1000, 9000, 1648363193268),
         make_demo_data<int32_t>(1001, 9001, 1648363193268),
@@ -362,9 +373,11 @@ TEST_F(demo_client_test, send_datas_of_int32_type)
       };
       EXPECT_TRUE(send(p));
     }
-    void on_write(bool success, std::size_t bytes)
+    void on_write_raw(const connection::pointer_type conn,
+                  const buffer_type& buffer,
+                  std::size_t bytes) override
     {
-      EXPECT_TRUE(success);
+      EXPECT_TRUE(conn);
       EXPECT_EQ(bytes, 81);
       stop();
     }
@@ -423,8 +436,8 @@ TEST_F(demo_client_test, send_datas_of_multiple_types)
       : demo_client(ip, port)
     {}
   public:
-    void on_connect(bool success) {
-      EXPECT_TRUE(success);
+    void on_connect(const connection::pointer_type conn) override {
+      EXPECT_TRUE(conn);
       data_group_type p{
         make_demo_data<int32_t>(1000, 9000, 1648363193268),
         make_demo_data<uint32_t>(1001, 9001, 1648363193268),
@@ -433,9 +446,11 @@ TEST_F(demo_client_test, send_datas_of_multiple_types)
       };
       EXPECT_TRUE(send(p));
     }
-    void on_write(bool success, std::size_t bytes)
+    void on_write_raw(const connection::pointer_type conn,
+                  const buffer_type& buffer,
+                  std::size_t bytes) override
     {
-      EXPECT_TRUE(success);
+      EXPECT_TRUE(conn);
       EXPECT_EQ(bytes, 77);
       stop();
     }
@@ -494,8 +509,8 @@ TEST_F(demo_client_test, send_datas_of_same_type)
       : demo_client(ip, port)
     {}
   public:
-    void on_connect(bool success) {
-      EXPECT_TRUE(success);
+    void on_connect(const connection::pointer_type conn) override {
+      EXPECT_TRUE(conn);
       data_group_type p{
         make_demo_data<int32_t>(1000, 9000, 1648363193268),
         make_demo_data<int32_t>(1002, 9001, 1648363193268),
@@ -504,9 +519,11 @@ TEST_F(demo_client_test, send_datas_of_same_type)
       };
       EXPECT_TRUE(send(p));
     }
-    void on_write(bool success, std::size_t bytes)
+    void on_write_raw(const connection::pointer_type conn,
+                  const buffer_type& buffer,
+                  std::size_t bytes) override
     {
-      EXPECT_TRUE(success);
+      EXPECT_TRUE(conn);
       EXPECT_EQ(bytes, 78);
       stop();
     }
@@ -563,8 +580,8 @@ TEST_F(demo_client_test, send_datas_of_multiple_packages_containing_same_type)
       : demo_client(ip, port)
     {}
   public:
-    void on_connect(bool success) {
-      EXPECT_TRUE(success);
+    void on_connect(const connection::pointer_type conn) override {
+      EXPECT_TRUE(conn);
       data_group_type p{
         make_demo_data<int32_t>(1000, 9000, 1648363193268),
         make_demo_data<int32_t>(1002, 9001, 1648363193268),
@@ -577,9 +594,11 @@ TEST_F(demo_client_test, send_datas_of_multiple_packages_containing_same_type)
       };
       EXPECT_TRUE(send(p));
     }
-    void on_write(bool success, std::size_t bytes)
+    void on_write_raw(const connection::pointer_type conn,
+                  const buffer_type& buffer,
+                  std::size_t bytes) override
     {
-      EXPECT_TRUE(success);
+      EXPECT_TRUE(conn);
       EXPECT_EQ(bytes, 168);
       stop();
     }
@@ -670,8 +689,8 @@ TEST_F(demo_client_test, send_datas_of_same_timestamp)
       : demo_client(ip, port)
     {}
   public:
-    void on_connect(bool success) {
-      EXPECT_TRUE(success);
+    void on_connect(const connection::pointer_type conn) override {
+      EXPECT_TRUE(conn);
       data_group_type p{
         make_demo_data<int32_t>(1000, 9000, 1648363193268),
         make_demo_data<uint32_t>(1002, 9001, 1648363193268),
@@ -680,9 +699,11 @@ TEST_F(demo_client_test, send_datas_of_same_timestamp)
       };
       EXPECT_TRUE(send(p));
     }
-    void on_write(bool success, std::size_t bytes)
+    void on_write_raw(const connection::pointer_type conn,
+                  const buffer_type& buffer,
+                  std::size_t bytes) override
     {
-      EXPECT_TRUE(success);
+      EXPECT_TRUE(conn);
       EXPECT_EQ(bytes, 53);
       stop();
     }
@@ -739,8 +760,8 @@ TEST_F(demo_client_test, send_datas_of_multiple_packages_containing_same_timesta
       : demo_client(ip, port)
     {}
   public:
-    void on_connect(bool success) {
-      EXPECT_TRUE(success);
+    void on_connect(const connection::pointer_type conn) override {
+      EXPECT_TRUE(conn);
       data_group_type p{
         make_demo_data<int32_t>(1000, 9000, 1648363193268),
         make_demo_data<uint32_t>(1002, 9001, 1648363193268),
@@ -753,9 +774,11 @@ TEST_F(demo_client_test, send_datas_of_multiple_packages_containing_same_timesta
       };
       EXPECT_TRUE(send(p));
     }
-    void on_write(bool success, std::size_t bytes)
+    void on_write_raw(const connection::pointer_type conn,
+                  const buffer_type& buffer,
+                  std::size_t bytes) override
     {
-      EXPECT_TRUE(success);
+      EXPECT_TRUE(conn);
       EXPECT_EQ(bytes, 106);
       stop();
     }
@@ -838,8 +861,8 @@ TEST_F(demo_client_test, send_datas_of_key_sequence)
       : demo_client(ip, port)
     {}
   public:
-    void on_connect(bool success) {
-      EXPECT_TRUE(success);
+    void on_connect(const connection::pointer_type conn) override {
+      EXPECT_TRUE(conn);
       data_group_type p{
         make_demo_data<int32_t>(1000, 9000, 1648363193268),
         make_demo_data<uint32_t>(1001, 9001, 1648363193269),
@@ -848,9 +871,11 @@ TEST_F(demo_client_test, send_datas_of_key_sequence)
       };
       EXPECT_TRUE(send(p));
     }
-    void on_write(bool success, std::size_t bytes)
+    void on_write_raw(const connection::pointer_type conn,
+                  const buffer_type& buffer,
+                  std::size_t bytes) override
     {
-      EXPECT_TRUE(success);
+      EXPECT_TRUE(conn);
       EXPECT_EQ(bytes, 65);
       stop();
     }
@@ -907,8 +932,8 @@ TEST_F(demo_client_test, send_datas_of_multiple_packages_containing_key_sequence
       : demo_client(ip, port)
     {}
   public:
-    void on_connect(bool success) {
-      EXPECT_TRUE(success);
+    void on_connect(const connection::pointer_type conn) override {
+      EXPECT_TRUE(conn);
       data_group_type p{
         make_demo_data<int32_t>(1000, 9000, 1648363193268),
         make_demo_data<uint32_t>(1001, 9001, 1648363193269),
@@ -924,9 +949,11 @@ TEST_F(demo_client_test, send_datas_of_multiple_packages_containing_key_sequence
       };
       EXPECT_TRUE(send(p));
     }
-    void on_write(bool success, std::size_t bytes)
+    void on_write_raw(const connection::pointer_type conn,
+                  const buffer_type& buffer,
+                  std::size_t bytes) override
     {
-      EXPECT_TRUE(success);
+      EXPECT_TRUE(conn);
       EXPECT_EQ(bytes, 180);
       stop();
     }
@@ -1029,8 +1056,8 @@ TEST_F(demo_client_test, send_datas_of_same_timestamp_and_key_sequence)
       : demo_client(ip, port)
     {}
   public:
-    void on_connect(bool success) {
-      EXPECT_TRUE(success);
+    void on_connect(const connection::pointer_type conn) override {
+      EXPECT_TRUE(conn);
       data_group_type p{
         make_demo_data<int32_t>(1000, 9000, 1648363193268),
         make_demo_data<uint32_t>(1001, 9001, 1648363193268),
@@ -1039,9 +1066,11 @@ TEST_F(demo_client_test, send_datas_of_same_timestamp_and_key_sequence)
       };
       EXPECT_TRUE(send(p));
     }
-    void on_write(bool success, std::size_t bytes)
+    void on_write_raw(const connection::pointer_type conn,
+                  const buffer_type& buffer,
+                  std::size_t bytes) override
     {
-      EXPECT_TRUE(success);
+      EXPECT_TRUE(conn);
       EXPECT_EQ(bytes, 41);
       stop();
     }
@@ -1096,8 +1125,8 @@ TEST_F(demo_client_test, send_datas_of_same_timestamp_and_same_type)
       : demo_client(ip, port)
     {}
   public:
-    void on_connect(bool success) {
-      EXPECT_TRUE(success);
+    void on_connect(const connection::pointer_type conn) override {
+      EXPECT_TRUE(conn);
       data_group_type p{
         make_demo_data<int32_t>(1000, 9000, 1648363193268),
         make_demo_data<int32_t>(1001, 9001, 1648363193268),
@@ -1106,9 +1135,11 @@ TEST_F(demo_client_test, send_datas_of_same_timestamp_and_same_type)
       };
       EXPECT_TRUE(send(p));
     }
-    void on_write(bool success, std::size_t bytes)
+    void on_write_raw(const connection::pointer_type conn,
+                  const buffer_type& buffer,
+                  std::size_t bytes) override
     {
-      EXPECT_TRUE(success);
+      EXPECT_TRUE(conn);
       EXPECT_EQ(bytes, 54);
       stop();
     }
@@ -1163,8 +1194,8 @@ TEST_F(demo_client_test, send_datas_of_key_sequence_and_same_type)
       : demo_client(ip, port)
     {}
   public:
-    void on_connect(bool success) {
-      EXPECT_TRUE(success);
+    void on_connect(const connection::pointer_type conn) override {
+      EXPECT_TRUE(conn);
       data_group_type p{
         make_demo_data<int32_t>(1000, 9000, 1648363193268),
         make_demo_data<int32_t>(1001, 9001, 1648363193268),
@@ -1173,9 +1204,11 @@ TEST_F(demo_client_test, send_datas_of_key_sequence_and_same_type)
       };
       EXPECT_TRUE(send(p));
     }
-    void on_write(bool success, std::size_t bytes)
+    void on_write_raw(const connection::pointer_type conn,
+                  const buffer_type& buffer,
+                  std::size_t bytes) override
     {
-      EXPECT_TRUE(success);
+      EXPECT_TRUE(conn);
       EXPECT_EQ(bytes, 66);
       stop();
     }
@@ -1230,8 +1263,8 @@ TEST_F(demo_client_test, send_datas_of_all_attribute)
       : demo_client(ip, port)
     {}
   public:
-    void on_connect(bool success) {
-      EXPECT_TRUE(success);
+    void on_connect(const connection::pointer_type conn) override {
+      EXPECT_TRUE(conn);
       data_group_type p{
         make_demo_data<int32_t>(1000, 9000, 1648363193268),
         make_demo_data<int32_t>(1001, 9001, 1648363193268),
@@ -1240,9 +1273,11 @@ TEST_F(demo_client_test, send_datas_of_all_attribute)
       };
       EXPECT_TRUE(send(p));
     }
-    void on_write(bool success, std::size_t bytes)
+    void on_write_raw(const connection::pointer_type conn,
+                  const buffer_type& buffer,
+                  std::size_t bytes) override
     {
-      EXPECT_TRUE(success);
+      EXPECT_TRUE(conn);
       EXPECT_EQ(bytes, 42);
       stop();
     }
@@ -1292,8 +1327,8 @@ TEST_F(demo_client_test, send_datas_of_all_attribute_multiple_packages)
       : demo_client(ip, port)
     {}
   public:
-    void on_connect(bool success) {
-      EXPECT_TRUE(success);
+    void on_connect(const connection::pointer_type conn) override {
+      EXPECT_TRUE(conn);
       data_group_type p{
         make_demo_data<int32_t>(1000, 9000, 1648363193268),
         make_demo_data<uint32_t>(1000, 9000, 1648363193270),
@@ -1310,9 +1345,11 @@ TEST_F(demo_client_test, send_datas_of_all_attribute_multiple_packages)
       };
       EXPECT_TRUE(send(p));
     }
-    void on_write(bool success, std::size_t bytes)
+    void on_write_raw(const connection::pointer_type conn,
+                  const buffer_type& buffer,
+                  std::size_t bytes) override
     {
-      EXPECT_TRUE(success);
+      EXPECT_TRUE(conn);
       EXPECT_EQ(bytes, 126);
       stop();
     }
@@ -1400,13 +1437,15 @@ TEST_F(demo_client_test, send_positive_keepalive)
       : demo_client(ip, port)
     {}
   public:
-    void on_connect(bool success) {
-      EXPECT_TRUE(success);
+    void on_connect(const connection::pointer_type conn) override {
+      EXPECT_TRUE(conn);
       std::this_thread::sleep_for(std::chrono::seconds(config::t1()+1));
     }
-    void on_write(bool success, std::size_t bytes)
+    void on_write_raw(const connection::pointer_type conn,
+                  const buffer_type& buffer,
+                  std::size_t bytes) override
     {
-      EXPECT_TRUE(success);
+      EXPECT_TRUE(conn);
       EXPECT_EQ(bytes, 4);
       stop();
     }
@@ -1441,19 +1480,21 @@ TEST_F(demo_client_test, t0_t1_t2)
     {}
 
   public:
-    void on_connect(bool success) {
+    void on_connect(const connection::pointer_type conn) override {
       if (!reconnect_) {
-        EXPECT_TRUE(success);
+        EXPECT_TRUE(conn);
         std::this_thread::sleep_for(std::chrono::seconds(config::t1()+1));
         reconnect_ = true;
       } else {
-        EXPECT_TRUE(success);
+        EXPECT_TRUE(conn);
         stop();
       }
     }
-    void on_write(bool success, std::size_t bytes)
+    void on_write_raw(const connection::pointer_type conn,
+                  const buffer_type& buffer,
+                  std::size_t bytes) override
     {
-      EXPECT_TRUE(success);
+      EXPECT_TRUE(conn);
       EXPECT_EQ(bytes, 4);
     }
 
@@ -1480,6 +1521,7 @@ TEST_F(demo_client_test, t0_t1_t2)
   }
 }
 
+/*
 TEST_F(demo_client_test, call_t0_multiple_times)
 {
   class connect_fail_client : public demo_client
@@ -1491,7 +1533,7 @@ TEST_F(demo_client_test, call_t0_multiple_times)
     {}
 
   public:
-    void on_connect(bool success) {
+    void on_connect(const connection::pointer_type conn) override {
       if (!reconnect_) {
         EXPECT_FALSE(success);
         reconnect_ = true;
@@ -1500,7 +1542,9 @@ TEST_F(demo_client_test, call_t0_multiple_times)
         stop();
       }
     }
-    void on_write(bool success, std::size_t bytes)
+    void on_write_raw(const connection::pointer_type conn,
+                  const buffer_type& buffer,
+                  std::size_t bytes) override
     {}
 
   private:
@@ -1511,6 +1555,7 @@ TEST_F(demo_client_test, call_t0_multiple_times)
   connect_fail_client c("127.0.0.1", 9902);
   c.run();
 }
+*/
 
 TEST_F(demo_client_test, negative_keepalive)
 {
@@ -1521,13 +1566,15 @@ TEST_F(demo_client_test, negative_keepalive)
       : demo_client(ip, port)
     {}
   public:
-    void on_connect(bool success)
+    void on_connect(const connection::pointer_type conn) override
     {
-      EXPECT_TRUE(success);
+      EXPECT_TRUE(conn);
     }
-    void on_write(bool success, std::size_t bytes)
+    void on_write_raw(const connection::pointer_type conn,
+                  const buffer_type& buffer,
+                  std::size_t bytes) override
     {
-      EXPECT_TRUE(success);
+      EXPECT_TRUE(conn);
       EXPECT_EQ(bytes, 4);
       stop();
     }
@@ -1563,13 +1610,15 @@ TEST_F(demo_client_test, pack_and_nkeep)
       : demo_client(ip, port)
     {}
   public:
-    void on_connect(bool success)
+    void on_connect(const connection::pointer_type conn) override
     {
-      EXPECT_TRUE(success);
+      EXPECT_TRUE(conn);
     }
-    void on_write(bool success, std::size_t bytes)
+    void on_write_raw(const connection::pointer_type conn,
+                  const buffer_type& buffer,
+                  std::size_t bytes) override
     {
-      EXPECT_TRUE(success);
+      EXPECT_TRUE(conn);
       EXPECT_EQ(bytes, 4);
       stop();
     }

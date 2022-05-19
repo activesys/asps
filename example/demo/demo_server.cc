@@ -29,7 +29,6 @@ public:
               << conn->remote_address() << ":"
               << conn->remote_port() << std::endl;
   }
-
   void on_read(const connection::pointer_type conn,
                const data_group_type& datas) override
   {
@@ -45,21 +44,21 @@ public:
         {
           bool v;
           d->get_value(&v);
-          std::cout << " value: " << v << std::endl;
+          std::cout << " value: " << std::boolalpha << v << std::endl;
         }
         break;
       case demo_data::int8_type:
         {
           int8_t v;
           d->get_value(&v);
-          std::cout << " value: " << v << std::endl;
+          std::cout << " value: " << int16_t(v) << std::endl;
         }
         break;
       case demo_data::uint8_type:
         {
           uint8_t v;
           d->get_value(&v);
-          std::cout << " value: " << v << std::endl;
+          std::cout << " value: " << uint16_t(v) << std::endl;
         }
         break;
       case demo_data::int16_type:
@@ -149,7 +148,7 @@ public:
   {
     if (debug_) {
       std::cout << std::endl
-                << "demo_server> send raw datas from "
+                << "demo_server> send raw datas to "
                 << conn->remote_address() << ":"
                 << conn->remote_port() << std::endl;
       std::cout << "demo_server>";
@@ -182,6 +181,7 @@ int main(int argc, char* argv[])
     return 1;
   }
 
+  config::t1_t2(sop.t1(), sop.t2());
   my_demo_server server(sop.port(), sop.debug());
   std::cout << "demo_server> listen on " << sop.port() << std::endl;
   server.run();

@@ -21,29 +21,36 @@ namespace demo {
 
 class demo_client : public client_observer
 {
+  typedef timer_service::pointer_type timer_type;
+  typedef connector::pointer_type connector_type;
+  typedef connection::pointer_type connection_type;
+  typedef client_session_service::pointer_type session_type;
+
 public:
   demo_client(const std::string& ip, uint16_t port)
     : connector_(make_connector(ip, port)),
-      t0_(make_timer_service(config::t0(),
-                             std::bind(&demo_client::t0_timeout, this)))
-  {
-    t0_->start();
-  }
+      t0_(make_timer_service(config::t0() * 1000,
+                             std::bind(&demo_client::t0_timeout, this),
+                             true))
+  {}
   demo_client(const connector::pointer_type conn)
     : connector_(conn),
-      t0_(make_timer_service(config::t0(),
-                             std::bind(&demo_client::t0_timeout, this)))
-  {
-    t0_->start();
-  }
+      t0_(make_timer_service(config::t0() * 1000,
+                             std::bind(&demo_client::t0_timeout, this),
+                             true))
+  {}
   virtual ~demo_client()
-  {
-    t0_->stop();
-  }
+  {}
 
 public:
-  virtual void on_connect(bool success) = 0;
-  virtual void on_write(bool success, std::size_t bytes) = 0;
+  virtual void on_connect(const connection_type conn) {}
+  virtual void on_close(const connection_type conn) {}
+  virtual void on_write_raw(const connection_type conn,
+                            const buffer_type& buffer,
+                            std::size_t bytes) {}
+  virtual void on_read_raw(const connection_type conn,
+                           const buffer_type& buffer,
+                           std::size_t bytes) {}
 
 public:
   bool send(const data_group_type& group);
@@ -52,13 +59,13 @@ public:
   void stop();
 
 private:
-  void connect_handler(bool success, connection::pointer_type conn);
-  void write_handler(connection::pointer_type conn,
+  void connect_handler(connection_type conn);
+  void write_handler(connection_type conn,
                      std::size_t bytes);
-  void read_handler(connection::pointer_type conn,
+  void read_handler(connection_type conn,
                     const buffer_type& buffer,
                     std::size_t bytes);
-  void close_handler(connection::pointer_type conn);
+  void close_handler(connection_type conn);
   void t0_timeout();
 
 private:
@@ -66,11 +73,12 @@ private:
   void update_event() override;
 
 private:
-  connector::pointer_type connector_;
-  connection::pointer_type connection_;
-  client_session_service::pointer_type session_;
-  timer_service::pointer_type t0_;
+  connector_type connector_;
+  connection_type connection_;
+  session_type session_;
+  timer_type t0_;
   buffer_type read_buffer_;
+  buffer_type write_buffer_;
 };
 
 } // demo

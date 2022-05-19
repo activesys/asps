@@ -18,6 +18,7 @@ namespace demo {
 
 class demo_server : public server_observer
 {
+  typedef acceptor::pointer_type acceptor_type;
   typedef connection::pointer_type connection_type;
   typedef server_session_service::pointer_type session_type;
   typedef boost::bimap<connection_type, session_type> bimap_type;
@@ -71,7 +72,7 @@ private:
   const session_type get_session(const connection_type conn);
 
 private:
-  acceptor::pointer_type acceptor_;
+  acceptor_type acceptor_;
   bimap_type connection_container_;
   buffer_type read_buffer_;
   buffer_type write_buffer_;

@@ -24,7 +24,7 @@ server_session::server_session()
   : data_sequence_(make_data_receive_sequence()),
     nkeep_sequence_(make_active_sequence(true)),
     gc_sequence_(make_garbage_collector_sequence()),
-    t1_(make_timer_service(config::t1(),
+    t1_(make_timer_service(config::t1() * 1000,
                            std::bind(&server_session::t1_timeout, this),
                            true))
 {

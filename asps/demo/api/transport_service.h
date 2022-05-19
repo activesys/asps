@@ -52,7 +52,7 @@ class connector
 public:
   typedef std::shared_ptr<connector> pointer_type;
 
-  typedef std::function<void(bool,connection::pointer_type)> connect_handler;
+  typedef std::function<void(connection::pointer_type)> connect_handler;
 
 public:
   connector(const std::string& ip, uint16_t port)
