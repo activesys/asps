@@ -31,11 +31,9 @@ public:
       count_(0),
       dre_(std::random_device()())
   {
-    timer_ = make_timer_service(cop_.frequency(),
-                                std::bind(&my_demo_client::on_timeout,
-                                          this),
-                                false);
-    received_bytes_ = 0;
+    timer_ = make_timer(cop_.frequency(),
+                        std::bind(&my_demo_client::on_timeout,
+                        this));
   }
 
 public:
@@ -240,7 +238,6 @@ public:
 public:
   void on_connect(const connection::pointer_type conn) override
   {
-    conn_ = conn;
     std::cout << std::endl
               << "demo_client> establish a connection to "
               << conn->remote_address() << ":"
@@ -307,9 +304,7 @@ private:
   uint32_t count_;
   const client_options_parser& cop_;
   timer_service::pointer_type timer_;
-  connection::pointer_type conn_;
   std::default_random_engine dre_;
-  uint32_t received_bytes_;
 };
 
 int main(int argc, char* argv[])

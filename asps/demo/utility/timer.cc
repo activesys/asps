@@ -14,9 +14,9 @@ namespace demo {
 using namespace std::placeholders;
 
 timer_service::pointer_type
-make_timer_service(uint32_t expiry,
-                   timer_service::timeout_handler timeout,
-                   bool repeat)
+make_timer(uint32_t expiry,
+           timer_service::timeout_handler timeout,
+           bool repeat)
 {
   return std::make_shared<timer>(g_context, expiry, timeout, repeat);
 }

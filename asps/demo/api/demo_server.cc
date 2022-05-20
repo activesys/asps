@@ -43,7 +43,7 @@ void demo_server::accept_handler(connection_type conn)
                                 this,
                                 std::placeholders::_1));
 
-    session_type session = make_server_session_service();
+    session_type session = make_server_session();
     session->register_observer(this);
     connection_container_.insert(bimap_type::value_type(conn, session));
 

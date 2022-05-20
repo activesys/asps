@@ -97,8 +97,8 @@ bool passive_sequence::receive_request(buffer_type& buffer)
 
 // Active Sequence
 active_sequence::active_sequence()
-  : t2_(make_timer_service(config::t2() * 1000,
-                           std::bind(&active_sequence::t2_timeout, this))),
+  : t2_(make_timer(config::t2() * 1000,
+                   std::bind(&active_sequence::t2_timeout, this))),
     state_(none_state::instance())
 {}
 

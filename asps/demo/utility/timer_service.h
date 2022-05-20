@@ -38,9 +38,9 @@ protected:
 };
 
 timer_service::pointer_type
-make_timer_service(uint32_t expiry,
-                   timer_service::timeout_handler handler,
-                   bool repeat = false);
+make_timer(uint32_t expiry,
+           timer_service::timeout_handler handler,
+           bool repeat = false);
 
 } // demo
 } // asps

@@ -93,7 +93,7 @@ TEST(server_session_test, receive_data_and_notify)
     0xaa, 0xff
   };
 
-  server_session_service::pointer_type session = make_server_session_service();
+  server_session_service::pointer_type session = make_server_session();
   server_observer_test sot;
   session->register_observer(&sot);
 
@@ -134,7 +134,7 @@ TEST(server_session_test, receive_positive_keepalive_and_notify)
   };
 
   config::pack_nkeep(0xff, 0x00);
-  server_session_service::pointer_type session = make_server_session_service();
+  server_session_service::pointer_type session = make_server_session();
   server_observer_test sot;
   session->register_observer(&sot);
 

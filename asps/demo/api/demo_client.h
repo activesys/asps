@@ -29,15 +29,15 @@ class demo_client : public client_observer
 public:
   demo_client(const std::string& ip, uint16_t port)
     : connector_(make_connector(ip, port)),
-      t0_(make_timer_service(config::t0() * 1000,
-                             std::bind(&demo_client::t0_timeout, this),
-                             true))
+      t0_(make_timer(config::t0() * 1000,
+                     std::bind(&demo_client::t0_timeout, this),
+                     true))
   {}
   demo_client(const connector::pointer_type conn)
     : connector_(conn),
-      t0_(make_timer_service(config::t0() * 1000,
-                             std::bind(&demo_client::t0_timeout, this),
-                             true))
+      t0_(make_timer(config::t0() * 1000,
+                     std::bind(&demo_client::t0_timeout, this),
+                     true))
   {}
   virtual ~demo_client()
   {}

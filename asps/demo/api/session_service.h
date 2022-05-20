@@ -63,7 +63,7 @@ protected:
 };
 
 client_session_service::pointer_type
-make_client_session_service();
+make_client_session();
 
 // Server Session Service
 class server_session_service;
@@ -122,7 +122,7 @@ protected:
 };
 
 server_session_service::pointer_type
-make_server_session_service();
+make_server_session();
 
 } // demo
 } // asps

@@ -11,13 +11,18 @@
 namespace asps {
 namespace demo {
 
+client_session_service::pointer_type make_client_session()
+{
+  return std::make_shared<client_session>();
+}
+
 client_session::client_session()
   : client_session_service(),
     pkeep_sequence_(make_active_sequence(false)),
     data_sequence_(make_data_send_sequence()),
     gc_sequence_(make_garbage_collector_sequence()),
-    t1_(make_timer_service(config::t1() * 1000,
-                           std::bind(&client_session::t1_timeout, this)))
+    t1_(make_timer(config::t1() * 1000,
+                   std::bind(&client_session::t1_timeout, this)))
 {
   t1_->start();
   pkeep_sequence_->register_event_observer(this);
@@ -78,11 +83,6 @@ void client_session::t1_timeout()
 void client_session::update_event()
 {
   notify_event();
-}
-
-client_session_service::pointer_type make_client_session_service()
-{
-  return std::make_shared<client_session>();
 }
 
 } // demo

@@ -48,7 +48,7 @@ void demo_client::t0_timeout()
 void demo_client::connect_handler(connection::pointer_type conn)
 {
   connection_ = conn;
-  session_ = make_client_session_service();
+  session_ = make_client_session();
   session_->register_observer(this);
   t0_->stop();
 
