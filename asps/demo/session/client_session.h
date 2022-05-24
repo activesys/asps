@@ -11,11 +11,13 @@
 #include <vector>
 
 #include <asps/demo/session/sequence_service.h>
-#include <asps/demo/utility/timer_service.h>
+#include <asps/utility/timer_service.h>
 #include <asps/demo/api/session_service.h>
 
 namespace asps {
 namespace demo {
+
+using namespace asps::utility;
 
 // Demo Client Session
 class client_session

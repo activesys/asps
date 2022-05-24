@@ -2,16 +2,16 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file. See the AUTHORS file for names of contributors.
 //
-// Demo Timer service.
+// Timer service.
 
-#ifndef ASPS_DEMO_UTILITY_TIMER_SERVICE_H
-#define ASPS_DEMO_UTILITY_TIMER_SERVICE_H
+#ifndef ASPS_UTILITY_TIMER_SERVICE_H
+#define ASPS_UTILITY_TIMER_SERVICE_H
 
 #include <memory>
 #include <functional>
 
 namespace asps {
-namespace demo {
+namespace utility {
 
 class timer_service
 {
@@ -42,7 +42,7 @@ make_timer(uint32_t expiry,
            timer_service::timeout_handler handler,
            bool repeat = false);
 
-} // demo
+} // utility
 } // asps
 
-#endif // ASPS_DEMO_UTILITY_TIMER_SERVICE_H
+#endif // ASPS_UTILITY_TIMER_SERVICE_H

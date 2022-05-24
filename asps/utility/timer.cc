@@ -2,16 +2,19 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file. See the AUTHORS file for names of contributors.
 //
-// Demo timer.
+// timer.
 
 #include <chrono>
 #include <functional>
-#include <asps/demo/utility/timer.h>
+#include <asps/utility/timer.h>
+#include <asps/transport/transport.h>
+#include <asps/utility/boost_env.h>
 
 namespace asps {
-namespace demo {
+namespace utility {
 
 using namespace std::placeholders;
+using namespace asps::transport;
 
 timer_service::pointer_type
 make_timer(uint32_t expiry,
@@ -46,5 +49,5 @@ void timer::on_timeout(const error_code& ec)
   }
 }
 
-} // demo
+} // utility
 } // asps

@@ -2,18 +2,20 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file. See the AUTHORS file for names of contributors.
 //
-// Demo Transport service.
+// Transport service.
 
-#ifndef ASPS_DEMO_API_TRANSPORT_SERVICE_H
-#define ASPS_DEMO_API_TRANSPORT_SERVICE_H
+#ifndef ASPS_TRANSPORT_TRANSPORT_SERVICE_H
+#define ASPS_TRANSPORT_TRANSPORT_SERVICE_H
 
 #include <string>
 #include <memory>
 #include <functional>
-#include <asps/demo/semantic/demo_data.h>
+#include <asps/utility/utility.h>
 
 namespace asps {
-namespace demo {
+namespace transport {
+
+using namespace asps::utility;
 
 // Connection
 class connection
@@ -112,7 +114,7 @@ make_acceptor(const std::string& ip, uint16_t port);
 acceptor::pointer_type
 make_acceptor(uint16_t port);
 
-} // demo
+} // transport
 } // asps
 
-#endif // ASPS_DEMO_API_TRANSPORT_SERVICE_H
+#endif // ASPS_TRANSPORT_TRANSPORT_SERVICE_H

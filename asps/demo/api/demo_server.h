@@ -9,12 +9,15 @@
 
 #include <string>
 #include <asps/demo/api/session_service.h>
-#include <asps/demo/api/transport_service.h>
-#include <asps/demo/utility/utility.h>
+#include <asps/transport/transport_service.h>
+#include <asps/utility/utility.h>
 #include <boost/bimap.hpp>
 
 namespace asps {
 namespace demo {
+
+using namespace asps::transport;
+using namespace asps::utility;
 
 class demo_server : public server_observer
 {

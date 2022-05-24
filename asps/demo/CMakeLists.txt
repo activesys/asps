@@ -29,14 +29,15 @@ set(ASPS_DEMO_SOURCES
   session/server_session.cc
   message/client_message.cc
   message/server_message.cc
-  utility/timer.cc
-  utility/utility.cc
-  utility/transport.cc
   config/config.cc
   sequence/client_sequence.cc
   sequence/server_sequence.cc
   sequence/state.cc
   sequence/sequence.cc
+  ../transport/transport.cc
+  ../utility/timer.cc
+  ../utility/utility.cc
+  ../utility/boost_env.cc
 )
 
 ##################################

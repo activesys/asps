@@ -14,14 +14,14 @@
 #include <chrono>
 #include <functional>
 #include <boost/asio.hpp>
-#include <asps/demo/utility/utility.h>
+#include <asps/utility/utility.h>
 
 namespace asps_test {
 namespace demo_test {
 
 using namespace boost::asio;
 using namespace boost::system;
-using namespace asps::demo;
+using namespace asps::utility;
 
 class demo_test_client
 {

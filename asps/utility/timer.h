@@ -2,22 +2,20 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file. See the AUTHORS file for names of contributors.
 //
-// Demo timer.
+// timer.
 
-#ifndef ASPS_DEMO_UTILITY_TIMER_H
-#define ASPS_DEMO_UTILITY_TIMER_H
+#ifndef ASPS_UTILITY_TIMER_H
+#define ASPS_UTILITY_TIMER_H
 
 #include <memory>
 #include <boost/asio.hpp>
-#include <asps/demo/utility/timer_service.h>
+#include <asps/utility/timer_service.h>
 
 namespace asps {
-namespace demo {
+namespace utility {
 
 using namespace boost::asio;
 using namespace boost::system;
-
-extern std::shared_ptr<io_context> g_context;
 
 class timer : public timer_service
 {
@@ -43,7 +41,7 @@ private:
   steady_timer timer_;
 };
 
-} // demo
+} // utility
 } // asps
 
-#endif // ASPS_DEMO_UTILITY_TIMER_H
+#endif // ASPS_UTILITY_TIMER_H

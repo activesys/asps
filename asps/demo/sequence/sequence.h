@@ -10,10 +10,12 @@
 #include <asps/demo/session/sequence_service.h>
 #include <asps/demo/message/server_message.h>
 #include <asps/demo/sequence/state.h>
-#include <asps/demo/utility/timer_service.h>
+#include <asps/utility/timer_service.h>
 
 namespace asps {
 namespace demo {
+
+using namespace asps::utility;
 
 // Passive Sequence
 class passive_sequence

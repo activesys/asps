@@ -14,13 +14,14 @@
 #include <asps/demo/demo.h>
 #include <boost/asio.hpp>
 
-#include <asps/demo/utility/transport.h>
+#include <asps/utility/boost_env.h>
 #include <test/demo/utility/demo_test_server.h>
 
 namespace asps_test {
 namespace demo_test {
 
 using namespace asps::demo;
+using namespace asps::utility;
 using namespace boost::asio;
 
 class demo_client_test : public ::testing::Test

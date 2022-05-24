@@ -7,13 +7,14 @@
 #include <string>
 #include <gtest/gtest.h>
 #include <asps/demo/demo.h>
-#include <asps/demo/utility/transport.h>
+#include <asps/utility/boost_env.h>
 #include <test/demo/utility/demo_test_client.h>
 
 namespace asps_test {
 namespace demo_test {
 
 using namespace asps::demo;
+using namespace asps::utility;
 
 class demo_server_test : public ::testing::Test
 {

@@ -7,12 +7,14 @@
 #ifndef ASPS_DEMO_SEQUENCE_SERVER_SEQUENCE_H
 #define ASPS_DEMO_SEQUENCE_SERVER_SEQUENCE_H
 
-#include <asps/demo/utility/utility.h>
+#include <asps/utility/utility.h>
 #include <asps/demo/semantic/demo_data.h>
 #include <asps/demo/sequence/sequence.h>
 
 namespace asps {
 namespace demo {
+
+using namespace asps::utility;
 
 // Server Data Sequence
 class server_data_sequence

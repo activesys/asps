@@ -2,17 +2,16 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file. See the AUTHORS file for names of contributors.
 //
-// Demo Default Transport.
+// Transport layer services implemented using Boost.
 
-#include <asps/demo/config/config.h>
-#include <asps/demo/utility/transport.h>
+#include <asps/transport/transport.h>
+#include <asps/utility/boost_env.h>
 
 namespace asps {
-namespace demo {
+namespace transport {
 
 using namespace std::placeholders;
-
-std::shared_ptr<io_context> g_context = std::make_shared<io_context>();
+using namespace asps::utility;
 
 // Connection
 connection::pointer_type

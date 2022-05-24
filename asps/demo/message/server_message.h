@@ -7,12 +7,14 @@
 #ifndef ASPS_DEMO_MESSAGE_SERVER_MESSAGE_H
 #define ASPS_DEMO_MESSAGE_SERVER_MESSAGE_H
 
-#include <asps/demo/utility/utility.h>
+#include <asps/utility/utility.h>
 #include <asps/demo/semantic/demo_data.h>
 #include <asps/demo/sequence/message_service.h>
 
 namespace asps {
 namespace demo {
+
+using namespace asps::utility;
 
 class server_data : public message_unserialization_service
 {

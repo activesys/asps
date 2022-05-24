@@ -5,12 +5,14 @@
 // Server Message.
 
 #include <cstring>
-#include <asps/demo/utility/utility.h>
+#include <asps/utility/utility.h>
 #include <asps/demo/message/server_message.h>
 #include <asps/demo/message/keepalive.h>
 
 namespace asps {
 namespace demo {
+
+using namespace asps::utility;
 
 message_unserialization_service::pointer_type
 make_server_data_message()

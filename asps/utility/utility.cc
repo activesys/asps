@@ -2,12 +2,12 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file. See the AUTHORS file for names of contributors.
 //
-// Demo utility.
+// utility.
 
-#include <asps/demo/utility/utility.h>
+#include <asps/utility/utility.h>
 
 namespace asps {
-namespace demo {
+namespace utility {
 
 uint64_t htonll(uint64_t value)
 {
@@ -41,5 +41,5 @@ uint64_t ntohll(uint64_t value)
   return htonll(value);
 }
 
-} // demo
+} // utility
 } // asps

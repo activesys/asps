@@ -2,24 +2,21 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file. See the AUTHORS file for names of contributors.
 //
-// Demo Default Transport.
+// Transport layer services implemented using Boost.
 
-#ifndef ASPS_DEMO_UTILITY_TRANSPORT_H
-#define ASPS_DEMO_UTILITY_TRANSPORT_H
+#ifndef ASPS_TRANSPORT_TRANSPORT_H
+#define ASPS_TRANSPORT_TRANSPORT_H
 
 #include <memory>
 #include <string>
 #include <boost/asio.hpp>
-#include <asps/demo/config/config.h>
-#include <asps/demo/api/transport_service.h>
+#include <asps/transport/transport_service.h>
 
 namespace asps {
-namespace demo {
+namespace transport {
 
 using namespace boost::asio;
 using namespace boost::system;
-
-extern std::shared_ptr<io_context> g_context;
 
 // Connection
 class boost_connection
@@ -31,7 +28,7 @@ public:
     : context_(context),
       socket_(*context_)
   {
-    buffer_.resize(config::read_buffer_size());
+    buffer_.resize(65536);
   }
   virtual ~boost_connection() {}
 
@@ -139,7 +136,7 @@ private:
   release_handler release_handler_;
 };
 
-} // demo
+} // transport
 } // asps
 
-#endif // ASPS_DEMO_UTILITY_TRANSPORT_H
+#endif // ASPS_TRANSPORT_TRANSPORT_H

@@ -13,11 +13,12 @@
 #include <thread>
 #include <functional>
 #include <boost/asio.hpp>
-#include <asps/demo/utility/utility.h>
+#include <asps/utility/utility.h>
 
 namespace asps_test {
 namespace demo_test {
 
+using namespace asps::utility;
 using namespace boost::asio;
 
 class demo_test_server

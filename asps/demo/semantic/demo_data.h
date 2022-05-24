@@ -12,10 +12,12 @@
 #include <vector>
 #include <arpa/inet.h>
 
-#include <asps/demo/utility/utility.h>
+#include <asps/utility/utility.h>
 
 namespace asps {
 namespace demo {
+
+using namespace asps::utility;
 
 // Demo Data
 class demo_data

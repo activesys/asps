@@ -2,16 +2,16 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file. See the AUTHORS file for names of contributors.
 //
-// Demo utility.
+// utility.
 
-#ifndef ASPS_DEMO_UTILITY_UTILITY_H
-#define ASPS_DEMO_UTILITY_UTILITY_H
+#ifndef ASPS_UTILITY_UTILITY_H
+#define ASPS_UTILITY_UTILITY_H
 
 #include <cstdint>
 #include <vector>
 
 namespace asps {
-namespace demo {
+namespace utility {
 
 typedef std::vector<uint8_t> buffer_type;
 
@@ -19,7 +19,7 @@ typedef std::vector<uint8_t> buffer_type;
 uint64_t htonll(uint64_t value);
 uint64_t ntohll(uint64_t value);
 
-} // demo
+} // utility
 } // asps
 
-#endif // ASPS_DEMO_UTILITY_UTILITY_H
+#endif // ASPS_UTILITY_UTILITY_H

@@ -12,12 +12,14 @@
 #include <functional>
 #include <asps/demo/api/session_service.h>
 #include <asps/demo/semantic/demo_data.h>
-#include <asps/demo/api/transport_service.h>
-#include <asps/demo/utility/timer_service.h>
+#include <asps/transport/transport_service.h>
+#include <asps/utility/timer_service.h>
 #include <asps/demo/config/config.h>
 
 namespace asps {
 namespace demo {
+
+using namespace asps::transport;
 
 class demo_client : public client_observer
 {
