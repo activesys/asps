@@ -4,13 +4,13 @@
 //
 // Demo Client.
 
-#ifndef ASPS_DEMO_API_DEMO_CLIENT_H
-#define ASPS_DEMO_API_DEMO_CLIENT_H
+#ifndef ASPS_DEMO_SEMANTIC_DEMO_CLIENT_H
+#define ASPS_DEMO_SEMANTIC_DEMO_CLIENT_H
 
 #include <cstdint>
 #include <string>
 #include <functional>
-#include <asps/demo/api/session_service.h>
+#include <asps/demo/semantic/session_service.h>
 #include <asps/demo/semantic/demo_data.h>
 #include <asps/transport/transport_service.h>
 #include <asps/utility/timer_service.h>
@@ -86,4 +86,4 @@ private:
 } // demo
 } // asps
 
-#endif // ASPS_DEMO_API_DEMO_CLIENT_H
+#endif // ASPS_DEMO_SEMANTIC_DEMO_CLIENT_H

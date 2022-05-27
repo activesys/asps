@@ -4,11 +4,11 @@
 //
 // Demo Server.
 
-#ifndef ASPS_DEMO_API_DEMO_SERVER_H
-#define ASPS_DEMO_API_DEMO_SERVER_H
+#ifndef ASPS_DEMO_SEMANTIC_DEMO_SERVER_H
+#define ASPS_DEMO_SEMANTIC_DEMO_SERVER_H
 
 #include <string>
-#include <asps/demo/api/session_service.h>
+#include <asps/demo/semantic/session_service.h>
 #include <asps/transport/transport_service.h>
 #include <asps/utility/utility.h>
 #include <boost/bimap.hpp>
@@ -84,4 +84,4 @@ private:
 } // demo
 } // asps
 
-#endif // ASPS_DEMO_API_DEMO_SERVER_H
+#endif // ASPS_DEMO_SEMANTIC_DEMO_SERVER_H

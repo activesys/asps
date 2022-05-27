@@ -6,7 +6,7 @@
 
 #include <algorithm>
 #include <functional>
-#include <asps/demo/api/demo_client.h>
+#include <asps/demo/semantic/demo_client.h>
 
 namespace asps {
 namespace demo {
@@ -77,7 +77,7 @@ void demo_client::read_handler(connection::pointer_type conn,
                                std::size_t bytes)
 {
   on_read_raw(conn, buffer, bytes);
-  
+
   std::size_t remain_size = read_buffer_.size();
   read_buffer_.resize(remain_size + bytes);
   std::copy(buffer.begin(),

@@ -7,7 +7,7 @@
 #ifndef ASPS_DEMO_SESSION_SERVER_SESSION_H
 #define ASPS_DEMO_SESSION_SERVER_SESSION_H
 
-#include <asps/demo/api/session_service.h>
+#include <asps/demo/semantic/session_service.h>
 #include <asps/demo/session/sequence_service.h>
 #include <asps/utility/timer_service.h>
 

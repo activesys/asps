@@ -7,6 +7,9 @@
 #include <cstdint>
 #include <gtest/gtest.h>
 #include <asps/demo/demo.h>
+#include <asps/demo/message/keepalive.h>
+#include <asps/demo/message/client_message.h>
+#include <asps/demo/message/server_message.h>
 
 namespace asps_test {
 namespace demo_test {

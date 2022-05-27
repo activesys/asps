@@ -4,8 +4,8 @@
 //
 // Demo session service interface.
 
-#ifndef ASPS_DEMO_API_SESSION_SERVICE_H
-#define ASPS_DEMO_API_SESSION_SERVICE_H
+#ifndef ASPS_DEMO_SEMANTIC_SESSION_SERVICE_H
+#define ASPS_DEMO_SEMANTIC_SESSION_SERVICE_H
 
 #include <memory>
 #include <vector>
@@ -127,4 +127,4 @@ make_server_session();
 } // demo
 } // asps
 
-#endif // ASPS_DEMO_API_SESSION_SERVICE_H
+#endif // ASPS_DEMO_SEMANTIC_SESSION_SERVICE_H

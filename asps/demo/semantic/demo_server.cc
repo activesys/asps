@@ -5,7 +5,7 @@
 // Demo Server.
 
 #include <functional>
-#include <asps/demo/api/demo_server.h>
+#include <asps/demo/semantic/demo_server.h>
 
 namespace asps {
 namespace demo {
