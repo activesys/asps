@@ -22,17 +22,14 @@ configure_file(
 ##################################
 # Set sources for modbus
 set(ASPS_MODBUS_SOURCES
-    common/global_event.cc
-    api/config.cc
-    api/client.cc
-    api/server.cc
-    semantic/coils.cc
-    semantic/registers.cc
-    session/session.cc
-    pdu/message/pdu.cc
-    pdu/sequence/pdu_sequence.cc
-    adu/message/tcp_adu.cc
-    adu/sequence/tcp_adu_sequence.cc
+    pdu/semantic/data_model.cpp
+    pdu/semantic/client.cpp
+    pdu/semantic/request.cpp
+    pdu/session/session.cpp
+    pdu/sequence/sequence.cpp
+    pdu/sequence/state.cpp
+    pdu/sequence/client_sequence.cpp
+    pdu/message/client_message.cpp
 )
 
 ##################################
