@@ -17,10 +17,15 @@ using namespace asps::utility;
 // Test PDU unserialize
 TEST(client_read_coils_request_test, serialize)
 {
-  buffer_type msg{0x01, 0x00, 0x55, 0x00, 0x86};
-  pdu::client_read_coils_request r(85, 134);
-  const buffer_type& b = r.serialize();
-  EXPECT_EQ(b, msg);
+  buffer_type msg1{0x01, 0x00, 0x55, 0x00, 0x86};
+  pdu::client_read_coils_request r1(85, 134);
+  const buffer_type& b1 = r1.serialize();
+  EXPECT_EQ(b1, msg1);
+
+  buffer_type msg2{0x01, 0x1a, 0x28, 0x07, 0x20};
+  pdu::client_read_coils_request r2(6696, 1824);
+  const buffer_type& b2 = r2.serialize();
+  EXPECT_EQ(b2, msg2);
 }
 
 TEST(client_read_coils_response_test, unserialize)

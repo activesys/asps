@@ -13,19 +13,6 @@ namespace asps_test {
 namespace modbus_test {
 
 using namespace asps::modbus;
-using ::testing::_;
-
-class pdu_client_mock : public pdu::client
-{
-public:
-  pdu_client_mock(pdu::adu_service::pointer_type adu)
-    : pdu::client(adu)
-  {}
-public:
-  MOCK_METHOD(void, on_read_coils, (const pdu::coils& status), (override));
-  MOCK_METHOD(void, on_exception, (pdu::function_code fc,
-                                   pdu::exception_code ec), (override));
-};
 
 TEST(pdu_client_test, read_coils)
 {

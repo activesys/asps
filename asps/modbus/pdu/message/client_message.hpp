@@ -2,7 +2,7 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file. See the AUTHORS file for names of contributors.
 //
-// Modbus PDU Message service.
+// Modbus PDU Client Message.
 
 #ifndef ASPS_MODBUS_PDU_MESSAGE_CLIENT_MESSAGE_HPP
 #define ASPS_MODBUS_PDU_MESSAGE_CLIENT_MESSAGE_HPP

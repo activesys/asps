@@ -2,7 +2,7 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file. See the AUTHORS file for names of contributors.
 //
-// Unit test for Modbus Session.
+// Unit test for Modbus PDU Session.
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>

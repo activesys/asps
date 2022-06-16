@@ -2,11 +2,12 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file. See the AUTHORS file for names of contributors.
 //
-// Modbus PDU Message service.
+// Modbus PDU Client Message.
 
 #include <arpa/inet.h>
-#include <asps/modbus/pdu/message/client_message.hpp>
 #include <asps/modbus/pdu/semantic/constant.hpp>
+#include <asps/modbus/pdu/message/message.hpp>
+#include <asps/modbus/pdu/message/client_message.hpp>
 
 namespace asps {
 namespace modbus {
@@ -34,11 +35,11 @@ bool client_exception::unserialize(const buffer_type& buffer)
   if (*pos & 0x80) {
     // decode function code
     fc_ = function_code(*pos & 0x7f);
-    pos += 1;
+    pos += function_code_filed_length;
 
     // decode exception code
     ec_ = exception_code(*pos);
-    pos += 1;
+    pos += exception_code_field_length;
 
     return true;
   } else {
@@ -57,13 +58,13 @@ const buffer_type& client_read_coils_request::serialize()
 
   // encode function code;
   *pos = function_code_read_coils;
-  pos += 1;
+  pos += function_code_filed_length;
   // encode starting address
   *reinterpret_cast<uint16_t*>(pos) = htons(starting_address_);
-  pos += 2;
+  pos += address_field_length;
   // encode quantity of coils
   *reinterpret_cast<uint16_t*>(pos) = htons(quantity_of_coils_);
-  pos += 2;
+  pos += quantity_field_length;
 
   return buffer_;
 }
@@ -74,11 +75,11 @@ bool client_read_coils_response::unserialize(const buffer_type& buffer)
 
   // deocde function code
   fc_ = function_code(*pos);
-  pos += 1;
+  pos += function_code_filed_length;
 
   // decode byte count
   uint8_t byte_count = *pos;
-  pos += 1;
+  pos += byte_count_field_length;
 
   // decode status
   status_.resize(byte_count * 8);

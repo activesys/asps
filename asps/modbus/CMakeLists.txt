@@ -22,6 +22,7 @@ configure_file(
 ##################################
 # Set sources for modbus
 set(ASPS_MODBUS_SOURCES
+    # PDU sources
     pdu/semantic/data_model.cpp
     pdu/semantic/client.cpp
     pdu/semantic/request.cpp
@@ -30,6 +31,13 @@ set(ASPS_MODBUS_SOURCES
     pdu/sequence/state.cpp
     pdu/sequence/client_sequence.cpp
     pdu/message/client_message.cpp
+    # ADU sources
+    adu/sequence/sequence.cpp
+    adu/sequence/state.cpp
+    adu/sequence/client_sequence.cpp
+    adu/message/client_message.cpp
+    adu/session/session.cpp
+    adu/semantic/client.cpp
 )
 
 ##################################

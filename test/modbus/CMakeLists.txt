@@ -9,11 +9,17 @@ enable_testing()
 ##################################
 # Set sources for modbus
 set(ASPS_MODBUS_TEST_SOURCES
+    # PDU sources
     pdu/semantic/client_test.cpp
     pdu/semantic/request_test.cpp
     pdu/session/session_test.cpp
     pdu/sequence/client_sequence_test.cpp
     pdu/message/client_message_test.cpp
+    # ADU sources
+    adu/message/client_message_test.cpp
+    adu/sequence/client_sequence_test.cpp
+    adu/session/session_test.cpp
+    adu/semantic/client_test.cpp
 )
 
 ##################################

@@ -1,0 +1,156 @@
+// Copyright (c) 2021 The asps Authors. All rights reserved.
+// Use of this source code is governed by a MIT license that can be
+// found in the LICENSE file. See the AUTHORS file for names of contributors.
+//
+// Modbus ADU Sequence.
+
+#include <asps/modbus/adu/sequence/sequence.hpp>
+#include <asps/modbus/adu/sequence/client_sequence.hpp>
+
+namespace asps {
+namespace modbus {
+namespace adu {
+
+/*
+sequence_type get_client_sequence_type(const buffer_type& buffer)
+{
+  message_type type = get_message_type(buffer);
+
+  // For the client, only Pack and nkeep are valid data
+  if (type == positive_keepalive_ack_message) {
+    return belong_to_positive_keepalive_sequence;
+  } else if (type == negative_keepalive_message) {
+    return belong_to_negative_keepalive_sequence;
+  } else {
+    return belong_to_invalid_sequence;
+  }
+}
+
+sequence_type get_server_sequence_type(const buffer_type& buffer)
+{
+  message_type type = get_message_type(buffer);
+
+  // For the server, only data, pkeep and nack are valid data
+  if (type == data_message) {
+    return belong_to_data_sequence;
+  } else if (type == positive_keepalive_message) {
+    return belong_to_positive_keepalive_sequence;
+  } else if (type == negative_keepalive_ack_message) {
+    return belong_to_negative_keepalive_sequence;
+  } else {
+    return belong_to_invalid_sequence;
+  }
+}
+*/
+
+// Sequence make function
+active_sequence_service::pointer_type
+make_active_sequence()
+{
+  return nullptr;
+}
+
+/*
+passive_sequence_service::pointer_type
+make_passive_sequence(bool is_server)
+{
+  if (is_server) {
+    return std::make_shared<server_positive_keepalive_sequence>();
+  } else {
+    return std::make_shared<client_negative_keepalive_sequence>();
+  }
+}
+
+garbage_collector_sequence_service::pointer_type
+make_garbage_collector_sequence()
+{
+  return std::make_shared<garbage_collector_sequence>();
+}
+*/
+
+/*
+// Passive Sequence
+passive_sequence::passive_sequence()
+{}
+
+const buffer_type& passive_sequence::send_response()
+{
+  return ack_->serialize();
+}
+
+bool passive_sequence::receive_request(buffer_type& buffer)
+{
+  return keepalive_->unserialize(buffer);
+}
+*/
+
+// Active Sequence
+active_sequence::active_sequence()
+  : active_sequence_service(),
+    state_(idle_state::instance())
+{}
+
+/*
+void active_sequence::t2_start()
+{
+  t2_->start();
+}
+
+void active_sequence::t2_stop()
+{
+  t2_->stop();
+}
+*/
+
+const buffer_type& active_sequence::serialize()
+{
+  return request_->serialize();
+}
+
+bool active_sequence::unserialize(const buffer_type& buffer)
+{
+  return response_->unserialize(buffer);
+}
+
+void active_sequence::notify()
+{
+  notify_datas(response_->pdu());
+}
+
+const buffer_type& active_sequence::send_request()
+{
+  return state_->request(this);
+}
+
+void active_sequence::change_state(state* s)
+{
+  state_ = s;
+}
+
+bool active_sequence::receive_response(const buffer_type& adu)
+{
+  return state_->response(this, adu);
+}
+
+/*
+void active_sequence::t2_timeout()
+{
+  state_->timeout(this);
+}
+*/
+
+/*
+// Garbage Collector Sequence
+garbage_collector_sequence::garbage_collector_sequence()
+  : message_(make_invalid_message())
+{}
+
+bool garbage_collector_sequence::clear(buffer_type& buffer)
+{
+  return message_->unserialize(buffer);
+}
+*/
+
+} // adu
+} // demo
+} // asps
