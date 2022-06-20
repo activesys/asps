@@ -24,20 +24,20 @@ configure_file(
 set(ASPS_MODBUS_SOURCES
     # PDU sources
     pdu/semantic/data_model.cpp
-    pdu/semantic/client.cpp
+    pdu/semantic/pdu_client.cpp
     pdu/semantic/request.cpp
-    pdu/session/session.cpp
-    pdu/sequence/sequence.cpp
+    pdu/session/client_session.cpp
+    pdu/sequence/sequence_service.cpp
     pdu/sequence/state.cpp
     pdu/sequence/client_sequence.cpp
     pdu/message/client_message.cpp
+    pdu/message/message_service.cpp
     # ADU sources
-    adu/sequence/sequence.cpp
-    adu/sequence/state.cpp
     adu/sequence/client_sequence.cpp
+    adu/sequence/state.cpp
     adu/message/client_message.cpp
-    adu/session/session.cpp
-    adu/semantic/client.cpp
+    adu/session/client_session.cpp
+    adu/semantic/adu_client.cpp
 )
 
 ##################################

@@ -8,18 +8,18 @@
 #define ASPS_MODBUS_PDU_SEQUENCE_CLIENT_SEQUENCE_HPP
 
 #include <asps/modbus/pdu/semantic/request.hpp>
-#include <asps/modbus/pdu/sequence/sequence.hpp>
+#include <asps/modbus/pdu/sequence/sequence_service.hpp>
 
 namespace asps {
 namespace modbus {
 namespace pdu {
 
 class client_read_coils_sequence
-  : public active_sequence
+  : public active_sequence_service
 {
 public:
   client_read_coils_sequence(const request::pointer_type& req)
-    : active_sequence(req)
+    : active_sequence_service(req)
   {
     const read_coils_request* r =
       dynamic_cast<const read_coils_request*>(req.get());

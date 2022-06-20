@@ -7,7 +7,7 @@
 #include <memory>
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
-#include <asps/modbus/pdu/semantic/client.hpp>
+#include <asps/modbus/pdu/semantic/pdu_client.hpp>
 
 namespace asps_test {
 namespace modbus_test {
@@ -16,7 +16,7 @@ using namespace asps::modbus;
 
 TEST(pdu_client_test, read_coils)
 {
-  class adu_test : public pdu::adu_service
+  class adu_test : public frame::adu_service
   {
   public:
     virtual void set_handler(read_handler handler) override
@@ -28,14 +28,14 @@ TEST(pdu_client_test, read_coils)
     }
   };
 
-  pdu::adu_service::pointer_type adu = std::make_shared<adu_test>();
-  pdu::client c(adu);
+  frame::adu_service::pointer_type adu = std::make_shared<adu_test>();
+  pdu::pdu_client c(adu);
   c.read_coils(10, 100);
 }
 
 TEST(pdu_client_test, on_read_coils)
 {
-  class adu_test : public pdu::adu_service
+  class adu_test : public frame::adu_service
   {
   public:
     virtual void set_handler(read_handler handler) override
@@ -54,11 +54,11 @@ TEST(pdu_client_test, on_read_coils)
   private:
     read_handler handler_;
   };
-  class my_client : public pdu::client
+  class my_client : public pdu::pdu_client
   {
   public:
-    my_client(pdu::adu_service::pointer_type adu)
-      : pdu::client(adu)
+    my_client(frame::adu_service::pointer_type adu)
+      : pdu::pdu_client(adu)
     {}
   public:
     virtual void on_read_coils(const pdu::coils& status) override
@@ -72,14 +72,14 @@ TEST(pdu_client_test, on_read_coils)
     {}
   };
 
-  pdu::adu_service::pointer_type adu = std::make_shared<adu_test>();
+  frame::adu_service::pointer_type adu = std::make_shared<adu_test>();
   my_client c(adu);
   c.read_coils(10, 10);
 }
 
 TEST(pdu_client_test, on_exception)
 {
-  class adu_test : public pdu::adu_service
+  class adu_test : public frame::adu_service
   {
   public:
     virtual void set_handler(read_handler handler) override
@@ -98,11 +98,11 @@ TEST(pdu_client_test, on_exception)
   private:
     read_handler handler_;
   };
-  class my_client : public pdu::client
+  class my_client : public pdu::pdu_client
   {
   public:
-    my_client(pdu::adu_service::pointer_type adu)
-      : pdu::client(adu)
+    my_client(frame::adu_service::pointer_type adu)
+      : pdu::pdu_client(adu)
     {}
   public:
     virtual void on_read_coils(const pdu::coils& status) override
@@ -114,7 +114,7 @@ TEST(pdu_client_test, on_exception)
     }
   };
 
-  pdu::adu_service::pointer_type adu = std::make_shared<adu_test>();
+  frame::adu_service::pointer_type adu = std::make_shared<adu_test>();
   my_client c(adu);
   c.read_coils(10, 10);
 }

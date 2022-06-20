@@ -2,10 +2,10 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file. See the AUTHORS file for names of contributors.
 //
-// Modbus PDU Message service.
+// Modbus PDU Message Service.
 
-#ifndef ASPS_MODBUS_PDU_SEQUENCE_MESSAGE_SERVICE_HPP
-#define ASPS_MODBUS_PDU_SEQUENCE_MESSAGE_SERVICE_HPP
+#ifndef ASPS_MODBUS_PDU_MESSAGE_MESSAGE_SERVICE_HPP
+#define ASPS_MODBUS_PDU_MESSAGE_MESSAGE_SERVICE_HPP
 
 #include <memory>
 #include <asps/utility/utility.h>
@@ -17,6 +17,15 @@ namespace modbus {
 namespace pdu {
 
 using namespace asps::utility;
+
+enum message_filed_length
+{
+  function_code_filed_length = 1,
+  exception_code_field_length = 1,
+  address_field_length = 2,
+  quantity_field_length = 2,
+  byte_count_field_length = 1
+};
 
 class message_serialization_service
 {
@@ -69,4 +78,4 @@ make_client_read_coils_response();
 } // modbus
 } // asps
 
-#endif // ASPS_MODBUS_PDU_SEQUENCE_MESSAGE_SERVICE_HPP
+#endif // ASPS_MODBUS_PDU_MESSAGE_MESSAGE_SERVICE_HPP

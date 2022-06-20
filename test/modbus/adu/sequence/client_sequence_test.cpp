@@ -15,7 +15,7 @@ using namespace asps::utility;
 
 TEST(client_sequence_test, request_response)
 {
-  class active_observer_test : public adu::active_observer
+  class active_observer_test : public adu::client_sequence_observer
   {
   public:
     virtual void update_pdu(const buffer_type& pdu) override
@@ -23,8 +23,6 @@ TEST(client_sequence_test, request_response)
       buffer_type expect_pdu_rsp{0x01, 0x02, 0xff, 0x03};
       EXPECT_EQ(pdu, expect_pdu_rsp);
     }
-    virtual void update_event() override
-    {}
   };
   buffer_type expect_pdu_req{0x01, 0x00, 0x64, 0x00, 0x0a};
   buffer_type expect_adu_req{0x07, 0x58, 0x00, 0x00, 0x00, 0x06, 0x05,

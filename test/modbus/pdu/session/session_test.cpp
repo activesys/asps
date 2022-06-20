@@ -8,8 +8,8 @@
 #include <gmock/gmock.h>
 #include <functional>
 #include <asps/modbus/pdu/semantic/request.hpp>
-#include <asps/modbus/pdu/session/sequence_service.hpp>
-#include <asps/modbus/pdu/session/session.hpp>
+#include <asps/modbus/pdu/sequence/sequence_service.hpp>
+#include <asps/modbus/pdu/session/client_session.hpp>
 
 namespace asps_test {
 namespace modbus_test {
@@ -21,7 +21,7 @@ using namespace asps::modbus;
 // TEST client session
 TEST(client_session_test, request_response_once)
 {
-  class client_observer_test : public pdu::client_observer
+  class client_observer_test : public pdu::client_session_observer
   {
   public:
     virtual void update_send(const pdu::buffer_type& pdu) override
@@ -57,7 +57,7 @@ TEST(client_session_test, request_response_once)
 
 TEST(client_session_test, request_response_multiple_times)
 {
-  class client_observer_test : public pdu::client_observer
+  class client_observer_test : public pdu::client_session_observer
   {
   public:
     client_observer_test()
@@ -169,7 +169,7 @@ TEST(client_session_test, request_response_multiple_times)
 
 TEST(client_session_test, request_exception)
 {
-  class client_observer_test : public pdu::client_observer
+  class client_observer_test : public pdu::client_session_observer
   {
   public:
     virtual void update_send(const pdu::buffer_type& pdu) override

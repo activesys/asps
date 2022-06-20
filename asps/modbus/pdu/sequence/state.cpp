@@ -5,57 +5,44 @@
 // Modbus PDU State.
 
 #include <asps/modbus/pdu/sequence/state.hpp>
-#include <asps/modbus/pdu/sequence/sequence.hpp>
+#include <asps/modbus/pdu/sequence/sequence_service.hpp>
 
 namespace asps {
 namespace modbus {
 namespace pdu {
 
+// Idle State
 state* idle_state::instance_ = nullptr;
 
-const buffer_type& idle_state::request(active_sequence* seq)
+const buffer_type& idle_state::request(active_sequence_service* seq)
 {
   seq->change_state(sent_state::instance());
-  //seq->t2_start();
   return seq->serialize();
 }
 
-bool idle_state::response(active_sequence* seq, const buffer_type& buffer)
+bool idle_state::response(active_sequence_service* seq,
+                          const buffer_type& buffer)
 {
   return seq->unserialize(buffer);
 }
 
-/*
-void idle_state::timeout(active_sequence* seq)
-{
-}
-*/
-
+// Sent State
 state* sent_state::instance_ = nullptr;
 
-const buffer_type& sent_state::request(active_sequence* seq)
+const buffer_type& sent_state::request(active_sequence_service* seq)
 {
   return empty_buffer_;
 }
 
-bool sent_state::response(active_sequence* seq, const buffer_type& buffer)
+bool sent_state::response(active_sequence_service* seq,
+                          const buffer_type& buffer)
 {
   seq->change_state(idle_state::instance());
-  //seq->t2_stop();
   bool ret = seq->unserialize(buffer);
   seq->notify();
 
   return ret;
 }
-
-/*
-void sent_state::timeout(active_sequence* seq)
-{
-  seq->change_state(idle_state::instance());
-  seq->t2_start();
-  seq->notify_event();
-}
-*/
 
 } // pdu
 } // demo

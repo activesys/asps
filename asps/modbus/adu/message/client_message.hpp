@@ -8,7 +8,6 @@
 #define ASPS_MODBUS_ADU_MESSAGE_CLIENT_MESSAGE_HPP
 
 #include <asps/utility/utility.h>
-#include <asps/modbus/adu/sequence/message_service.hpp>
 
 namespace asps {
 namespace modbus {
@@ -18,9 +17,17 @@ using namespace asps::utility;
 
 const static uint16_t modbus_protocol = 0;
 
+enum message_field_length
+{
+  transaction_identifier_field_length = 2,
+  protocol_identifier_field_length = 2,
+  length_field_length = 2,
+  unit_identifier_field_length = 1,
+  mbap_field_length = 7
+};
+
 // Client ADU
 class client_request_adu
-  : public message_serialization_service
 {
 public:
   client_request_adu(uint16_t tid, uint8_t uid, const buffer_type& pdu)
@@ -31,7 +38,7 @@ public:
   {}
 
 public:
-  virtual const buffer_type& serialize() override;
+  const buffer_type& serialize();
 
 private:
   uint16_t tid_;
@@ -42,10 +49,25 @@ private:
 };
 
 class client_response_adu
-  : public message_unserialization_service
 {
 public:
-  virtual bool unserialize(const buffer_type& buffer) override;
+  bool unserialize(const buffer_type& buffer);
+
+public:
+  const buffer_type& pdu()
+  {return pdu_;}
+  uint16_t tid()
+  {return tid_;}
+  uint16_t pid()
+  {return pid_;}
+  uint8_t uid()
+  {return uid_;}
+
+private:
+  buffer_type pdu_;
+  uint16_t tid_;
+  uint16_t pid_;
+  uint8_t uid_;
 };
 
 } // adu

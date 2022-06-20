@@ -5,7 +5,7 @@
 // Unit test for Modbus ADU Client.
 
 #include <gtest/gtest.h>
-#include <asps/modbus/adu/semantic/client.hpp>
+#include <asps/modbus/adu/semantic/adu_client.hpp>
 #include <asps/transport/transport_service.h>
 
 namespace asps_test {

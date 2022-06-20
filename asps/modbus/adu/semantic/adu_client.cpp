@@ -4,7 +4,7 @@
 //
 // Modbus ADU Client.
 
-#include <asps/modbus/adu/semantic/client.hpp>
+#include <asps/modbus/adu/semantic/adu_client.hpp>
 
 namespace asps {
 namespace modbus {
@@ -28,14 +28,14 @@ void client::set_handler(read_handler rhandler)
 
 void client::write(const buffer_type& pdu)
 {
-  session_->send_request(pdu);
+  session_.send_request(pdu);
 }
 
 void client::on_read(connection::pointer_type conn,
                      const buffer_type& buffer,
                      std::size_t bytes)
 {
-  session_->receive_response(buffer);
+  session_.receive_response(buffer);
 }
 
 void client::on_write(connection::pointer_type conn,

@@ -6,7 +6,7 @@
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
-#include <asps/modbus/adu/session/session.hpp>
+#include <asps/modbus/adu/session/client_session.hpp>
 
 namespace asps_test {
 namespace modbus_test {
@@ -19,7 +19,7 @@ using namespace asps::utility;
 // TEST client session
 TEST(adu_client_session_test, request_response)
 {
-  class client_observer_test : public adu::client_observer
+  class client_observer_test : public adu::client_session_observer
   {
   public:
     virtual void update_send(const buffer_type& adu) override

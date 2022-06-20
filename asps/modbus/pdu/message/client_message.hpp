@@ -9,7 +9,7 @@
 
 #include <asps/modbus/pdu/semantic/constant.hpp>
 #include <asps/modbus/pdu/semantic/data_model.hpp>
-#include <asps/modbus/pdu/sequence/message_service.hpp>
+#include <asps/modbus/pdu/message/message_service.hpp>
 
 namespace asps {
 namespace modbus {

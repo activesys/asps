@@ -6,27 +6,11 @@
 
 #include <arpa/inet.h>
 #include <asps/modbus/pdu/semantic/constant.hpp>
-#include <asps/modbus/pdu/message/message.hpp>
 #include <asps/modbus/pdu/message/client_message.hpp>
 
 namespace asps {
 namespace modbus {
 namespace pdu {
-
-message_serialization_service::pointer_type
-make_client_read_coils_request(uint16_t starting_address,
-                               uint16_t quantity_of_coils)
-{
-  return std::make_shared<client_read_coils_request>(starting_address,
-                                                     quantity_of_coils);
-}
-
-message_unserialization_service::pointer_type
-make_client_read_coils_response()
-{
-  return std::make_shared<client_exception>(
-          std::make_shared<client_read_coils_response>());
-}
 
 bool client_exception::unserialize(const buffer_type& buffer)
 {

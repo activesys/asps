@@ -2,14 +2,14 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file. See the AUTHORS file for names of contributors.
 //
-// Modbus ADU Sequence.
+// Modbus PDU Active Sequence Interface.
 
-#include <asps/modbus/adu/sequence/sequence.hpp>
-#include <asps/modbus/adu/sequence/client_sequence.hpp>
+#include <asps/modbus/pdu/sequence/sequence_service.hpp>
+#include <asps/modbus/pdu/sequence/client_sequence.hpp>
 
 namespace asps {
 namespace modbus {
-namespace adu {
+namespace pdu {
 
 /*
 sequence_type get_client_sequence_type(const buffer_type& buffer)
@@ -45,8 +45,14 @@ sequence_type get_server_sequence_type(const buffer_type& buffer)
 
 // Sequence make function
 active_sequence_service::pointer_type
-make_active_sequence()
+make_active_sequence(request::pointer_type req)
 {
+  switch (req->func_code()) {
+  case function_code_read_coils:
+    return std::make_shared<client_read_coils_sequence>(req);
+    break;
+  }
+
   return nullptr;
 }
 
@@ -85,59 +91,46 @@ bool passive_sequence::receive_request(buffer_type& buffer)
 */
 
 // Active Sequence
-active_sequence::active_sequence()
-  : active_sequence_service(),
+active_sequence_service::active_sequence_service(const request::pointer_type& req)
+  : req_(req),
     state_(idle_state::instance())
 {}
 
-/*
-void active_sequence::t2_start()
-{
-  t2_->start();
-}
-
-void active_sequence::t2_stop()
-{
-  t2_->stop();
-}
-*/
-
-const buffer_type& active_sequence::serialize()
+const buffer_type& active_sequence_service::serialize()
 {
   return request_->serialize();
 }
 
-bool active_sequence::unserialize(const buffer_type& buffer)
+bool active_sequence_service::unserialize(const buffer_type& buffer)
 {
   return response_->unserialize(buffer);
 }
 
-void active_sequence::notify()
+void active_sequence_service::notify()
 {
-  notify_datas(response_->pdu());
+  sync_response();
+
+  if (response_->excep_code()) {
+    notify_exception(response_->excep_code());
+  } else {
+    notify_datas(response_->datas());
+  }
 }
 
-const buffer_type& active_sequence::send_request()
+const buffer_type& active_sequence_service::send_request()
 {
   return state_->request(this);
 }
 
-void active_sequence::change_state(state* s)
+void active_sequence_service::change_state(state* s)
 {
   state_ = s;
 }
 
-bool active_sequence::receive_response(const buffer_type& adu)
+bool active_sequence_service::receive_response(const buffer_type& buffer)
 {
-  return state_->response(this, adu);
+  return state_->response(this, buffer);
 }
-
-/*
-void active_sequence::t2_timeout()
-{
-  state_->timeout(this);
-}
-*/
 
 /*
 // Garbage Collector Sequence
@@ -151,6 +144,6 @@ bool garbage_collector_sequence::clear(buffer_type& buffer)
 }
 */
 
-} // adu
-} // demo
+} // pdu
+} // modbus
 } // asps

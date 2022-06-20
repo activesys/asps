@@ -15,29 +15,24 @@ namespace adu {
 
 using namespace asps::utility;
 
-class active_sequence;
+class client_sequence;
 class state
 {
 public:
   virtual ~state() {}
 
 public:
-  virtual const buffer_type& request(active_sequence* seq) = 0;
-  virtual bool response(active_sequence* seq,
+  virtual const buffer_type& request(client_sequence* seq) = 0;
+  virtual bool response(client_sequence* seq,
                         const buffer_type& buffer) = 0;
-  //virtual void timeout(active_sequence* seq) = 0;
 };
 
 class idle_state : public state
 {
-private:
-  idle_state() = default;
-
 public:
-  virtual const buffer_type& request(active_sequence* seq) override;
-  virtual bool response(active_sequence* seq,
+  virtual const buffer_type& request(client_sequence* seq) override;
+  virtual bool response(client_sequence* seq,
                         const buffer_type& buffer) override;
-  //virtual void timeout(active_sequence* seq) override;
 
 public:
   static state* instance()
@@ -55,14 +50,10 @@ private:
 
 class sent_state : public state
 {
-private:
-  sent_state() = default;
-
 public:
-  virtual const buffer_type& request(active_sequence* seq) override;
-  virtual bool response(active_sequence* seq,
+  virtual const buffer_type& request(client_sequence* seq) override;
+  virtual bool response(client_sequence* seq,
                         const buffer_type& buffer) override;
-  //virtual void timeout(active_sequence* seq) override;
 
 public:
   static state* instance()

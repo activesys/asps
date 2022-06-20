@@ -4,8 +4,8 @@
 //
 // Modbus ADU Message service.
 
-#ifndef ASPS_MODBUS_ADU_SEQUENCE_MESSAGE_SERVICE_HPP
-#define ASPS_MODBUS_ADU_SEQUENCE_MESSAGE_SERVICE_HPP
+#ifndef ASPS_MODBUS_ADU_MESSAGE_MESSAGE_SERVICE_HPP
+#define ASPS_MODBUS_ADU_MESSAGE_MESSAGE_SERVICE_HPP
 
 #include <memory>
 #include <asps/utility/utility.h>
@@ -15,6 +15,15 @@ namespace modbus {
 namespace adu {
 
 using namespace asps::utility;
+
+enum message_field_length
+{
+  transaction_identifier_field_length = 2,
+  protocol_identifier_field_length = 2,
+  length_field_length = 2,
+  unit_identifier_field_length = 1,
+  mbap_field_length = 7
+};
 
 class message_serialization_service
 {
@@ -65,4 +74,4 @@ make_client_response_adu();
 } // modbus
 } // asps
 
-#endif // ASPS_MODBUS_ADU_SEQUENCE_MESSAGE_SERVICE_HPP
+#endif // ASPS_MODBUS_ADU_MESSAGE_MESSAGE_SERVICE_HPP

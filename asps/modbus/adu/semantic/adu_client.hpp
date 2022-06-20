@@ -4,13 +4,13 @@
 //
 // Modbus ADU Client.
 
-#ifndef ASPS_MODBUS_ADU_SEMANTIC_CLIENT_HPP
-#define ASPS_MODBUS_ADU_SEMANTIC_CLIENT_HPP
+#ifndef ASPS_MODBUS_ADU_SEMANTIC_ADU_CLIENT_HPP
+#define ASPS_MODBUS_ADU_SEMANTIC_ADU_CLIENT_HPP
 
 #include <functional>
 #include <asps/transport/transport_service.h>
-#include <asps/modbus/adu/semantic/session_service.hpp>
-#include <asps/modbus/pdu/semantic/adu_service.hpp>
+#include <asps/modbus/frame/adu_service.hpp>
+#include <asps/modbus/adu/session/client_session.hpp>
 
 namespace asps {
 namespace modbus {
@@ -21,15 +21,14 @@ using namespace asps::utility;
 using namespace std::placeholders;
 
 class client
-  : public client_observer,
-    public pdu::adu_service
+  : public client_session_observer,
+    public frame::adu_service
 {
 public:
   client(connection::pointer_type conn)
-    : connection_(conn),
-      session_(make_client_session())
+    : connection_(conn)
   {
-    session_->register_observer(this);
+    session_.register_observer(this);
 
     connection_->set_handler(std::bind(&client::on_read, this, _1, _2, _3),
                             std::bind(&client::on_write, this, _1, _2),
@@ -56,7 +55,7 @@ public:
 
 private:
   connection::pointer_type connection_;
-  client_session_service::pointer_type session_;
+  client_session session_;
   read_handler handler_;
 };
 
@@ -64,4 +63,4 @@ private:
 } // modbus
 } // asps
 
-#endif // ASPS_MODBUS_ADU_SEMANTIC_CLIENT_HPP
+#endif // ASPS_MODBUS_ADU_SEMANTIC_ADU_CLIENT_HPP

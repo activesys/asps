@@ -2,19 +2,13 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file. See the AUTHORS file for names of contributors.
 //
-// Modbus Session.
+// Modbus Client Session.
 
-#include <asps/modbus/pdu/session/session.hpp>
+#include <asps/modbus/pdu/session/client_session.hpp>
 
 namespace asps {
 namespace modbus {
 namespace pdu {
-
-client_session_service::pointer_type
-make_client_session()
-{
-  return std::make_shared<client_session>();
-}
 
 // Client Session
 void client_session::receive_response(const buffer_type& buffer)
@@ -28,12 +22,6 @@ void client_session::receive_response(const buffer_type& buffer)
 void client_session::send_request(request::pointer_type req)
 {
   reqs_.push(req);
-  send_one_request();
-}
-
-void client_session::update_event()
-{
-  seq_.reset();
   send_one_request();
 }
 

@@ -4,8 +4,8 @@
 //
 // Modbus ADU Service.
 
-#ifndef ASPS_MODBUS_PDU_SEMANTIC_ADU_SERVICE_HPP
-#define ASPS_MODBUS_PDU_SEMANTIC_ADU_SERVICE_HPP
+#ifndef ASPS_MODBUS_FRAME_ADU_SERVICE_HPP
+#define ASPS_MODBUS_FRAME_ADU_SERVICE_HPP
 
 #include <memory>
 #include <functional>
@@ -13,7 +13,7 @@
 
 namespace asps {
 namespace modbus {
-namespace pdu {
+namespace frame {
 
 using namespace asps::utility;
 
@@ -37,8 +37,8 @@ make_tcp_adu();
 adu_service::pointer_type
 make_serial_line_adu();
 
-} // pdu
+} // frame
 } // modbus
 } // asps
 
-#endif // ASPS_MODBUS_PDU_SEMANTIC_ADU_SERVICE_HPP
+#endif // ASPS_MODBUS_FRAME_ADU_SERVICE_HPP

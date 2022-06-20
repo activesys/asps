@@ -18,10 +18,10 @@ using namespace asps::utility;
 TEST(client_read_coils_sequence_test, request_response)
 {
   class active_observer_test
-    : public pdu::active_observer
+    : public pdu::active_sequence_observer
   {
   public:
-    virtual void update_event() override {}
+    //virtual void update_event() override {}
     virtual void update_datas(const pdu::request::pointer_type& req,
                               const pdu::mb_datas& datas) override
     {
@@ -49,10 +49,10 @@ TEST(client_read_coils_sequence_test, request_response)
 TEST(client_read_coils_sequence_test, request_exception)
 {
   class active_observer_test
-    : public pdu::active_observer
+    : public pdu::active_sequence_observer
   {
   public:
-    virtual void update_event() override {}
+    //virtual void update_event() override {}
     virtual void update_datas(const pdu::request::pointer_type& req,
                               const pdu::mb_datas& datas) override
     {}
