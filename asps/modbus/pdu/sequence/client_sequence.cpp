@@ -10,6 +10,7 @@ namespace asps {
 namespace modbus {
 namespace pdu {
 
+// Read Coils Sequence
 void client_read_coils_sequence::sync_response()
 {
   if (response_->excep_code() == exception_code_success) {
@@ -20,6 +21,21 @@ void client_read_coils_sequence::sync_response()
       mb_datas& rsp_coils = response_->datas();
       rsp_coils.fill_address(req->address());
       rsp_coils.remove_fill_data(req->quantity());
+    }
+  }
+}
+
+// Read Discrete Inputs Sequence
+void client_read_discrete_inputs_sequence::sync_response()
+{
+  if (response_->excep_code() == exception_code_success) {
+    const read_discrete_inputs_request* req =
+      dynamic_cast<const read_discrete_inputs_request*>(req_.get());
+
+    if (req) {
+      mb_datas& rsp_inputs = response_->datas();
+      rsp_inputs.fill_address(req->address());
+      rsp_inputs.remove_fill_data(req->quantity());
     }
   }
 }

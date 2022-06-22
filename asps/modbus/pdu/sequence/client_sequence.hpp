@@ -14,6 +14,7 @@ namespace asps {
 namespace modbus {
 namespace pdu {
 
+// Read Coils sequence
 class client_read_coils_sequence
   : public active_sequence_service
 {
@@ -26,6 +27,27 @@ public:
     if (r) {
       request_ = make_client_read_coils_request(r->address(), r->quantity());
       response_ = make_client_read_coils_response();
+    }
+  }
+
+private:
+  virtual void sync_response() override;
+};
+
+// Read Discrete Inputs sequence
+class client_read_discrete_inputs_sequence
+  : public active_sequence_service
+{
+public:
+  client_read_discrete_inputs_sequence(const request::pointer_type& req)
+    : active_sequence_service(req)
+  {
+    const read_discrete_inputs_request* r =
+      dynamic_cast<const read_discrete_inputs_request*>(req.get());
+    if (r) {
+      request_ = make_client_read_discrete_inputs_request(r->address(),
+                                                          r->quantity());
+      response_ = make_client_read_discrete_inputs_response();
     }
   }
 

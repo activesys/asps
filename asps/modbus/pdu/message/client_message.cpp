@@ -12,6 +12,7 @@ namespace asps {
 namespace modbus {
 namespace pdu {
 
+// Exception PDU
 bool client_exception::unserialize(const buffer_type& buffer)
 {
   const uint8_t* pos = buffer.data();
@@ -35,9 +36,12 @@ bool client_exception::unserialize(const buffer_type& buffer)
   }
 }
 
+// Read Coils PDU
 const buffer_type& client_read_coils_request::serialize()
 {
-  buffer_.resize(5);
+  buffer_.resize(function_code_filed_length +
+                 address_field_length +
+                 quantity_field_length);
   uint8_t* pos = buffer_.data();
 
   // encode function code;
@@ -69,6 +73,49 @@ bool client_read_coils_response::unserialize(const buffer_type& buffer)
   status_.resize(byte_count * 8);
   for (std::size_t i = 0; i < byte_count * 8; ++i) {
     status_[i].bit = (pos[i/8] >> i%8) & 0x01;
+  }
+  pos += byte_count;
+
+  return true;
+}
+
+// Read Discrete Inputs PDU
+const buffer_type& client_read_discrete_inputs_request::serialize()
+{
+  buffer_.resize(function_code_filed_length +
+                 address_field_length +
+                 quantity_field_length);
+  uint8_t* pos = buffer_.data();
+
+  // encode function code;
+  *pos = function_code_read_discrete_inputs;
+  pos += function_code_filed_length;
+  // encode starting address
+  *reinterpret_cast<uint16_t*>(pos) = htons(starting_address_);
+  pos += address_field_length;
+  // encode quantity of inputs
+  *reinterpret_cast<uint16_t*>(pos) = htons(quantity_of_inputs_);
+  pos += quantity_field_length;
+
+  return buffer_;
+}
+
+bool client_read_discrete_inputs_response::unserialize(const buffer_type& buffer)
+{
+  const uint8_t* pos = buffer.data();
+
+  // deocde function code
+  fc_ = function_code(*pos);
+  pos += function_code_filed_length;
+
+  // decode byte count
+  uint8_t byte_count = *pos;
+  pos += byte_count_field_length;
+
+  // decode status
+  status_.reserve(byte_count * 8);
+  for (std::size_t i = 0; i < byte_count * 8; ++i) {
+    status_.emplace_back(0, (pos[i/8] >> i%8) & 0x01);
   }
   pos += byte_count;
 

@@ -15,6 +15,7 @@ namespace modbus_test {
 using namespace asps::modbus;
 using namespace asps::utility;
 
+// Read Coils sequence
 TEST(client_read_coils_sequence_test, request_response)
 {
   class active_observer_test
@@ -76,6 +77,73 @@ TEST(client_read_coils_sequence_test, request_exception)
   buffer_type expect_excep{0x81, 0x02};
   active_observer_test o;
   pdu::client_read_coils_sequence s(pdu::make_read_coils_request(0, 10));
+  s.register_event_observer(&o);
+  EXPECT_EQ(expect_req, s.send_request());
+  EXPECT_TRUE(s.receive_response(expect_excep));
+}
+
+// Read Discrete Inputs sequence
+TEST(client_read_discrete_inputs_sequence_test, request_response)
+{
+  class active_observer_test
+    : public pdu::active_sequence_observer
+  {
+  public:
+    //virtual void update_event() override {}
+    virtual void update_datas(const pdu::request::pointer_type& req,
+                              const pdu::mb_datas& datas) override
+    {
+      pdu::discrete_inputs expect_status{{0,false},{1,false},{2,false},{3,false},
+                                         {4,true},{5,true},{6,true},{7,true},
+                                         {8,true},{9,true}};
+      EXPECT_EQ(req->func_code(), pdu::function_code_read_discrete_inputs);
+      const pdu::discrete_inputs& status = dynamic_cast<const pdu::discrete_inputs&>(datas);
+      EXPECT_EQ(status, expect_status);
+    }
+    virtual void update_exception(const pdu::request::pointer_type& req,
+                                  pdu::exception_code ec) override
+    {}
+  };
+
+  buffer_type expect_req{0x02, 0x00, 0x00, 0x00, 0x0a};
+  buffer_type expect_rsp{0x02, 0x02, 0xf0, 0x03};
+  active_observer_test o;
+  pdu::client_read_discrete_inputs_sequence s(pdu::make_read_discrete_inputs_request(0, 10));
+  s.register_event_observer(&o);
+  EXPECT_EQ(expect_req, s.send_request());
+  EXPECT_TRUE(s.receive_response(expect_rsp));
+}
+
+TEST(client_read_discrete_inputs_sequence_test, request_exception)
+{
+  class active_observer_test
+    : public pdu::active_sequence_observer
+  {
+  public:
+    //virtual void update_event() override {}
+    virtual void update_datas(const pdu::request::pointer_type& req,
+                              const pdu::mb_datas& datas) override
+    {}
+    virtual void update_exception(const pdu::request::pointer_type& req,
+                                  pdu::exception_code ec) override
+    {
+      EXPECT_EQ(req->func_code(), pdu::function_code_read_discrete_inputs);
+      EXPECT_EQ(ec, pdu::exception_code_illegal_data_address);
+      const pdu::read_discrete_inputs_request* r =
+        dynamic_cast<const pdu::read_discrete_inputs_request*>(req.get());
+      if (r) {
+        EXPECT_EQ(r->address(), 0);
+        EXPECT_EQ(r->quantity(), 10);
+      } else {
+        EXPECT_TRUE(false);
+      }
+    }
+  };
+
+  buffer_type expect_req{0x02, 0x00, 0x00, 0x00, 0x0a};
+  buffer_type expect_excep{0x82, 0x02};
+  active_observer_test o;
+  pdu::client_read_discrete_inputs_sequence s(pdu::make_read_discrete_inputs_request(0, 10));
   s.register_event_observer(&o);
   EXPECT_EQ(expect_req, s.send_request());
   EXPECT_TRUE(s.receive_response(expect_excep));

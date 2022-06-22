@@ -12,6 +12,7 @@ namespace modbus_test {
 
 using namespace asps::modbus;
 
+// Read Coils Request
 TEST(read_coils_request_test, invalid)
 {
   pdu::read_coils_request req(100, 0);
@@ -45,6 +46,51 @@ TEST(read_coils_request_test, multiple_request)
   EXPECT_EQ(req.quantity(), 5000);
   pdu::read_coils_request* r =
     dynamic_cast<pdu::read_coils_request*>(req.split().get());
+  if (r) {
+    EXPECT_EQ(r->address(), 100);
+    EXPECT_EQ(r->quantity(), 2000);
+    EXPECT_TRUE(req.valid());
+    EXPECT_EQ(req.address(), 2100);
+    EXPECT_EQ(req.quantity(), 3000);
+  } else {
+    EXPECT_TRUE(false);
+  }
+}
+
+// Read Discrete Inputs Request
+TEST(read_discrete_inputs_request_test, invalid)
+{
+  pdu::read_discrete_inputs_request req(100, 0);
+  EXPECT_FALSE(req.valid());
+}
+
+TEST(read_discrete_inputs_request_test, one_request)
+{
+  pdu::read_discrete_inputs_request req(0, 100);
+  EXPECT_TRUE(req.valid());
+  EXPECT_EQ(req.address(), 0);
+  EXPECT_EQ(req.quantity(), 100);
+  pdu::request::pointer_type r = req.split();
+  pdu::read_discrete_inputs_request* p =
+    dynamic_cast<pdu::read_discrete_inputs_request*>(r.get());
+  if (r && p) {
+    EXPECT_TRUE(r->valid());
+    EXPECT_EQ(p->address(), 0);
+    EXPECT_EQ(p->quantity(), 100);
+    EXPECT_FALSE(req.valid());
+  } else {
+    EXPECT_TRUE(false);
+  }
+}
+
+TEST(read_discrete_inputs_request_test, multiple_request)
+{
+  pdu::read_discrete_inputs_request req(100, 5000);
+  EXPECT_TRUE(req.valid());
+  EXPECT_EQ(req.address(), 100);
+  EXPECT_EQ(req.quantity(), 5000);
+  pdu::read_discrete_inputs_request* r =
+    dynamic_cast<pdu::read_discrete_inputs_request*>(req.split().get());
   if (r) {
     EXPECT_EQ(r->address(), 100);
     EXPECT_EQ(r->quantity(), 2000);

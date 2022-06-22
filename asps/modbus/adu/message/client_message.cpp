@@ -12,20 +12,6 @@ namespace asps {
 namespace modbus {
 namespace adu {
 
-/*
-message_serialization_service::pointer_type
-make_client_request_adu(uint16_t tid, uint8_t uid, const buffer_type& pdu)
-{
-  return std::make_shared<client_request_adu>(tid, uid, pdu);
-}
-
-message_unserialization_service::pointer_type
-make_client_response_adu()
-{
-  return std::make_shared<client_response_adu>();
-}
-*/
-
 // Client ADU
 const buffer_type& client_request_adu::serialize()
 {

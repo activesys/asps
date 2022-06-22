@@ -27,9 +27,33 @@ struct mb_datas
 // Discrete Input
 struct discrete_input
 {
+  discrete_input()
+    : address(0),
+      bit(false)
+  {}
+  discrete_input(uint16_t addr, bool status)
+    : address(addr),
+      bit(status)
+  {}
+
   uint16_t address;
   const bool bit;
 };
+
+struct discrete_inputs : public mb_datas, public std::vector<discrete_input>
+{
+  discrete_inputs() = default;
+  discrete_inputs(std::initializer_list<discrete_input> il)
+    : mb_datas(),
+      std::vector<discrete_input>(il)
+  {}
+
+  virtual void fill_address(uint16_t address) override;
+  virtual void remove_fill_data(uint16_t quantity) override;
+};
+
+bool operator==(const discrete_input& first, const discrete_input& second);
+bool operator==(const discrete_inputs& first, const discrete_inputs& second);
 
 // Coil
 struct coil

@@ -12,10 +12,17 @@ namespace pdu {
 
 // Modbus PDU Client
 void pdu_client::read_coils(uint16_t starting_address,
-                        uint16_t quantity_of_coils)
+                            uint16_t quantity_of_coils)
 {
   session_.send_request(make_read_coils_request(starting_address,
                                                 quantity_of_coils));
+}
+
+void pdu_client::read_discrete_inputs(uint16_t starting_address,
+                                      uint16_t quantity_of_inputs)
+{
+  session_.send_request(make_read_discrete_inputs_request(starting_address,
+                                                          quantity_of_inputs));
 }
 
 void pdu_client::update_send(const buffer_type& pdu)
@@ -30,6 +37,10 @@ void pdu_client::update_datas(const request::pointer_type& req,
   {
   case function_code_read_coils:
     on_read_coils(dynamic_cast<const coils&>(datas));  
+    break;
+
+  case function_code_read_discrete_inputs:
+    on_read_discrete_inputs(dynamic_cast<const discrete_inputs&>(datas));
     break;
   }
 }

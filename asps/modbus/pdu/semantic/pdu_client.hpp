@@ -33,10 +33,14 @@ public:
   virtual ~pdu_client() {}
 
 public:
-  void read_coils(uint16_t starting_address, uint16_t quantity_of_coils);
+  void read_coils(uint16_t starting_address,
+                  uint16_t quantity_of_coils);
+  void read_discrete_inputs(uint16_t starting_address,
+                            uint16_t quantity_of_inputs);
 
 public:
   virtual void on_read_coils(const coils& status) {}
+  virtual void on_read_discrete_inputs(const discrete_inputs& status) {}
   virtual void on_exception(function_code fc, exception_code ec) {}
 
 private:

@@ -15,6 +15,7 @@ namespace asps {
 namespace modbus {
 namespace pdu {
 
+// Exception PDU
 class client_exception
   : public message_unserialization_service
 {
@@ -35,6 +36,8 @@ private:
   message_unserialization_service::pointer_type response_;
 };
 
+
+// Read Coils PDU
 class client_read_coils_request
   : public message_serialization_service
 {
@@ -71,6 +74,45 @@ public:
 
 private:
   coils status_;
+};
+
+// Read Discrete Inputs PDU
+class client_read_discrete_inputs_request
+  : public message_serialization_service
+{
+public:
+  client_read_discrete_inputs_request(uint16_t starting_address,
+                                      uint16_t quantity_of_inputs)
+    : starting_address_(starting_address),
+      quantity_of_inputs_(quantity_of_inputs)
+  {}
+
+public:
+  virtual const buffer_type& serialize() override;
+
+private:
+  uint16_t starting_address_;
+  uint16_t quantity_of_inputs_;
+  buffer_type buffer_;
+};
+
+class client_read_discrete_inputs_response
+  : public message_unserialization_service
+{
+public:
+  client_read_discrete_inputs_response()
+    : message_unserialization_service()
+  {}
+
+public:
+  virtual bool unserialize(const buffer_type& buffer) override;
+
+public:
+  virtual mb_datas& datas() override
+  {return status_;}
+
+private:
+  discrete_inputs status_;
 };
 
 } // pdu

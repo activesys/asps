@@ -24,7 +24,8 @@ void client_session::receive_response(const buffer_type& adu)
 
 void client_session::send_request(const buffer_type& pdu)
 {
-  client_sequence::pointer_type seq = std::make_shared<client_sequence>(tid_, 1, pdu);
+  client_sequence::pointer_type seq =
+    std::make_shared<client_sequence>(tid_, 1, pdu);
   seq->register_event_observer(this);
   seqs_[tid_++] = seq;
   notify_send(seq->send_request());
