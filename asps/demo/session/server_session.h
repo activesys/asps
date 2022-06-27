@@ -9,7 +9,7 @@
 
 #include <asps/demo/semantic/session_service.h>
 #include <asps/demo/session/sequence_service.h>
-#include <asps/utility/timer_service.h>
+#include <asps/utility/timer_service.hpp>
 
 namespace asps {
 namespace demo {

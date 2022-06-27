@@ -4,8 +4,8 @@
 //
 // Timer service.
 
-#ifndef ASPS_UTILITY_TIMER_SERVICE_H
-#define ASPS_UTILITY_TIMER_SERVICE_H
+#ifndef ASPS_UTILITY_TIMER_SERVICE_HPP
+#define ASPS_UTILITY_TIMER_SERVICE_HPP
 
 #include <memory>
 #include <functional>
@@ -45,4 +45,4 @@ make_timer(uint32_t expiry,
 } // utility
 } // asps
 
-#endif // ASPS_UTILITY_TIMER_SERVICE_H
+#endif // ASPS_UTILITY_TIMER_SERVICE_HPP

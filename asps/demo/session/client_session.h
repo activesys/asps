@@ -11,7 +11,7 @@
 #include <vector>
 
 #include <asps/demo/session/sequence_service.h>
-#include <asps/utility/timer_service.h>
+#include <asps/utility/timer_service.hpp>
 #include <asps/demo/semantic/session_service.h>
 
 namespace asps {

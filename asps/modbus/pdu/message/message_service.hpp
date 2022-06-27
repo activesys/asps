@@ -8,7 +8,7 @@
 #define ASPS_MODBUS_PDU_MESSAGE_MESSAGE_SERVICE_HPP
 
 #include <memory>
-#include <asps/utility/utility.h>
+#include <asps/utility/utility.hpp>
 #include <asps/modbus/pdu/semantic/constant.hpp>
 #include <asps/modbus/pdu/semantic/data_model.hpp>
 

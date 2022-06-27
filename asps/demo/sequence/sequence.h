@@ -10,7 +10,7 @@
 #include <asps/demo/session/sequence_service.h>
 #include <asps/demo/message/server_message.h>
 #include <asps/demo/sequence/state.h>
-#include <asps/utility/timer_service.h>
+#include <asps/utility/timer_service.hpp>
 
 namespace asps {
 namespace demo {

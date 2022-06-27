@@ -9,7 +9,7 @@
 
 #include <memory>
 #include <boost/asio.hpp>
-#include <asps/utility/timer_service.h>
+#include <asps/utility/timer_service.hpp>
 
 namespace asps {
 namespace utility {

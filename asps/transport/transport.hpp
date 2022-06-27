@@ -4,13 +4,13 @@
 //
 // Transport layer services implemented using Boost.
 
-#ifndef ASPS_TRANSPORT_TRANSPORT_H
-#define ASPS_TRANSPORT_TRANSPORT_H
+#ifndef ASPS_TRANSPORT_TRANSPORT_HPP
+#define ASPS_TRANSPORT_TRANSPORT_HPP
 
 #include <memory>
 #include <string>
 #include <boost/asio.hpp>
-#include <asps/transport/transport_service.h>
+#include <asps/transport/transport_service.hpp>
 
 namespace asps {
 namespace transport {
@@ -33,9 +33,12 @@ public:
   virtual ~boost_connection() {}
 
 public:
-  virtual void set_handler(const read_handler rhandler,
-                           const write_handler whandler,
-                           const close_handler chandler) override;
+  virtual void set_read_handler(const read_handler handler) override
+  {read_handler_ = handler;}
+  virtual void set_write_handler(const write_handler handler) override
+  {write_handler_ = handler;}
+  virtual void set_close_handler(const close_handler handler) override
+  {close_handler_ = handler;}
   virtual void read() override;
   virtual void write(const buffer_type& buf) override;
   virtual void close() override;
@@ -78,7 +81,8 @@ public:
   virtual ~boost_connector() {}
 
 public:
-  virtual void set_handler(const connect_handler handler) override;
+  virtual void set_connect_handler(const connect_handler handler) override
+  {connect_handler_ = handler;}
   virtual void connect() override;
   virtual void run() override;
   virtual void stop() override;
@@ -116,8 +120,10 @@ public:
   virtual ~boost_acceptor() {}
 
 public:
-  virtual void set_handler(const accept_handler ahandler,
-                           const release_handler rhandler) override;
+  virtual void set_accept_handler(const accept_handler handler) override
+  {accept_handler_ = handler;}
+  virtual void set_release_handler(const release_handler handler) override
+  {release_handler_ = handler;}
   virtual void accept() override;
   virtual void release(connection::pointer_type conn) override;
   virtual void run() override;
@@ -139,4 +145,4 @@ private:
 } // transport
 } // asps
 
-#endif // ASPS_TRANSPORT_TRANSPORT_H
+#endif // ASPS_TRANSPORT_TRANSPORT_HPP

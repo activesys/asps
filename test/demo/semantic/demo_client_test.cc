@@ -14,7 +14,7 @@
 #include <asps/demo/demo.h>
 #include <boost/asio.hpp>
 
-#include <asps/utility/boost_env.h>
+#include <asps/utility/boost_env.hpp>
 #include <test/demo/utility/demo_test_server.h>
 
 namespace asps_test {

@@ -4,8 +4,8 @@
 //
 // Transport layer services implemented using Boost.
 
-#include <asps/transport/transport.h>
-#include <asps/utility/boost_env.h>
+#include <asps/transport/transport.hpp>
+#include <asps/utility/boost_env.hpp>
 
 namespace asps {
 namespace transport {
@@ -18,15 +18,6 @@ connection::pointer_type
 make_connection()
 {
   return std::make_shared<boost_connection>(g_context);
-}
-
-void boost_connection::set_handler(const read_handler rhandler,
-                                   const write_handler whandler,
-                                   const close_handler chandler)
-{
-  read_handler_ = rhandler;
-  write_handler_ = whandler;
-  close_handler_ = chandler;
 }
 
 void boost_connection::read()
@@ -100,11 +91,6 @@ make_connector(const std::string& ip, uint16_t port)
   return std::make_shared<boost_connector>(g_context, ip, port);
 }
 
-void boost_connector::set_handler(const connect_handler handler)
-{
-  connect_handler_ = handler;
-}
-
 void boost_connector::connect()
 {
   do_connect();
@@ -150,13 +136,6 @@ acceptor::pointer_type
 make_acceptor(uint16_t port)
 {
   return std::make_shared<boost_acceptor>(g_context, port);
-}
-
-void boost_acceptor::set_handler(const accept_handler ahandler,
-                                 const release_handler rhandler)
-{
-  accept_handler_ = ahandler;
-  release_handler_ = rhandler;
 }
 
 void boost_acceptor::accept()

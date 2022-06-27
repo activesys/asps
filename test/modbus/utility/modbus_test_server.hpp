@@ -2,10 +2,10 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file. See the AUTHORS file for names of contributors.
 //
-// Demo server for testing demo client.
+// Modbus server for testing modbus client.
 
-#ifndef TEST_DEMO_UTILITY_DEMO_TEST_SERVER_H
-#define TEST_DEMO_UTILITY_DEMO_TEST_SERVER_H
+#ifndef TEST_MODBUS_UTILITY_MODBUS_TEST_SERVER_HPP
+#define TEST_MODBUS_UTILITY_MODBUS_TEST_SERVER_HPP
 
 #include <cstdint>
 #include <string>
@@ -16,15 +16,15 @@
 #include <asps/utility/utility.hpp>
 
 namespace asps_test {
-namespace demo_test {
+namespace modbus_test {
 
 using namespace asps::utility;
 using namespace boost::asio;
 
-class demo_test_server
+class modbus_test_server
 {
 public:
-  demo_test_server(const std::string& host, uint16_t port)
+  modbus_test_server(const std::string& host, uint16_t port)
     : acceptor_(context_, ip::tcp::endpoint(ip::address::from_string(host), port)),
       expect_length_(0)
   {
@@ -38,7 +38,7 @@ public:
   void start(bool need_read_data = true)
   {
     need_read_data_ = need_read_data;
-    server_thread_ = std::thread(std::bind(&demo_test_server::server_handler, this));
+    server_thread_ = std::thread(std::bind(&modbus_test_server::server_handler, this));
   }
   void wait()
   {
@@ -54,18 +54,18 @@ private:
   void on_accept(const boost::system::error_code& ec)
   {
     if (!ec) {
-      // Read Demo data
+      // Read modbus data
       if (need_read_data_) {
         async_read(*peer_,
                    buffer(buffer_),
-                   std::bind(&demo_test_server::on_completion, this, std::placeholders::_1, std::placeholders::_2),
-                   std::bind(&demo_test_server::on_read, this, std::placeholders::_1, std::placeholders::_2));
+                   std::bind(&modbus_test_server::on_completion, this, std::placeholders::_1, std::placeholders::_2),
+                   std::bind(&modbus_test_server::on_read, this, std::placeholders::_1, std::placeholders::_2));
       }
       // Write Data
       if (write_buffer_.size()) {
         async_write(*peer_,
                     buffer(write_buffer_),
-                    std::bind(&demo_test_server::on_write, this, std::placeholders::_1, std::placeholders::_2));
+                    std::bind(&modbus_test_server::on_write, this, std::placeholders::_1, std::placeholders::_2));
       }
     }
   }
@@ -75,6 +75,7 @@ private:
   }
   std::size_t on_completion(const boost::system::error_code& ec, std::size_t bytes)
   {
+    /*
     if (expect_length_ == SIZE_MAX) {
       return 0;
     }
@@ -87,15 +88,16 @@ private:
     if (expect_length_ == 4 && bytes == 4) {
       return 0;
     }
+    */
 
-    // The header of demo protocol has a fixed length of 16 bytes
-    if (bytes < 13) {
-      return 13 - bytes;
+    // The header of modbus protocol has a fixed length of 16 bytes
+    if (bytes < 7) {
+      return 7 - bytes;
     } else {
-      // Parses the demo protocol package length,
-      // expecting to return all demo package data.
+      // Parses the modbus protocol package length,
+      // expecting to return all modbus package data.
       uint8_t* pos = buffer_.data();
-      pos += 8;
+      pos += 4;
       uint16_t length = ntohs(*reinterpret_cast<uint16_t*>(pos));
       
       if (bytes < length) {
@@ -113,7 +115,7 @@ private:
   void server_handler()
   {
     peer_ = std::make_shared<ip::tcp::socket>(context_);
-    acceptor_.async_accept(*peer_, std::bind(&demo_test_server::on_accept, this, std::placeholders::_1));
+    acceptor_.async_accept(*peer_, std::bind(&modbus_test_server::on_accept, this, std::placeholders::_1));
     context_.run();
   }
 
@@ -128,7 +130,7 @@ private:
   bool need_read_data_;
 };
 
-} // demo_test
+} // modbus_test
 } // asps_test
 
-#endif // TEST_DEMO_UTILITY_DEMO_SERVER_H
+#endif // TEST_MODBUS_UTILITY_MODBUS_TEST_SERVER_HPP

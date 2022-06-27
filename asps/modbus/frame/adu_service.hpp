@@ -9,13 +9,15 @@
 
 #include <memory>
 #include <functional>
-#include <asps/utility/utility.h>
+#include <asps/utility/utility.hpp>
+#include <asps/transport/transport_service.hpp>
 
 namespace asps {
 namespace modbus {
 namespace frame {
 
 using namespace asps::utility;
+using namespace asps::transport;
 
 // ADU Service
 class adu_service
@@ -33,7 +35,7 @@ public:
 };
 
 adu_service::pointer_type
-make_tcp_adu();
+make_tcp_adu(connection::pointer_type conn);
 adu_service::pointer_type
 make_serial_line_adu();
 

@@ -4,8 +4,8 @@
 //
 // Boost environment.
 
-#ifndef ASPS_UTILITY_BOOST_ENV_H
-#define ASPS_UTILITY_BOOST_ENV_H
+#ifndef ASPS_UTILITY_BOOST_ENV_HPP
+#define ASPS_UTILITY_BOOST_ENV_HPP
 
 #include <memory>
 #include <boost/asio.hpp>
@@ -20,4 +20,4 @@ extern std::shared_ptr<io_context> g_context;
 } // utility
 } // asps
 
-#endif // ASPS_UTILITY_BOOST_ENV_H
+#endif // ASPS_UTILITY_BOOST_ENV_HPP

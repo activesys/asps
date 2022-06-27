@@ -31,27 +31,33 @@ void pdu_client::update_send(const buffer_type& pdu)
 }
 
 void pdu_client::update_datas(const request::pointer_type& req,
-                          const mb_datas& datas)
+                              const mb_datas& datas)
 {
   switch (req->func_code())
   {
   case function_code_read_coils:
-    on_read_coils(dynamic_cast<const coils&>(datas));  
+    if (rchandler_) {
+      rchandler_(dynamic_cast<const coils&>(datas));
+    }
     break;
 
   case function_code_read_discrete_inputs:
-    on_read_discrete_inputs(dynamic_cast<const discrete_inputs&>(datas));
+    if (rdihandler_) {
+      rdihandler_(dynamic_cast<const discrete_inputs&>(datas));
+    }
     break;
   }
 }
 
 void pdu_client::update_exception(const request::pointer_type& req,
-                              exception_code ec)
+                                  exception_code ec)
 {
-  on_exception(req->func_code(), ec);
+  if (ehandler_) {
+    ehandler_(req->func_code(), ec);
+  }
 }
 
-void pdu_client::read_handler(const buffer_type& pdu)
+void pdu_client::adu_read_handler(const buffer_type& pdu)
 {
   session_.receive_response(pdu);
 }

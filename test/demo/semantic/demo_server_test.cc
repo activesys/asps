@@ -7,7 +7,7 @@
 #include <string>
 #include <gtest/gtest.h>
 #include <asps/demo/demo.h>
-#include <asps/utility/boost_env.h>
+#include <asps/utility/boost_env.hpp>
 #include <test/demo/utility/demo_test_client.h>
 
 namespace asps_test {

@@ -12,8 +12,6 @@ namespace modbus {
 namespace adu {
 
 // Client Session
-uint16_t client_session::tid_ = 0;
-
 void client_session::receive_response(const buffer_type& adu)
 {
   uint16_t tid = get_tid(adu);

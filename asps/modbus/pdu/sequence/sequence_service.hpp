@@ -9,7 +9,7 @@
 
 #include <memory>
 #include <list>
-#include <asps/utility/utility.h>
+#include <asps/utility/utility.hpp>
 #include <asps/modbus/pdu/semantic/constant.hpp>
 #include <asps/modbus/pdu/semantic/data_model.hpp>
 #include <asps/modbus/pdu/semantic/request_service.hpp>

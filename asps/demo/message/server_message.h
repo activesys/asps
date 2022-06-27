@@ -7,7 +7,7 @@
 #ifndef ASPS_DEMO_MESSAGE_SERVER_MESSAGE_H
 #define ASPS_DEMO_MESSAGE_SERVER_MESSAGE_H
 
-#include <asps/utility/utility.h>
+#include <asps/utility/utility.hpp>
 #include <asps/demo/semantic/demo_data.h>
 #include <asps/demo/sequence/message_service.h>
 

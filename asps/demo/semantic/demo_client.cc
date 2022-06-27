@@ -20,7 +20,8 @@ bool demo_client::send(const data_group_type& group)
 
 void demo_client::run()
 {
-  connector_->set_handler(std::bind(&demo_client::connect_handler, this, _1));
+  connector_->set_connect_handler(std::bind(&demo_client::connect_handler,
+                                            this, _1));
   connector_->connect();
   t0_->start();
   connector_->run();
@@ -52,9 +53,12 @@ void demo_client::connect_handler(connection::pointer_type conn)
   session_->register_observer(this);
   t0_->stop();
 
-  connection_->set_handler(std::bind(&demo_client::read_handler, this, _1, _2, _3),
-                           std::bind(&demo_client::write_handler, this, _1, _2),
-                           std::bind(&demo_client::close_handler, this, _1));
+  connection_->set_read_handler(std::bind(&demo_client::read_handler,
+                                          this, _1, _2, _3));
+  connection_->set_write_handler(std::bind(&demo_client::write_handler,
+                                           this, _1, _2));
+  connection_->set_close_handler(std::bind(&demo_client::close_handler,
+                                           this, _1));
   connection_->read();
 
   on_connect(conn);

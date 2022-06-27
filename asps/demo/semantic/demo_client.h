@@ -12,8 +12,8 @@
 #include <functional>
 #include <asps/demo/semantic/session_service.h>
 #include <asps/demo/semantic/demo_data.h>
-#include <asps/transport/transport_service.h>
-#include <asps/utility/timer_service.h>
+#include <asps/transport/transport_service.hpp>
+#include <asps/utility/timer_service.hpp>
 #include <asps/demo/config/config.h>
 
 namespace asps {

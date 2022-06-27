@@ -7,7 +7,7 @@
 #ifndef ASPS_MODBUS_ADU_MESSAGE_CLIENT_MESSAGE_HPP
 #define ASPS_MODBUS_ADU_MESSAGE_CLIENT_MESSAGE_HPP
 
-#include <asps/utility/utility.h>
+#include <asps/utility/utility.hpp>
 
 namespace asps {
 namespace modbus {

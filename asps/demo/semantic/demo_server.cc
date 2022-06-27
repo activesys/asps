@@ -12,12 +12,12 @@ namespace demo {
 
 void demo_server::run()
 {
-  acceptor_->set_handler(std::bind(&demo_server::accept_handler,
-                                   this,
-                                   std::placeholders::_1),
-                         std::bind(&demo_server::release_handler,
-                                   this,
-                                   std::placeholders::_1));
+  acceptor_->set_accept_handler(std::bind(&demo_server::accept_handler,
+                                          this,
+                                          std::placeholders::_1));
+  acceptor_->set_release_handler(std::bind(&demo_server::release_handler,
+                                           this,
+                                           std::placeholders::_1));
   acceptor_->accept();
   acceptor_->run();
 }
@@ -30,18 +30,18 @@ void demo_server::stop()
 void demo_server::accept_handler(connection_type conn)
 {
   if (conn) {
-    conn->set_handler(std::bind(&demo_server::read_handler,
-                                this,
-                                std::placeholders::_1,
-                                std::placeholders::_2,
-                                std::placeholders::_3),
-                      std::bind(&demo_server::write_handler,
-                                this,
-                                std::placeholders::_1,
-                                std::placeholders::_2),
-                      std::bind(&demo_server::close_handler,
-                                this,
-                                std::placeholders::_1));
+    conn->set_read_handler(std::bind(&demo_server::read_handler,
+                                     this,
+                                     std::placeholders::_1,
+                                     std::placeholders::_2,
+                                     std::placeholders::_3));
+    conn->set_write_handler(std::bind(&demo_server::write_handler,
+                                      this,
+                                      std::placeholders::_1,
+                                      std::placeholders::_2));
+    conn->set_close_handler(std::bind(&demo_server::close_handler,
+                                      this,
+                                      std::placeholders::_1));
 
     session_type session = make_server_session();
     session->register_observer(this);

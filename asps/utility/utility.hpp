@@ -4,8 +4,8 @@
 //
 // utility.
 
-#ifndef ASPS_UTILITY_UTILITY_H
-#define ASPS_UTILITY_UTILITY_H
+#ifndef ASPS_UTILITY_UTILITY_HPP
+#define ASPS_UTILITY_UTILITY_HPP
 
 #include <cstdint>
 #include <vector>
@@ -22,4 +22,4 @@ uint64_t ntohll(uint64_t value);
 } // utility
 } // asps
 
-#endif // ASPS_UTILITY_UTILITY_H
+#endif // ASPS_UTILITY_UTILITY_HPP

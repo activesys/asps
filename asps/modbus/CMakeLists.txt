@@ -38,6 +38,14 @@ set(ASPS_MODBUS_SOURCES
     adu/message/client_message.cpp
     adu/session/client_session.cpp
     adu/semantic/adu_client.cpp
+    # API sources
+    api/tcp_client.cpp
+    # transport
+    ../transport/transport.cpp
+    # utility
+    ../utility/timer.cpp
+    ../utility/utility.cpp
+    ../utility/boost_env.cpp
 )
 
 ##################################
@@ -48,6 +56,7 @@ set_target_properties(asmodbus
     VERSION     ${ASPS_MODBUS_VERSION_TEXT}
     SOVERSION   ${ASPS_MODBUS_SOVERSION_TEXT}
 )
+target_link_libraries(asmodbus Boost::system pthread)
 
 ##################################
 # Install library

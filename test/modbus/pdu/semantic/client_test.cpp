@@ -13,6 +13,7 @@ namespace asps_test {
 namespace modbus_test {
 
 using namespace asps::modbus;
+using namespace std::placeholders;
 
 // Read Coils
 TEST(pdu_client_test, read_coils)
@@ -55,26 +56,22 @@ TEST(pdu_client_test, on_read_coils)
   private:
     read_handler handler_;
   };
-  class my_client : public pdu::pdu_client
+  class my_handler
   {
   public:
-    my_client(frame::adu_service::pointer_type adu)
-      : pdu::pdu_client(adu)
-    {}
-  public:
-    virtual void on_read_coils(const pdu::coils& status) override
+    void on_read_coils(const pdu::coils& status)
     {
       pdu::coils expect_status{{10,true},{11,true},{12,true},{13,true},
                                {14,true},{15,true},{16,true},{17,true},
                                {18,true},{19,true}};
       EXPECT_EQ(status, expect_status);
     }
-    virtual void on_exception(pdu::function_code fc, pdu::exception_code ec) override
-    {}
   };
 
+  my_handler h;
   frame::adu_service::pointer_type adu = std::make_shared<adu_test>();
-  my_client c(adu);
+  pdu::pdu_client c(adu);
+  c.set_read_coils_handler(std::bind(&my_handler::on_read_coils, &h, _1));
   c.read_coils(10, 10);
 }
 
@@ -99,24 +96,20 @@ TEST(pdu_client_test, on_exception_read_coils)
   private:
     read_handler handler_;
   };
-  class my_client : public pdu::pdu_client
+  class my_handler
   {
   public:
-    my_client(frame::adu_service::pointer_type adu)
-      : pdu::pdu_client(adu)
-    {}
-  public:
-    virtual void on_read_coils(const pdu::coils& status) override
-    {}
-    virtual void on_exception(pdu::function_code fc, pdu::exception_code ec) override
+    void on_exception(pdu::function_code fc, pdu::exception_code ec)
     {
       EXPECT_EQ(fc, pdu::function_code_read_coils);
       EXPECT_EQ(ec, pdu::exception_code_memory_parity_error);
     }
   };
 
+  my_handler h;
   frame::adu_service::pointer_type adu = std::make_shared<adu_test>();
-  my_client c(adu);
+  pdu::pdu_client c(adu);
+  c.set_exception_handler(std::bind(&my_handler::on_exception, &h, _1, _2));
   c.read_coils(10, 10);
 }
 
@@ -161,26 +154,22 @@ TEST(pdu_client_test, on_read_discrete_inputs)
   private:
     read_handler handler_;
   };
-  class my_client : public pdu::pdu_client
+  class my_handler
   {
   public:
-    my_client(frame::adu_service::pointer_type adu)
-      : pdu::pdu_client(adu)
-    {}
-  public:
-    virtual void on_read_discrete_inputs(const pdu::discrete_inputs& status) override
+    void on_read_discrete_inputs(const pdu::discrete_inputs& status)
     {
       pdu::discrete_inputs expect_status{{10,true},{11,true},{12,true},{13,true},
                                          {14,true},{15,true},{16,true},{17,true},
                                          {18,true},{19,true}};
       EXPECT_EQ(status, expect_status);
     }
-    virtual void on_exception(pdu::function_code fc, pdu::exception_code ec) override
-    {}
   };
 
+  my_handler h;
   frame::adu_service::pointer_type adu = std::make_shared<adu_test>();
-  my_client c(adu);
+  pdu::pdu_client c(adu);
+  c.set_read_discrete_inputs_handler(std::bind(&my_handler::on_read_discrete_inputs, &h, _1));
   c.read_discrete_inputs(10, 10);
 }
 
@@ -205,27 +194,22 @@ TEST(pdu_client_test, on_exception_read_discrete_inputs)
   private:
     read_handler handler_;
   };
-  class my_client : public pdu::pdu_client
+  class my_handler
   {
   public:
-    my_client(frame::adu_service::pointer_type adu)
-      : pdu::pdu_client(adu)
-    {}
-  public:
-    virtual void on_read_discrete_inputs(const pdu::discrete_inputs& status) override
-    {}
-    virtual void on_exception(pdu::function_code fc, pdu::exception_code ec) override
+    void on_exception(pdu::function_code fc, pdu::exception_code ec)
     {
       EXPECT_EQ(fc, pdu::function_code_read_discrete_inputs);
       EXPECT_EQ(ec, pdu::exception_code_memory_parity_error);
     }
   };
 
+  my_handler h;
   frame::adu_service::pointer_type adu = std::make_shared<adu_test>();
-  my_client c(adu);
+  pdu::pdu_client c(adu);
+  c.set_exception_handler(std::bind(&my_handler::on_exception, &h, _1, _2));
   c.read_discrete_inputs(10, 10);
 }
-
 
 } // modbus_test
 } // asps_test

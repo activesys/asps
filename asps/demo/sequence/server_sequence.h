@@ -7,7 +7,7 @@
 #ifndef ASPS_DEMO_SEQUENCE_SERVER_SEQUENCE_H
 #define ASPS_DEMO_SEQUENCE_SERVER_SEQUENCE_H
 
-#include <asps/utility/utility.h>
+#include <asps/utility/utility.hpp>
 #include <asps/demo/semantic/demo_data.h>
 #include <asps/demo/sequence/sequence.h>
 

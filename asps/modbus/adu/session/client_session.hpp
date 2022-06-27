@@ -30,6 +30,11 @@ class client_session
   : public client_sequence_observer
 {
 public:
+  client_session()
+    : tid_(0)
+  {}
+
+public:
   void receive_response(const buffer_type& adu);
   void send_request(const buffer_type& pdu);
 
@@ -58,7 +63,7 @@ public:
 private:
   std::list<client_session_observer*> csobjs_;
   std::unordered_map<uint16_t, client_sequence::pointer_type> seqs_;
-  static uint16_t tid_;
+  uint16_t tid_;
 };
 
 } // adu

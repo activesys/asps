@@ -7,7 +7,7 @@
 #ifndef ASPS_MODBUS_ADU_SEQUENCE_STATE_HPP
 #define ASPS_MODBUS_ADU_SEQUENCE_STATE_HPP
 
-#include <asps/utility/utility.h>
+#include <asps/utility/utility.hpp>
 
 namespace asps {
 namespace modbus {

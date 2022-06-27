@@ -4,13 +4,13 @@
 //
 // Transport service.
 
-#ifndef ASPS_TRANSPORT_TRANSPORT_SERVICE_H
-#define ASPS_TRANSPORT_TRANSPORT_SERVICE_H
+#ifndef ASPS_TRANSPORT_TRANSPORT_SERVICE_HPP
+#define ASPS_TRANSPORT_TRANSPORT_SERVICE_HPP
 
 #include <string>
 #include <memory>
 #include <functional>
-#include <asps/utility/utility.h>
+#include <asps/utility/utility.hpp>
 
 namespace asps {
 namespace transport {
@@ -35,9 +35,9 @@ public:
   virtual ~connection() {}
 
 public:
-  virtual void set_handler(const read_handler rhandler,
-                           const write_handler whandler,
-                           const close_handler chandler) = 0;
+  virtual void set_read_handler(const read_handler handler) = 0;
+  virtual void set_write_handler(const write_handler handler) = 0;
+  virtual void set_close_handler(const close_handler handler) = 0;
   virtual void read() = 0;
   virtual void write(const buffer_type& buf) = 0;
   virtual void close() = 0;
@@ -64,7 +64,7 @@ public:
   virtual ~connector() {}
 
 public:
-  virtual void set_handler(const connect_handler handler) = 0;
+  virtual void set_connect_handler(const connect_handler handler) = 0;
   virtual void connect() = 0;
   virtual void run() = 0;
   virtual void stop() = 0;
@@ -97,8 +97,8 @@ public:
   virtual ~acceptor() {}
 
 public:
-  virtual void set_handler(const accept_handler ahandler,
-                           const release_handler rhandler) = 0;
+  virtual void set_accept_handler(const accept_handler ahandler) = 0;
+  virtual void set_release_handler(const release_handler rhandler) = 0;
   virtual void release(connection::pointer_type conn) = 0;
   virtual void accept() = 0;
   virtual void run() = 0;
@@ -117,4 +117,4 @@ make_acceptor(uint16_t port);
 } // transport
 } // asps
 
-#endif // ASPS_TRANSPORT_TRANSPORT_SERVICE_H
+#endif // ASPS_TRANSPORT_TRANSPORT_SERVICE_HPP

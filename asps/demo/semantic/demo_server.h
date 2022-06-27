@@ -9,8 +9,8 @@
 
 #include <string>
 #include <asps/demo/semantic/session_service.h>
-#include <asps/transport/transport_service.h>
-#include <asps/utility/utility.h>
+#include <asps/transport/transport_service.hpp>
+#include <asps/utility/utility.hpp>
 #include <boost/bimap.hpp>
 
 namespace asps {

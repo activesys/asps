@@ -34,10 +34,10 @@ set(ASPS_DEMO_SOURCES
   message/client_message.cc
   message/server_message.cc
   config/config.cc
-  ../transport/transport.cc
-  ../utility/timer.cc
-  ../utility/utility.cc
-  ../utility/boost_env.cc
+  ../transport/transport.cpp
+  ../utility/timer.cpp
+  ../utility/utility.cpp
+  ../utility/boost_env.cpp
 )
 
 ##################################

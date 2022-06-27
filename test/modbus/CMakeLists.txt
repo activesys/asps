@@ -20,6 +20,8 @@ set(ASPS_MODBUS_TEST_SOURCES
     adu/sequence/client_sequence_test.cpp
     adu/session/session_test.cpp
     adu/semantic/client_test.cpp
+    # Modbus TCP Client
+    api/tcp_client_test.cpp
 )
 
 ##################################

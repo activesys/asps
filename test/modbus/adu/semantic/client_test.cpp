@@ -6,7 +6,7 @@
 
 #include <gtest/gtest.h>
 #include <asps/modbus/adu/semantic/adu_client.hpp>
-#include <asps/transport/transport_service.h>
+#include <asps/transport/transport_service.hpp>
 
 namespace asps_test {
 namespace modbus_test {
@@ -20,15 +20,14 @@ TEST(adu_client_test, write)
   class connection_test : public connection
   {
   public:
-    virtual void set_handler(const read_handler rhandler,
-                            const write_handler whandler,
-                            const close_handler chandler) override
-    {}
+    virtual void set_read_handler(const read_handler rhandler) override{}
+    virtual void set_write_handler(const write_handler whandler) override {}
+    virtual void set_close_handler(const close_handler chandler) override {}
     virtual void read() override
     {}
     virtual void write(const buffer_type& buf) override
     {
-      buffer_type expect_adu{0x00, 0x01, 0x00, 0x00, 0x00, 0x06, 0x01,
+      buffer_type expect_adu{0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x01,
                              0x01, 0x00, 0x64, 0x00, 0x64};
       EXPECT_EQ(buf, expect_adu);
     }
@@ -45,7 +44,7 @@ TEST(adu_client_test, write)
   };
   buffer_type expect_pdu{0x01, 0x00, 0x64, 0x00, 0x64};
   connection::pointer_type conn = std::make_shared<connection_test>();
-  adu::client c(conn);
+  adu::adu_client c(conn);
   c.write(expect_pdu);
 }
 
@@ -54,12 +53,10 @@ TEST(adu_client_test, read)
   class connection_test : public connection, public std::enable_shared_from_this<connection>
   {
   public:
-    virtual void set_handler(const read_handler rhandler,
-                            const write_handler whandler,
-                            const close_handler chandler) override
-    {
-      rhandler_ = rhandler;
-    }
+    virtual void set_read_handler(const read_handler rhandler) override
+    {rhandler_ = rhandler;}
+    virtual void set_write_handler(const write_handler whandler) override {}
+    virtual void set_close_handler(const close_handler chandler) override {}
     virtual void read() override
     {
       buffer_type expect_adu{0x00, 0x01, 0x00, 0x00, 0x00, 0x03, 0x01,
@@ -93,7 +90,7 @@ TEST(adu_client_test, read)
     }
   };
   connection::pointer_type conn = std::make_shared<connection_test>();
-  adu::client c(conn);
+  adu::adu_client c(conn);
   read_test t;
   c.set_handler(std::bind(&read_test::read, &t, std::placeholders::_1));
   conn->read();

@@ -5,7 +5,7 @@
 // Server Message.
 
 #include <cstring>
-#include <asps/utility/utility.h>
+#include <asps/utility/utility.hpp>
 #include <asps/demo/message/server_message.h>
 #include <asps/demo/message/keepalive.h>
 
