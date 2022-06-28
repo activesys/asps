@@ -56,6 +56,24 @@ void async_tcp_client::read_discrete_inputs(uint16_t starting_address,
   }
 }
 
+void async_tcp_client::read_holding_registers(uint16_t starting_address,
+                                              uint16_t quantity_of_registers)
+{
+  if (pdu_) {
+    pdu_->read_holding_registers(starting_address, quantity_of_registers);
+    connection_->read();
+  }
+}
+
+void async_tcp_client::read_input_registers(uint16_t starting_address,
+                                            uint16_t quantity_of_registers)
+{
+  if (pdu_) {
+    pdu_->read_input_registers(starting_address, quantity_of_registers);
+    connection_->read();
+  }
+}
+
 void async_tcp_client::connect_handler(tp::connection::pointer_type conn)
 {
   timer_->stop();
@@ -64,12 +82,14 @@ void async_tcp_client::connect_handler(tp::connection::pointer_type conn)
   adu_ = std::make_shared<adu::adu_client>(conn);
   pdu_ = std::make_shared<pdu::pdu_client>(adu_);
 
-  pdu_->set_read_coils_handler(std::bind(&async_tcp_client::read_coils_handler,
-                                         this,
-                                         _1));
-  pdu_->set_read_discrete_inputs_handler(std::bind(&async_tcp_client::read_discrete_inputs_handler,
-                                                   this,
-                                                   _1));
+  pdu_->set_read_coils_handler(
+    std::bind(&async_tcp_client::read_coils_handler, this, _1));
+  pdu_->set_read_discrete_inputs_handler(
+    std::bind(&async_tcp_client::read_discrete_inputs_handler, this, _1));
+  pdu_->set_read_holding_registers_handler(
+    std::bind(&async_tcp_client::read_holding_registers_handler, this, _1));
+  pdu_->set_read_input_registers_handler(
+    std::bind(&async_tcp_client::read_input_registers_handler, this, _1));
 
   on_connect();
 }
@@ -79,14 +99,28 @@ void async_tcp_client::timeout_handler()
   connector_->connect();
 }
 
-void async_tcp_client::read_coils_handler(const pdu::coils& status)
+void async_tcp_client::read_coils_handler(
+  const pdu::coils& status)
 {
   on_read_coils(status);
 }
 
-void async_tcp_client::read_discrete_inputs_handler(const pdu::discrete_inputs& status)
+void async_tcp_client::read_discrete_inputs_handler(
+  const pdu::discrete_inputs& status)
 {
   on_read_discrete_inputs(status);
+}
+
+void async_tcp_client::read_holding_registers_handler(
+  const pdu::holding_registers& registers)
+{
+  on_read_holding_registers(registers);
+}
+
+void async_tcp_client::read_input_registers_handler(
+  const pdu::input_registers& registers)
+{
+  on_read_input_registers(registers);
 }
 
 } // modbus

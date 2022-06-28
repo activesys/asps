@@ -29,6 +29,8 @@ public:
 
   typedef std::function<void(const coils&)> read_coils_handler;
   typedef std::function<void(const discrete_inputs&)> read_discrete_inputs_handler;
+  typedef std::function<void(const holding_registers&)> read_holding_registers_handler;
+  typedef std::function<void(const input_registers&)> read_input_registers_handler;
   typedef std::function<void(function_code, exception_code)> exception_handler;
 
 public:
@@ -47,12 +49,20 @@ public:
   {rchandler_ = handler;}
   void set_read_discrete_inputs_handler(read_discrete_inputs_handler handler)
   {rdihandler_ = handler;}
+  void set_read_holding_registers_handler(read_holding_registers_handler handler)
+  {rhrhandler_ = handler;}
+  void set_read_input_registers_handler(read_input_registers_handler handler)
+  {rirhandler_ = handler;}
 
 public:
   void read_coils(uint16_t starting_address,
                   uint16_t quantity_of_coils);
   void read_discrete_inputs(uint16_t starting_address,
                             uint16_t quantity_of_inputs);
+  void read_holding_registers(uint16_t starting_address,
+                              uint16_t quantity_of_registers);
+  void read_input_registers(uint16_t starting_address,
+                            uint16_t quantity_of_registers);
 
 private:
   virtual void update_send(const buffer_type& pdu) override;
@@ -70,6 +80,8 @@ private:
 
   read_coils_handler rchandler_;
   read_discrete_inputs_handler rdihandler_;
+  read_holding_registers_handler rhrhandler_;
+  read_input_registers_handler rirhandler_;
   exception_handler ehandler_;
 };
 

@@ -37,6 +37,9 @@ public:
 
 public:
   virtual const buffer_type& serialize() = 0;
+
+protected:
+  buffer_type buffer_;
 };
 
 class message_unserialization_service
@@ -73,11 +76,24 @@ make_client_read_coils_request(uint16_t starting_address,
                                uint16_t quantity_of_coils);
 message_unserialization_service::pointer_type
 make_client_read_coils_response();
+
 message_serialization_service::pointer_type
 make_client_read_discrete_inputs_request(uint16_t starting_address,
                                          uint16_t quantity_of_inputs);
 message_unserialization_service::pointer_type
 make_client_read_discrete_inputs_response();
+
+message_serialization_service::pointer_type
+make_client_read_holding_registers_request(uint16_t starting_address,
+                                           uint16_t quantity_of_registers);
+message_unserialization_service::pointer_type
+make_client_read_holding_registers_response();
+
+message_serialization_service::pointer_type
+make_client_read_input_registers_request(uint16_t starting_address,
+                                         uint16_t quantity_of_registers);
+message_unserialization_service::pointer_type
+make_client_read_input_registers_response();
 
 } // pdu
 } // modbus

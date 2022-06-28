@@ -17,21 +17,6 @@ bool operator==(const discrete_input& first, const discrete_input& second)
          first.bit == second.bit;
 }
 
-bool operator==(const discrete_inputs& first, const discrete_inputs& second)
-{
-  if (first.size() != second.size()) {
-    return false;
-  }
-
-  for (std::size_t i = 0; i < first.size(); ++i) {
-    if (!(first[i] == second[i])) {
-      return false;
-    }
-  }
-
-  return true;
-}
-
 void discrete_inputs::fill_address(uint16_t address)
 {
   for (std::size_t i = 0; i < size(); ++i) {
@@ -53,21 +38,6 @@ bool operator==(const coil& first, const coil& second)
          first.bit == second.bit;
 }
 
-bool operator==(const coils& first, const coils& second)
-{
-  if (first.size() != second.size()) {
-    return false;
-  }
-
-  for (std::size_t i = 0; i < first.size(); ++i) {
-    if (!(first[i] == second[i])) {
-      return false;
-    }
-  }
-
-  return true;
-}
-
 void coils::fill_address(uint16_t address)
 {
   for (std::size_t i = 0; i < size(); ++i) {
@@ -76,6 +46,48 @@ void coils::fill_address(uint16_t address)
 }
 
 void coils::remove_fill_data(uint16_t quantity)
+{
+  if (quantity < size()) {
+    resize(quantity);
+  }
+}
+
+// Input Registers
+bool operator==(const input_register& first, const input_register& second)
+{
+  return first.address == second.address &&
+         first.word == second.word;
+}
+
+void input_registers::fill_address(uint16_t address)
+{
+  for (std::size_t i = 0; i < size(); ++i) {
+    at(i).address = address + i;
+  }
+}
+
+void input_registers::remove_fill_data(uint16_t quantity)
+{
+  if (quantity < size()) {
+    resize(quantity);
+  }
+}
+
+// Holding Registers
+bool operator==(const holding_register& first, const holding_register& second)
+{
+  return first.address == second.address &&
+         first.word == second.word;
+}
+
+void holding_registers::fill_address(uint16_t address)
+{
+  for (std::size_t i = 0; i < size(); ++i) {
+    at(i).address = address + i;
+  }
+}
+
+void holding_registers::remove_fill_data(uint16_t quantity)
 {
   if (quantity < size()) {
     resize(quantity);

@@ -54,7 +54,6 @@ public:
 private:
   uint16_t starting_address_;
   uint16_t quantity_of_coils_;
-  buffer_type buffer_;
 };
 
 class client_read_coils_response
@@ -93,7 +92,6 @@ public:
 private:
   uint16_t starting_address_;
   uint16_t quantity_of_inputs_;
-  buffer_type buffer_;
 };
 
 class client_read_discrete_inputs_response
@@ -113,6 +111,82 @@ public:
 
 private:
   discrete_inputs status_;
+};
+
+// Read Holding Registers PDU
+class client_read_holding_registers_request
+  : public message_serialization_service
+{
+public:
+  client_read_holding_registers_request(uint16_t starting_address,
+                                        uint16_t quantity_of_registers)
+    : starting_address_(starting_address),
+      quantity_of_registers_(quantity_of_registers)
+  {}
+
+public:
+  virtual const buffer_type& serialize() override;
+
+private:
+  uint16_t starting_address_;
+  uint16_t quantity_of_registers_;
+};
+
+class client_read_holding_registers_response
+  : public message_unserialization_service
+{
+public:
+  client_read_holding_registers_response()
+    : message_unserialization_service()
+  {}
+
+public:
+  virtual bool unserialize(const buffer_type& buffer) override;
+
+public:
+  virtual mb_datas& datas() override
+  {return registers_;}
+
+private:
+  holding_registers registers_;
+};
+
+// Read Input Registers PDU
+class client_read_input_registers_request
+  : public message_serialization_service
+{
+public:
+  client_read_input_registers_request(uint16_t starting_address,
+                                      uint16_t quantity_of_registers)
+    : starting_address_(starting_address),
+      quantity_of_registers_(quantity_of_registers)
+  {}
+
+public:
+  virtual const buffer_type& serialize() override;
+
+private:
+  uint16_t starting_address_;
+  uint16_t quantity_of_registers_;
+};
+
+class client_read_input_registers_response
+  : public message_unserialization_service
+{
+public:
+  client_read_input_registers_response()
+    : message_unserialization_service()
+  {}
+
+public:
+  virtual bool unserialize(const buffer_type& buffer) override;
+
+public:
+  virtual mb_datas& datas() override
+  {return registers_;}
+
+private:
+  input_registers registers_;
 };
 
 } // pdu

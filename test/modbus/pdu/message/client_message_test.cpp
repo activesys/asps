@@ -118,5 +118,81 @@ TEST(client_read_discrete_inputs_response_test, unserialize_exception)
   EXPECT_EQ(r->excep_code(), pdu::exception_code_acknowledge);
 }
 
+// Read Holding Registers
+TEST(client_read_holding_registers_request_test, serialize)
+{
+  buffer_type msg1{0x03, 0x00, 0x55, 0x00, 0x86};
+  pdu::client_read_holding_registers_request r1(85, 134);
+  const buffer_type& b1 = r1.serialize();
+  EXPECT_EQ(b1, msg1);
+
+  buffer_type msg2{0x03, 0x1a, 0x28, 0x00, 0x7d};
+  pdu::client_read_holding_registers_request r2(6696, 125);
+  const buffer_type& b2 = r2.serialize();
+  EXPECT_EQ(b2, msg2);
+}
+
+TEST(client_read_holding_registers_response_test, unserialize)
+{
+  pdu::holding_registers registers{{0,26}, {0,72}, {0,-9}, {0,1234},
+                                {0,690}, {0,-13}, {0,0}, {0,2322}};
+  buffer_type msg{0x03, 0x10,
+                  0x00, 0x1a, 0x00, 0x48, 0xff, 0xf7, 0x04, 0xd2,
+                  0x02, 0xb2, 0xff, 0xf3, 0x00, 0x00, 0x09, 0x12};
+  pdu::message_unserialization_service::pointer_type r =
+    pdu::make_client_read_holding_registers_response();
+  EXPECT_TRUE(r->unserialize(msg));
+  const pdu::holding_registers& s = dynamic_cast<pdu::holding_registers&>(r->datas());
+  EXPECT_EQ(registers, s);
+}
+
+TEST(client_read_holding_registers_response_test, unserialize_exception)
+{
+  buffer_type msg{0x83, 0x04};
+  pdu::message_unserialization_service::pointer_type r =
+    pdu::make_client_read_holding_registers_response();
+  EXPECT_TRUE(r->unserialize(msg));
+  EXPECT_EQ(r->func_code(), pdu::function_code_read_holding_registers);
+  EXPECT_EQ(r->excep_code(), pdu::exception_code_server_device_failure);
+}
+
+// Read Input Registers
+TEST(client_read_input_registers_request_test, serialize)
+{
+  buffer_type msg1{0x04, 0x00, 0x55, 0x00, 0x86};
+  pdu::client_read_input_registers_request r1(85, 134);
+  const buffer_type& b1 = r1.serialize();
+  EXPECT_EQ(b1, msg1);
+
+  buffer_type msg2{0x04, 0x1a, 0x28, 0x00, 0x7d};
+  pdu::client_read_input_registers_request r2(6696, 125);
+  const buffer_type& b2 = r2.serialize();
+  EXPECT_EQ(b2, msg2);
+}
+
+TEST(client_read_input_registers_response_test, unserialize)
+{
+  pdu::input_registers registers{{0,26}, {0,72}, {0,-9}, {0,1234},
+                                {0,690}, {0,-13}, {0,0}, {0,2322}};
+  buffer_type msg{0x04, 0x10,
+                  0x00, 0x1a, 0x00, 0x48, 0xff, 0xf7, 0x04, 0xd2,
+                  0x02, 0xb2, 0xff, 0xf3, 0x00, 0x00, 0x09, 0x12};
+  pdu::message_unserialization_service::pointer_type r =
+    pdu::make_client_read_input_registers_response();
+  EXPECT_TRUE(r->unserialize(msg));
+  const pdu::input_registers& s = dynamic_cast<pdu::input_registers&>(r->datas());
+  EXPECT_EQ(registers, s);
+}
+
+TEST(client_read_input_registers_response_test, unserialize_exception)
+{
+  buffer_type msg{0x84, 0x04};
+  pdu::message_unserialization_service::pointer_type r =
+    pdu::make_client_read_input_registers_response();
+  EXPECT_TRUE(r->unserialize(msg));
+  EXPECT_EQ(r->func_code(), pdu::function_code_read_input_registers);
+  EXPECT_EQ(r->excep_code(), pdu::exception_code_server_device_failure);
+}
+
 } // modbus_test
 } // asps_test

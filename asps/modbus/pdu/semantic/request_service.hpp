@@ -39,6 +39,10 @@ request::pointer_type
 make_read_coils_request(uint16_t address, uint16_t quantity);
 request::pointer_type
 make_read_discrete_inputs_request(uint16_t address, uint16_t quantity);
+request::pointer_type
+make_read_holding_registers_request(uint16_t address, uint16_t quantity);
+request::pointer_type
+make_read_input_registers_request(uint16_t address, uint16_t quantity);
 
 } // pdu
 } // modbus

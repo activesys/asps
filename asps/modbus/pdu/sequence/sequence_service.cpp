@@ -55,6 +55,14 @@ make_active_sequence(request::pointer_type req)
   case function_code_read_discrete_inputs:
     return std::make_shared<client_read_discrete_inputs_sequence>(req);
     break;
+
+  case function_code_read_holding_registers:
+    return std::make_shared<client_read_holding_registers_sequence>(req);
+    break;
+
+  case function_code_read_input_registers:
+    return std::make_shared<client_read_input_registers_sequence>(req);
+    break;
   }
 
   return nullptr;

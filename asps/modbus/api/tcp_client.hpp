@@ -44,17 +44,25 @@ public:
                   uint16_t quantity_of_coils);
   void read_discrete_inputs(uint16_t starting_address,
                             uint16_t quantity_of_inputs);
+  void read_holding_registers(uint16_t starting_address,
+                              uint16_t quantity_of_registers);
+  void read_input_registers(uint16_t starting_address,
+                            uint16_t quantity_of_registers);
 
 public:
   virtual void on_connect() {}
   virtual void on_read_coils(const pdu::coils& status) {}
   virtual void on_read_discrete_inputs(const pdu::discrete_inputs& status) {}
+  virtual void on_read_holding_registers(const pdu::holding_registers& registers) {}
+  virtual void on_read_input_registers(const pdu::input_registers& registers) {}
 
 private:
   void connect_handler(tp::connection::pointer_type conn);
   void timeout_handler();
   void read_coils_handler(const pdu::coils& status);
   void read_discrete_inputs_handler(const pdu::discrete_inputs& status);
+  void read_holding_registers_handler(const pdu::holding_registers& registers);
+  void read_input_registers_handler(const pdu::input_registers& registers);
 
 private:
   tp::connector::pointer_type     connector_;

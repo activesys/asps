@@ -40,6 +40,36 @@ void client_read_discrete_inputs_sequence::sync_response()
   }
 }
 
+// Read Holding Registers Sequence
+void client_read_holding_registers_sequence::sync_response()
+{
+  if (response_->excep_code() == exception_code_success) {
+    const read_holding_registers_request* req =
+      dynamic_cast<const read_holding_registers_request*>(req_.get());
+
+    if (req) {
+      mb_datas& rsp_inputs = response_->datas();
+      rsp_inputs.fill_address(req->address());
+      rsp_inputs.remove_fill_data(req->quantity());
+    }
+  }
+}
+
+// Read Input Registers Sequence
+void client_read_input_registers_sequence::sync_response()
+{
+  if (response_->excep_code() == exception_code_success) {
+    const read_input_registers_request* req =
+      dynamic_cast<const read_input_registers_request*>(req_.get());
+
+    if (req) {
+      mb_datas& rsp_inputs = response_->datas();
+      rsp_inputs.fill_address(req->address());
+      rsp_inputs.remove_fill_data(req->quantity());
+    }
+  }
+}
+
 } // pdu
 } // modbus
 } // asps

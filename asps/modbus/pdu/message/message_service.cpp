@@ -41,6 +41,36 @@ make_client_read_discrete_inputs_response()
           std::make_shared<client_read_discrete_inputs_response>());
 }
 
+message_serialization_service::pointer_type
+make_client_read_holding_registers_request(uint16_t starting_address,
+                                           uint16_t quantity_of_registers)
+{
+  return std::make_shared<client_read_holding_registers_request>(starting_address,
+                                                                 quantity_of_registers);
+}
+
+message_unserialization_service::pointer_type
+make_client_read_holding_registers_response()
+{
+  return std::make_shared<client_exception>(
+          std::make_shared<client_read_holding_registers_response>());
+}
+
+message_serialization_service::pointer_type
+make_client_read_input_registers_request(uint16_t statring_address,
+                                         uint16_t quantity_of_registers)
+{
+  return std::make_shared<client_read_input_registers_request>(statring_address,
+                                                               quantity_of_registers);
+}
+
+message_unserialization_service::pointer_type
+make_client_read_input_registers_response()
+{
+  return std::make_shared<client_exception>(
+          std::make_shared<client_read_input_registers_response>());
+}
+
 } // pdu
 } // modbus
 } // asps

@@ -58,6 +58,54 @@ request::pointer_type read_discrete_inputs_request::split()
   return make_read_discrete_inputs_request(address, quantity);
 }
 
+// Read Holding Registers Request
+request::pointer_type make_read_holding_registers_request(uint16_t address,
+                                                          uint16_t quantity)
+{
+  return std::make_shared<read_holding_registers_request>(address, quantity);
+}
+
+bool read_holding_registers_request::valid()
+{
+  return quantity_of_registers_ > 0;
+}
+
+request::pointer_type read_holding_registers_request::split()
+{
+  uint16_t address = starting_address_;
+  uint16_t quantity = quantity_of_registers_ < max_quantity_of_registers ?
+                      quantity_of_registers_ : max_quantity_of_registers;
+
+  starting_address_ += quantity;
+  quantity_of_registers_ -= quantity;
+
+  return make_read_holding_registers_request(address, quantity);
+}
+
+// Read Input Registers Request
+request::pointer_type make_read_input_registers_request(uint16_t address,
+                                                        uint16_t quantity)
+{
+  return std::make_shared<read_input_registers_request>(address, quantity);
+}
+
+bool read_input_registers_request::valid()
+{
+  return quantity_of_registers_ > 0;
+}
+
+request::pointer_type read_input_registers_request::split()
+{
+  uint16_t address = starting_address_;
+  uint16_t quantity = quantity_of_registers_ < max_quantity_of_input_registers ?
+                      quantity_of_registers_ : max_quantity_of_input_registers;
+
+  starting_address_ += quantity;
+  quantity_of_registers_ -= quantity;
+
+  return make_read_input_registers_request(address, quantity);
+}
+
 } // pdu
 } // modbus
 } // asps

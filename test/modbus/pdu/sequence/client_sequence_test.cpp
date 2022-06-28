@@ -149,5 +149,143 @@ TEST(client_read_discrete_inputs_sequence_test, request_exception)
   EXPECT_TRUE(s.receive_response(expect_excep));
 }
 
+// Read Holding Registers sequence
+TEST(client_read_holding_registers_sequence_test, request_response)
+{
+  class active_observer_test
+    : public pdu::active_sequence_observer
+  {
+  public:
+    virtual void update_datas(const pdu::request::pointer_type& req,
+                              const pdu::mb_datas& datas) override
+    {
+      pdu::holding_registers expect_registers{{0,-88},{1,23752},{2,12},{3,0},
+                                         {4,-9987},{5,346},{6,-78},{7,23456},
+                                         {8,99},{9,1000}};
+      EXPECT_EQ(req->func_code(), pdu::function_code_read_holding_registers);
+      const pdu::holding_registers& registers = dynamic_cast<const pdu::holding_registers&>(datas);
+      EXPECT_EQ(registers, expect_registers);
+    }
+    virtual void update_exception(const pdu::request::pointer_type& req,
+                                  pdu::exception_code ec) override
+    {}
+  };
+
+  buffer_type expect_req{0x03, 0x00, 0x00, 0x00, 0x0a};
+  buffer_type expect_rsp{0x03, 0x14,
+                         0xff, 0xa8, 0x5c, 0xc8, 0x00, 0x0c, 0x00, 0x00,
+                         0xd8, 0xfd, 0x01, 0x5a, 0xff, 0xb2, 0x5b, 0xa0,
+                         0x00, 0x63, 0x03, 0xe8};
+  active_observer_test o;
+  pdu::client_read_holding_registers_sequence s(pdu::make_read_holding_registers_request(0, 10));
+  s.register_event_observer(&o);
+  EXPECT_EQ(expect_req, s.send_request());
+  EXPECT_TRUE(s.receive_response(expect_rsp));
+}
+
+TEST(client_read_holding_registers_sequence_test, request_exception)
+{
+  class active_observer_test
+    : public pdu::active_sequence_observer
+  {
+  public:
+    //virtual void update_event() override {}
+    virtual void update_datas(const pdu::request::pointer_type& req,
+                              const pdu::mb_datas& datas) override
+    {}
+    virtual void update_exception(const pdu::request::pointer_type& req,
+                                  pdu::exception_code ec) override
+    {
+      EXPECT_EQ(req->func_code(), pdu::function_code_read_holding_registers);
+      EXPECT_EQ(ec, pdu::exception_code_illegal_data_address);
+      const pdu::read_holding_registers_request* r =
+        dynamic_cast<const pdu::read_holding_registers_request*>(req.get());
+      if (r) {
+        EXPECT_EQ(r->address(), 0);
+        EXPECT_EQ(r->quantity(), 10);
+      } else {
+        EXPECT_TRUE(false);
+      }
+    }
+  };
+
+  buffer_type expect_req{0x03, 0x00, 0x00, 0x00, 0x0a};
+  buffer_type expect_excep{0x83, 0x02};
+  active_observer_test o;
+  pdu::client_read_holding_registers_sequence s(pdu::make_read_holding_registers_request(0, 10));
+  s.register_event_observer(&o);
+  EXPECT_EQ(expect_req, s.send_request());
+  EXPECT_TRUE(s.receive_response(expect_excep));
+}
+
+// Read Input Registers sequence
+TEST(client_read_input_registers_sequence_test, request_response)
+{
+  class active_observer_test
+    : public pdu::active_sequence_observer
+  {
+  public:
+    virtual void update_datas(const pdu::request::pointer_type& req,
+                              const pdu::mb_datas& datas) override
+    {
+      pdu::input_registers expect_registers{{0,-88},{1,23752},{2,12},{3,0},
+                                         {4,-9987},{5,346},{6,-78},{7,23456},
+                                         {8,99},{9,1000}};
+      EXPECT_EQ(req->func_code(), pdu::function_code_read_input_registers);
+      const pdu::input_registers& registers = dynamic_cast<const pdu::input_registers&>(datas);
+      EXPECT_EQ(registers, expect_registers);
+    }
+    virtual void update_exception(const pdu::request::pointer_type& req,
+                                  pdu::exception_code ec) override
+    {}
+  };
+
+  buffer_type expect_req{0x04, 0x00, 0x00, 0x00, 0x0a};
+  buffer_type expect_rsp{0x04, 0x14,
+                         0xff, 0xa8, 0x5c, 0xc8, 0x00, 0x0c, 0x00, 0x00,
+                         0xd8, 0xfd, 0x01, 0x5a, 0xff, 0xb2, 0x5b, 0xa0,
+                         0x00, 0x63, 0x03, 0xe8};
+  active_observer_test o;
+  pdu::client_read_input_registers_sequence s(pdu::make_read_input_registers_request(0, 10));
+  s.register_event_observer(&o);
+  EXPECT_EQ(expect_req, s.send_request());
+  EXPECT_TRUE(s.receive_response(expect_rsp));
+}
+
+TEST(client_read_input_registers_sequence_test, request_exception)
+{
+  class active_observer_test
+    : public pdu::active_sequence_observer
+  {
+  public:
+    //virtual void update_event() override {}
+    virtual void update_datas(const pdu::request::pointer_type& req,
+                              const pdu::mb_datas& datas) override
+    {}
+    virtual void update_exception(const pdu::request::pointer_type& req,
+                                  pdu::exception_code ec) override
+    {
+      EXPECT_EQ(req->func_code(), pdu::function_code_read_input_registers);
+      EXPECT_EQ(ec, pdu::exception_code_illegal_data_address);
+      const pdu::read_input_registers_request* r =
+        dynamic_cast<const pdu::read_input_registers_request*>(req.get());
+      if (r) {
+        EXPECT_EQ(r->address(), 0);
+        EXPECT_EQ(r->quantity(), 10);
+      } else {
+        EXPECT_TRUE(false);
+      }
+    }
+  };
+
+  buffer_type expect_req{0x04, 0x00, 0x00, 0x00, 0x0a};
+  buffer_type expect_excep{0x84, 0x02};
+  active_observer_test o;
+  pdu::client_read_input_registers_sequence s(pdu::make_read_input_registers_request(0, 10));
+  s.register_event_observer(&o);
+  EXPECT_EQ(expect_req, s.send_request());
+  EXPECT_TRUE(s.receive_response(expect_excep));
+}
+
 } // modbus_test
 } // asps_test

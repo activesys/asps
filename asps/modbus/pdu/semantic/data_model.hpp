@@ -40,7 +40,9 @@ struct discrete_input
   const bool bit;
 };
 
-struct discrete_inputs : public mb_datas, public std::vector<discrete_input>
+struct discrete_inputs
+  : public mb_datas,
+    public std::vector<discrete_input>
 {
   discrete_inputs() = default;
   discrete_inputs(std::initializer_list<discrete_input> il)
@@ -53,7 +55,6 @@ struct discrete_inputs : public mb_datas, public std::vector<discrete_input>
 };
 
 bool operator==(const discrete_input& first, const discrete_input& second);
-bool operator==(const discrete_inputs& first, const discrete_inputs& second);
 
 // Coil
 struct coil
@@ -71,7 +72,9 @@ struct coil
   bool bit;
 };
 
-struct coils : public mb_datas, public std::vector<coil>
+struct coils
+  : public mb_datas,
+    public std::vector<coil>
 {
   coils() = default;
   coils(std::initializer_list<coil> il)
@@ -84,21 +87,70 @@ struct coils : public mb_datas, public std::vector<coil>
 };
 
 bool operator==(const coil& first, const coil& second);
-bool operator==(const coils& first, const coils& second);
 
 // Input Register
 struct input_register
 {
+  input_register()
+    : address(0),
+      word(0)
+  {}
+  input_register(uint16_t addr, int16_t value)
+    : address(addr),
+      word(value)
+  {}
+
   uint16_t address;
   const int16_t word;
 };
 
+struct input_registers
+  : public mb_datas,
+    public std::vector<input_register>
+{
+  input_registers() = default;
+  input_registers(std::initializer_list<input_register> il)
+    : mb_datas(),
+      std::vector<input_register>(il)
+  {}
+
+  virtual void fill_address(uint16_t address) override;
+  virtual void remove_fill_data(uint16_t quantity) override;
+};
+
+bool operator==(const input_register& first, const input_register& second);
+
 // Holding Register
 struct holding_register
 {
+  holding_register()
+    : address(0),
+      word(0)
+  {}
+  holding_register(uint16_t addr, int16_t value)
+    : address(addr),
+      word(value)
+  {}
+
   uint16_t address;
   int16_t word;
 };
+
+struct holding_registers :
+  public mb_datas,
+  public std::vector<holding_register>
+{
+  holding_registers() = default;
+  holding_registers(std::initializer_list<holding_register> il)
+    : mb_datas(),
+      std::vector<holding_register>(il)
+  {}
+
+  virtual void fill_address(uint16_t address) override;
+  virtual void remove_fill_data(uint16_t quantity) override;
+};
+
+bool operator==(const holding_register& first, const holding_register& second);
 
 } // pdu
 } // modbus
